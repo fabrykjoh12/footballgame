@@ -36,8 +36,15 @@ const FEATURES = [
 ];
 
 export function HomePage() {
-  const { createRoom, joinRoom, playDemo, connecting, error, multiplayerAvailable } =
-    useGame();
+  const {
+    createRoom,
+    joinRoom,
+    playDemo,
+    connecting,
+    error,
+    multiplayerAvailable,
+    multiplayerProvider,
+  } = useGame();
   const [name, setName] = useLocalStorage('bk_name', '');
   const [showJoin, setShowJoin] = useState(false);
   const [code, setCode] = useState('');
@@ -171,8 +178,10 @@ export function HomePage() {
 
         <p className="mt-4 text-center text-[11px] text-white/35">
           {multiplayerAvailable
-            ? 'Real-time multiplayer is enabled (Supabase).'
-            : 'Demo mode active — Create/Join play vs a CPU. Add Supabase keys for live 1v1.'}
+            ? `Real-time multiplayer is enabled (${
+                multiplayerProvider === 'ably' ? 'Ably' : 'Supabase'
+              }).`
+            : 'Demo mode active — Create/Join play vs a CPU. Add Ably or Supabase keys for live 1v1.'}
         </p>
       </Card>
 

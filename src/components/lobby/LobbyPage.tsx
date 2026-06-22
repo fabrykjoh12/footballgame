@@ -43,8 +43,8 @@ export function LobbyPage() {
         <Button variant="ghost" size="sm" onClick={leaveRoom}>
           <IconBack className="h-4 w-4" /> Leave
         </Button>
-        <Badge tone={serviceMode === 'supabase' ? 'pitch' : 'muted'}>
-          {serviceMode === 'supabase' ? 'Live multiplayer' : 'Demo vs CPU'}
+        <Badge tone={serviceMode === 'remote' ? 'pitch' : 'muted'}>
+          {serviceMode === 'remote' ? 'Live multiplayer' : 'Demo vs CPU'}
         </Badge>
       </div>
 
@@ -67,7 +67,7 @@ export function LobbyPage() {
           </Button>
         </div>
         <p className="mt-3 text-xs text-white/40">
-          {serviceMode === 'supabase'
+          {serviceMode === 'remote'
             ? 'Share this code with a friend to join your match.'
             : 'A CPU opponent will join shortly so you can play right now.'}
         </p>

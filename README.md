@@ -17,7 +17,7 @@ Think **Kahoot × Football Wordle × FIFA trivia × a live match scoreboard.**
 
 ## ✨ Features
 
-- **Real-time 1v1 duels** via Supabase Realtime — or a fully offline **demo
+- **Real-time 1v1 duels** via Ably or Supabase — or a fully offline **demo
   mode vs a CPU** when no backend is configured.
 - **Four mini-games:** Who Am I? (timed clue reveals), Career Path, Higher or
   Lower, and Club/Country trivia.
@@ -70,16 +70,25 @@ brutal), and it "thinks" for a realistic, varied amount of time.
 
 ---
 
-## 🌐 Enable real multiplayer (Supabase)
+## 🌐 Enable real multiplayer
 
-1. Create a free project at [supabase.com](https://supabase.com).
-2. Copy `.env.example` → `.env` and fill in `VITE_SUPABASE_URL` and
-   `VITE_SUPABASE_ANON_KEY`.
-3. Restart the dev server.
+Configure **one** provider (if both are set, Ably wins). The realtime SDK is
+code-split, so it's only downloaded when a player actually starts an online
+match — the demo bundle stays lean.
 
-**No SQL is required** — live sync uses Supabase Realtime _broadcast_. Optional
-persistence tables (rooms / players / answers), RLS policies, and the full
-architecture are documented in **[SUPABASE_SETUP.md](./SUPABASE_SETUP.md)**.
+**Option A — Ably (recommended: no database, no server):**
+1. Get a free key at [ably.com](https://ably.com).
+2. Copy `.env.example` → `.env`, set `VITE_ABLY_API_KEY`, restart.
+3. Full guide + security notes: **[ABLY_SETUP.md](./ABLY_SETUP.md)**.
+
+**Option B — Supabase (reuses any existing project, no SQL needed):**
+1. Copy `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` into `.env`, restart.
+2. Live sync uses Realtime _broadcast_ (no tables required). Optional
+   persistence schema + RLS: **[SUPABASE_SETUP.md](./SUPABASE_SETUP.md)**.
+
+Both backends are host-authoritative (the host runs the match engine and
+broadcasts snapshots) and implement the same `GameService` interface, so the
+UI is identical either way.
 
 ---
 
@@ -117,13 +126,16 @@ src/
     roomCode.ts               # BK7Q2-style codes
     questionPicker.ts         # 3/3/2/2 distribution + difficulty filter + shuffle
     matchModes.ts             # Casual / Serious / Nightmare configs
-    supabaseClient.ts         # env detection + lazy client
+    realtimeConfig.ts         # SDK-free env detection (keeps SDKs out of main bundle)
+    ablyClient.ts             # Ably connection (lazy chunk)
+    supabaseClient.ts         # Supabase client (lazy chunk)
     teamName.ts · playerTitle.ts · shareResult.ts · id.ts
   services/
-    gameService.ts            # factory (local vs supabase)
+    gameService.ts            # factory: local vs lazily-loaded ably/supabase
     matchEngine.ts            # authoritative state machine (shared)
     localGameService.ts       # offline / bot opponent
-    supabaseGameService.ts    # real-time multiplayer (broadcast + persistence)
+    ablyGameService.ts        # real-time multiplayer (Ably)
+    supabaseGameService.ts    # real-time multiplayer (Supabase broadcast)
     botPlayer.ts              # CPU answer behaviour
   context/GameProvider.tsx    # React state + actions over the service
   hooks/                      # useCountdown, useLocalStorage

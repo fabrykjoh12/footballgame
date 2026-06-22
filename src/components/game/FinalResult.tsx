@@ -112,7 +112,7 @@ export function FinalResult() {
             <IconBack className="h-4 w-4" /> Home
           </Button>
         </div>
-        {!isHost && serviceMode === 'supabase' && (
+        {!isHost && serviceMode === 'remote' && (
           <p className="text-center text-xs text-white/40">
             Waiting for the host to start a rematch…
           </p>

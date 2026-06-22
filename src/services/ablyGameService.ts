@@ -1,19 +1,17 @@
 /**
- * SupabaseGameService — real-time 1v1 across devices.
+ * AblyGameService — real-time 1v1 across devices, powered by Ably Realtime.
  *
- * Architecture: the HOST is authoritative. The host owns a MatchEngine and
- * broadcasts a full Room snapshot on every change over a Supabase Realtime
+ * Same design as the Supabase service: the HOST is authoritative. It owns a
+ * MatchEngine and publishes a full Room snapshot on every change to an Ably
  * channel (`bk-room-<CODE>`). Guests never run the engine — they render the
- * latest snapshot and send their actions (join / answer) back to the host.
+ * latest snapshot and publish their actions (join / answer) back to the host.
  *
- * Why broadcast (not Postgres CDC)? It needs zero SQL to work the moment the
- * env vars are set, and it keeps the authoritative logic identical to local
- * mode (same MatchEngine). We still best-effort persist rooms/players/answers
- * to the documented tables (see SUPABASE_SETUP.md) when they exist, so you
- * get history without the live loop depending on it.
+ * Ably needs no database and no server to deploy, so there's nothing to
+ * persist here — the channel IS the transport. Presence is used to detect a
+ * player disconnecting.
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
+import * as Ably from 'ably';
 import type {
   GameEvent,
   GameService,
@@ -27,10 +25,10 @@ import { defaultSettings } from '../lib/matchModes';
 import { generateRoomCode, normalizeRoomCode } from '../lib/roomCode';
 import { pickMatchQuestions } from '../lib/questionPicker';
 import { uid } from '../lib/id';
-import { getSupabaseClient } from '../lib/supabaseClient';
+import { createAblyRealtime } from '../lib/ablyClient';
 import { MatchEngine } from './matchEngine';
 
-type BroadcastEvent =
+type ChannelEvent =
   | 'snapshot'
   | 'join'
   | 'answer'
@@ -38,7 +36,7 @@ type BroadcastEvent =
   | 'leave'
   | 'room_full';
 
-const JOIN_TIMEOUT_MS = 5000;
+const JOIN_TIMEOUT_MS = 6000;
 const MAX_PLAYERS = 2;
 
 function makePlayer(name: string, isHost: boolean): Player {
@@ -56,11 +54,11 @@ function makePlayer(name: string, isHost: boolean): Player {
   };
 }
 
-export class SupabaseGameService implements GameService {
+export class AblyGameService implements GameService {
   readonly mode: ServiceMode = 'remote';
 
-  private supabase: SupabaseClient;
-  private channel: ReturnType<SupabaseClient['channel']> | null = null;
+  private realtime: Ably.Realtime | null = null;
+  private channel: Ably.RealtimeChannel | null = null;
   private engine: MatchEngine | null = null;
 
   private isHost = false;
@@ -71,14 +69,6 @@ export class SupabaseGameService implements GameService {
 
   private roomListeners = new Set<(room: Room | null) => void>();
   private eventListeners = new Set<(event: GameEvent) => void>();
-
-  constructor() {
-    const client = getSupabaseClient();
-    if (!client) {
-      throw new Error('Supabase is not configured');
-    }
-    this.supabase = client;
-  }
 
   getLocalPlayerId(): string {
     return this.localPlayerId;
@@ -113,7 +103,6 @@ export class SupabaseGameService implements GameService {
     });
 
     await this.openChannel(host.id);
-    void this.persistRoom(room);
     this.emitRoom(room);
     return room;
   }
@@ -127,11 +116,11 @@ export class SupabaseGameService implements GameService {
     await this.openChannel(guest.id);
 
     // Announce ourselves and ask the host for the current state.
-    this.send('join', { player: guest });
-    this.send('request_state', { playerId: guest.id });
+    void this.send('join', { player: guest });
+    void this.send('request_state', { playerId: guest.id });
 
-    // Wait until the host replies with a snapshot that includes us.
-    const room = await new Promise<Room>((resolve, reject) => {
+    // Resolve once the host replies with a snapshot that includes us.
+    return new Promise<Room>((resolve, reject) => {
       const timeout = setTimeout(() => {
         cleanup();
         reject(
@@ -153,16 +142,18 @@ export class SupabaseGameService implements GameService {
         unsub();
       };
     });
-
-    return room;
   }
 
   async leaveRoom(): Promise<void> {
-    this.send('leave', { playerId: this.localPlayerId });
-    if (this.channel) {
-      await this.supabase.removeChannel(this.channel);
-      this.channel = null;
+    try {
+      void this.send('leave', { playerId: this.localPlayerId });
+      await this.channel?.presence.leave();
+    } catch {
+      /* best effort */
     }
+    this.realtime?.close();
+    this.realtime = null;
+    this.channel = null;
     this.engine?.dispose();
     this.engine = null;
     this.snapshot = null;
@@ -186,7 +177,7 @@ export class SupabaseGameService implements GameService {
     if (this.isHost) {
       this.engine?.recordAnswer(this.localPlayerId, input);
     } else {
-      this.send('answer', { playerId: this.localPlayerId, input });
+      void this.send('answer', { playerId: this.localPlayerId, input });
     }
   }
 
@@ -213,66 +204,56 @@ export class SupabaseGameService implements GameService {
 
   /* ----------------------------- channel ----------------------------- */
 
-  private async openChannel(presenceKey: string): Promise<void> {
-    const channel = this.supabase.channel(`bk-room-${this.roomCode}`, {
-      config: {
-        broadcast: { self: false },
-        presence: { key: presenceKey },
-      },
-    });
+  private async openChannel(clientId: string): Promise<void> {
+    const realtime = createAblyRealtime(clientId);
+    if (!realtime) throw new Error('Ably is not configured');
+    this.realtime = realtime;
 
-    channel.on('broadcast', { event: 'snapshot' }, ({ payload }) => {
-      if (!this.isHost) this.applySnapshot(payload as Room);
+    const channel = realtime.channels.get(`bk-room-${this.roomCode}`);
+    this.channel = channel;
+
+    channel.subscribe('snapshot', (msg) => {
+      if (!this.isHost) this.applySnapshot(msg.data as Room);
     });
 
     // Host-only message handlers.
-    channel.on('broadcast', { event: 'join' }, ({ payload }) => {
-      if (this.isHost) this.hostOnJoin((payload as { player: Player }).player);
+    channel.subscribe('join', (msg) => {
+      if (this.isHost) this.hostOnJoin((msg.data as { player: Player }).player);
     });
-    channel.on('broadcast', { event: 'answer' }, ({ payload }) => {
+    channel.subscribe('answer', (msg) => {
       if (this.isHost) {
-        const p = payload as { playerId: string; input: SubmitAnswerInput };
+        const p = msg.data as { playerId: string; input: SubmitAnswerInput };
         this.engine?.recordAnswer(p.playerId, p.input);
       }
     });
-    channel.on('broadcast', { event: 'request_state' }, () => {
+    channel.subscribe('request_state', () => {
       if (this.isHost && this.engine) {
-        this.send('snapshot', this.engine.getRoom());
+        void this.send('snapshot', this.engine.getRoom());
       }
     });
-    channel.on('broadcast', { event: 'leave' }, ({ payload }) => {
-      if (this.isHost) this.hostOnLeave((payload as { playerId: string }).playerId);
+    channel.subscribe('leave', (msg) => {
+      if (this.isHost) {
+        this.hostMarkDisconnected((msg.data as { playerId: string }).playerId);
+      }
     });
 
-    // Presence: mark players connected/disconnected (host authority).
-    channel.on('presence', { event: 'leave' }, ({ leftPresences }) => {
-      if (!this.isHost || !this.engine) return;
-      const room = this.engine.getRoom();
-      const leftKeys = new Set(
-        (leftPresences as Array<{ presence_ref?: string; key?: string }>).map(
-          (p) => p.key,
-        ),
-      );
-      const players = room.players.map((pl) =>
-        leftKeys.has(pl.id) ? { ...pl, connected: false } : pl,
-      );
-      this.engine.setRoom({ ...room, players });
+    // Presence: detect a player dropping (host authority).
+    channel.presence.subscribe('leave', (member) => {
+      if (this.isHost && member.clientId) {
+        this.hostMarkDisconnected(member.clientId);
+      }
     });
 
-    await new Promise<void>((resolve) => {
-      channel.subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          channel.track({ key: presenceKey });
-          resolve();
-        }
-      });
-    });
-
-    this.channel = channel;
+    await channel.attach();
+    await channel.presence.enter();
   }
 
-  private send(event: BroadcastEvent, payload: unknown): void {
-    this.channel?.send({ type: 'broadcast', event, payload });
+  private async send(event: ChannelEvent, payload: unknown): Promise<void> {
+    try {
+      await this.channel?.publish(event, payload);
+    } catch {
+      /* transient publish error; snapshots are idempotent */
+    }
   }
 
   /* ----------------------------- host logic ----------------------------- */
@@ -282,7 +263,7 @@ export class SupabaseGameService implements GameService {
     const room = this.engine.getRoom();
     if (room.players.some((p) => p.id === player.id)) return;
     if (room.players.length >= MAX_PLAYERS) {
-      this.send('room_full', { roomCode: this.roomCode });
+      void this.send('room_full', { roomCode: this.roomCode });
       return;
     }
     const joined: Player = { ...player, isHost: false, connected: true };
@@ -291,23 +272,22 @@ export class SupabaseGameService implements GameService {
       players: [...room.players, joined],
       scores: { ...room.scores, [joined.id]: 0 },
     });
-    void this.persistPlayer(joined);
   }
 
-  private hostOnLeave(playerId: string): void {
+  private hostMarkDisconnected(playerId: string): void {
     if (!this.engine) return;
     const room = this.engine.getRoom();
+    if (!room.players.some((p) => p.id === playerId && p.connected)) return;
     const players = room.players.map((p) =>
       p.id === playerId ? { ...p, connected: false } : p,
     );
     this.engine.setRoom({ ...room, players });
   }
 
-  /** Host: on every engine change, broadcast the snapshot + persist. */
+  /** Host: on every engine change, broadcast the snapshot. */
   private hostHandleRoom(room: Room): void {
     this.emitRoom(room);
-    this.send('snapshot', room);
-    void this.persistRoomUpdate(room);
+    void this.send('snapshot', room);
   }
 
   /* ----------------------------- guest logic ----------------------------- */
@@ -325,52 +305,5 @@ export class SupabaseGameService implements GameService {
 
   private emitEvent(event: GameEvent): void {
     for (const cb of this.eventListeners) cb(event);
-  }
-
-  /* ------------------- best-effort persistence (optional) ------------------- */
-  /* These mirror the documented tables. They never block gameplay: if the    */
-  /* tables don't exist or RLS rejects, we swallow the error.                  */
-
-  private async persistRoom(room: Room): Promise<void> {
-    try {
-      await this.supabase.from('rooms').insert({
-        room_code: room.roomCode,
-        host_id: room.hostId,
-        status: room.status,
-        settings_json: room.settings,
-        selected_questions_json: room.selectedQuestions,
-        current_question_index: room.currentQuestionIndex,
-      });
-    } catch {
-      /* tables optional */
-    }
-  }
-
-  private async persistRoomUpdate(room: Room): Promise<void> {
-    try {
-      await this.supabase
-        .from('rooms')
-        .update({
-          status: room.status,
-          selected_questions_json: room.selectedQuestions,
-          current_question_index: room.currentQuestionIndex,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('room_code', room.roomCode);
-    } catch {
-      /* tables optional */
-    }
-  }
-
-  private async persistPlayer(player: Player): Promise<void> {
-    try {
-      await this.supabase.from('room_players').insert({
-        room_code: this.roomCode,
-        player_name: player.name,
-        is_host: player.isHost,
-      });
-    } catch {
-      /* tables optional */
-    }
   }
 }

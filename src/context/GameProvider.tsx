@@ -18,8 +18,10 @@ import type {
 import {
   createGameService,
   multiplayerAvailable,
+  multiplayerProvider,
   type GameIntent,
   type GameService,
+  type MultiplayerProvider,
 } from '../services/gameService';
 
 interface GameContextValue {
@@ -27,6 +29,7 @@ interface GameContextValue {
   localPlayerId: string;
   serviceMode: ServiceMode | null;
   multiplayerAvailable: boolean;
+  multiplayerProvider: MultiplayerProvider;
   connecting: boolean;
   error: string | null;
   events: GameEvent[];
@@ -84,7 +87,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setRoom(null);
       setConnecting(true);
 
-      const service = createGameService(intent);
+      const service = await createGameService(intent);
       serviceRef.current = service;
       setServiceMode(service.mode);
 
@@ -182,6 +185,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     localPlayerId,
     serviceMode,
     multiplayerAvailable,
+    multiplayerProvider,
     connecting,
     error,
     events,

@@ -222,7 +222,8 @@ export interface GameEvent {
 /* Service layer contract                                              */
 /* ------------------------------------------------------------------ */
 
-export type ServiceMode = 'local' | 'supabase';
+/** 'local' = offline vs a bot; 'remote' = networked vs a real player. */
+export type ServiceMode = 'local' | 'remote';
 
 export interface SubmitAnswerInput {
   selectedAnswer: string | null;
