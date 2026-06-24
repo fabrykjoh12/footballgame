@@ -1,11 +1,13 @@
 import { useEffect, type ReactNode } from 'react';
 import { StadiumBackground } from './StadiumBackground';
+import { useGame } from '../../context/GameProvider';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { setSoundEnabled, play } from '../../lib/sound';
 import { IconSound, IconMute } from '../ui/icons';
 
 /** App frame: stadium backdrop, brand header, and a centered content column. */
 export function AppShell({ children }: { children: ReactNode }) {
+  const { connectionState } = useGame();
   const [soundOn, setSoundOn] = useLocalStorage('bk_sound', true);
 
   // Keep the sound engine's flag in sync with the persisted toggle.
@@ -48,6 +50,21 @@ export function AppShell({ children }: { children: ReactNode }) {
           {soundOn ? <IconSound /> : <IconMute />}
         </button>
       </header>
+
+      {connectionState !== 'connected' && (
+        <div
+          role="status"
+          className={`z-10 mx-4 mb-2 rounded-lg border px-3 py-2 text-center text-sm sm:mx-6 ${
+            connectionState === 'failed'
+              ? 'border-danger/30 bg-danger/10 text-danger'
+              : 'border-gold/30 bg-gold/10 text-gold animate-pulse'
+          }`}
+        >
+          {connectionState === 'failed'
+            ? 'Connection lost. Check your network and rejoin.'
+            : 'Reconnecting…'}
+        </div>
+      )}
 
       <main className="z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-10 sm:px-6">
         {children}

@@ -270,4 +270,9 @@ export interface GameService {
   onRoomUpdate(cb: (room: Room | null) => void): () => void;
   /** Subscribe to transient football events (GOAL! etc.). */
   onEvent(cb: (event: GameEvent) => void): () => void;
+  /** Subscribe to realtime connection health (remote backends only). */
+  onConnectionState?(cb: (state: ConnectionState) => void): () => void;
 }
+
+/** Health of the realtime transport, surfaced to the UI as a banner. */
+export type ConnectionState = 'connected' | 'reconnecting' | 'failed';

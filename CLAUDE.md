@@ -105,8 +105,10 @@ Env vars (build-time, `VITE_` prefixed; see `.env.example`):
 - `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` — enables Supabase multiplayer.
 
 No keys → demo mode (vs CPU) everywhere. Setup guides: `ABLY_SETUP.md`,
-`SUPABASE_SETUP.md`. **Status:** demo + local loop are verified; the live
-multiplayer paths are built but not yet tested against real keys/two devices.
+`SUPABASE_SETUP.md`. **Status:** demo + local loop verified; **live Ably 1v1
+verified** across two devices, with disconnect/reconnect handling, lobby-slot
+release on leave, and guest-side countdown rebasing to neutralise clock skew
+(see `ablyGameService.ts`). The Supabase path is built but not yet device-tested.
 
 ## Deployment (GitHub Pages, currently manual)
 

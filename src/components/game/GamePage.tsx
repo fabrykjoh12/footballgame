@@ -12,7 +12,8 @@ import { ResultReveal } from './ResultReveal';
 import { GoalAnimation } from './GoalAnimation';
 
 export function GamePage() {
-  const { room, localPlayerId, isHost, submitAnswer, nextQuestion } = useGame();
+  const { room, localPlayerId, isHost, opponent, submitAnswer, nextQuestion } =
+    useGame();
 
   const [picked, setPicked] = useState<string | null>(null);
   const [locked, setLocked] = useState(false);
@@ -82,6 +83,15 @@ export function GamePage() {
         questionNumber={Math.min(room.currentQuestionIndex + 1, total)}
         totalQuestions={total}
       />
+
+      {opponent && !opponent.connected && (
+        <div
+          role="status"
+          className="rounded-lg border border-gold/30 bg-gold/10 px-3 py-2 text-center text-sm text-gold"
+        >
+          {opponent.name} disconnected — they may rejoin, or you can finish out the match.
+        </div>
+      )}
 
       {status === 'starting' && <Kickoff players={room.players} mode={room.settings.mode} />}
 

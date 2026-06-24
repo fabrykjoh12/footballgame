@@ -13,6 +13,7 @@
 
 import * as Ably from 'ably';
 import type {
+  ConnectionState,
   GameEvent,
   GameService,
   MatchSettings,
@@ -26,6 +27,7 @@ import { generateRoomCode, normalizeRoomCode } from '../lib/roomCode';
 import { pickMatchQuestions } from '../lib/questionPicker';
 import { uid } from '../lib/id';
 import { createAblyRealtime } from '../lib/ablyClient';
+import { mapRealtimeState } from './connectionMapping';
 import { MatchEngine } from './matchEngine';
 
 type ChannelEvent =
@@ -69,6 +71,12 @@ export class AblyGameService implements GameService {
 
   private roomListeners = new Set<(room: Room | null) => void>();
   private eventListeners = new Set<(event: GameEvent) => void>();
+  private connectionListeners = new Set<(state: ConnectionState) => void>();
+  private connectionState: ConnectionState = 'connected';
+
+  /** Guest-side: pin a question's countdown to local receipt time (anti-skew). */
+  private rebasedQuestionKey: string | null = null;
+  private rebasedStartedAt: number | null = null;
 
   getLocalPlayerId(): string {
     return this.localPlayerId;
@@ -202,12 +210,20 @@ export class AblyGameService implements GameService {
     return () => this.eventListeners.delete(cb);
   }
 
+  onConnectionState(cb: (state: ConnectionState) => void): () => void {
+    this.connectionListeners.add(cb);
+    cb(this.connectionState);
+    return () => this.connectionListeners.delete(cb);
+  }
+
   /* ----------------------------- channel ----------------------------- */
 
   private async openChannel(clientId: string): Promise<void> {
     const realtime = createAblyRealtime(clientId);
     if (!realtime) throw new Error('Ably is not configured');
     this.realtime = realtime;
+
+    realtime.connection.on((change) => this.handleConnectionChange(change.current));
 
     const channel = realtime.channels.get(`bk-room-${this.roomCode}`);
     this.channel = channel;
@@ -237,10 +253,15 @@ export class AblyGameService implements GameService {
       }
     });
 
-    // Presence: detect a player dropping (host authority).
+    // Presence: detect a player dropping / rejoining (host authority).
     channel.presence.subscribe('leave', (member) => {
       if (this.isHost && member.clientId) {
         this.hostMarkDisconnected(member.clientId);
+      }
+    });
+    channel.presence.subscribe('enter', (member) => {
+      if (this.isHost && member.clientId) {
+        this.hostMarkConnected(member.clientId);
       }
     });
 
@@ -283,11 +304,42 @@ export class AblyGameService implements GameService {
   private hostMarkDisconnected(playerId: string): void {
     if (!this.engine) return;
     const room = this.engine.getRoom();
+    if (playerId === room.hostId) return; // never drop the host
+    if (!room.players.some((p) => p.id === playerId)) return;
+
+    if (room.status === 'lobby') {
+      // Before kickoff: free the slot so a fresh opponent can join.
+      const scores = { ...room.scores };
+      delete scores[playerId];
+      this.engine.setRoom({
+        ...room,
+        players: room.players.filter((p) => p.id !== playerId),
+        scores,
+      });
+      return;
+    }
+
+    // Mid-match: keep the player (and their score) but flag them disconnected.
     if (!room.players.some((p) => p.id === playerId && p.connected)) return;
-    const players = room.players.map((p) =>
-      p.id === playerId ? { ...p, connected: false } : p,
-    );
-    this.engine.setRoom({ ...room, players });
+    this.engine.setRoom({
+      ...room,
+      players: room.players.map((p) =>
+        p.id === playerId ? { ...p, connected: false } : p,
+      ),
+    });
+  }
+
+  private hostMarkConnected(playerId: string): void {
+    if (!this.engine) return;
+    const room = this.engine.getRoom();
+    const player = room.players.find((p) => p.id === playerId);
+    if (!player || player.connected) return;
+    this.engine.setRoom({
+      ...room,
+      players: room.players.map((p) =>
+        p.id === playerId ? { ...p, connected: true } : p,
+      ),
+    });
   }
 
   /** Host: on every engine change, broadcast the snapshot. */
@@ -299,8 +351,30 @@ export class AblyGameService implements GameService {
   /* ----------------------------- guest logic ----------------------------- */
 
   private applySnapshot(room: Room): void {
-    this.snapshot = room;
-    this.emitRoom(room);
+    this.snapshot = this.rebaseQuestionClock(room);
+    this.emitRoom(this.snapshot);
+  }
+
+  /**
+   * Neutralise host/guest clock skew: pin each question's countdown to the
+   * instant this guest received it, and reuse that start for later updates of
+   * the same question so the timer doesn't jump when answers arrive.
+   */
+  private rebaseQuestionClock(room: Room): Room {
+    if (room.status !== 'in_question' || room.questionStartedAt == null) {
+      this.rebasedQuestionKey = null;
+      this.rebasedStartedAt = null;
+      return room;
+    }
+    const key = `${room.currentQuestionIndex}:${room.questionStartedAt}`;
+    if (key !== this.rebasedQuestionKey) {
+      this.rebasedQuestionKey = key;
+      this.rebasedStartedAt = Date.now();
+    }
+    return {
+      ...room,
+      questionStartedAt: this.rebasedStartedAt ?? room.questionStartedAt,
+    };
   }
 
   /* ----------------------------- emit ----------------------------- */
@@ -311,5 +385,23 @@ export class AblyGameService implements GameService {
 
   private emitEvent(event: GameEvent): void {
     for (const cb of this.eventListeners) cb(event);
+  }
+
+  private emitConnectionState(state: ConnectionState): void {
+    for (const cb of this.connectionListeners) cb(state);
+  }
+
+  private handleConnectionChange(state: Ably.ConnectionState): void {
+    const next = mapRealtimeState(state);
+    if (!next) return; // ignore initialized / closing / closed (intentional)
+
+    const wasDown = this.connectionState !== 'connected';
+    this.connectionState = next;
+    this.emitConnectionState(next);
+
+    // After recovering, a guest re-requests the authoritative state to resync.
+    if (next === 'connected' && wasDown && !this.isHost) {
+      void this.send('request_state', { playerId: this.localPlayerId });
+    }
   }
 }

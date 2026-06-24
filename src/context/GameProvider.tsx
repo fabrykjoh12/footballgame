@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import type {
+  ConnectionState,
   GameEvent,
   MatchSettings,
   Player,
@@ -32,6 +33,7 @@ interface GameContextValue {
   multiplayerAvailable: boolean;
   multiplayerProvider: MultiplayerProvider;
   connecting: boolean;
+  connectionState: ConnectionState;
   error: string | null;
   events: GameEvent[];
 
@@ -60,6 +62,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [localPlayerId, setLocalPlayerId] = useState('');
   const [serviceMode, setServiceMode] = useState<ServiceMode | null>(null);
   const [connecting, setConnecting] = useState(false);
+  const [connectionState, setConnectionState] = useState<ConnectionState>('connected');
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<GameEvent[]>([]);
 
@@ -87,6 +90,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setError(null);
       setEvents([]);
       setRoom(null);
+      setConnectionState('connected');
       setConnecting(true);
 
       const service = await createGameService(intent);
@@ -104,6 +108,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
       unsubsRef.current.push(
         service.onEvent((e) => setEvents((prev) => [...prev, e].slice(-6))),
       );
+      if (service.onConnectionState) {
+        unsubsRef.current.push(service.onConnectionState(setConnectionState));
+      }
 
       try {
         if (intent === 'join') {
@@ -174,6 +181,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setLocalPlayerId('');
     setEvents([]);
     setError(null);
+    setConnectionState('connected');
   }, [teardown]);
 
   const clearEvent = useCallback((nonce: number) => {
@@ -198,6 +206,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     multiplayerAvailable,
     multiplayerProvider,
     connecting,
+    connectionState,
     error,
     events,
     localPlayer,
