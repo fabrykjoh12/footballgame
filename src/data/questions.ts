@@ -31,7 +31,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'easy',
     category: 'players',
     clues: [
-      'I am a forward famous for dribbling and playmaking.',
+      'I am an Argentine forward famous for mesmerising dribbling and playmaking.',
       'I spent most of my club career at Barcelona before moving to PSG and then MLS.',
       'I am Argentine and won the World Cup in 2022.',
     ],
@@ -45,7 +45,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'easy',
     category: 'players',
     clues: [
-      'I am a prolific goalscoring forward known for my athleticism.',
+      'I am a Portuguese forward known for my athleticism and relentless goalscoring.',
       'I have played for Sporting CP, Manchester United, Real Madrid, Juventus and Al-Nassr.',
       'I am Portuguese and the all-time top scorer in the Champions League.',
     ],
@@ -59,7 +59,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'easy',
     category: 'players',
     clues: [
-      'I am a towering centre-forward known for explosive pace and finishing.',
+      'I am a Norwegian centre-forward known for a towering frame and explosive pace.',
       'I broke out at Red Bull Salzburg and Borussia Dortmund before moving to the Premier League.',
       'I am Norwegian and now play for Manchester City.',
     ],
@@ -73,7 +73,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'easy',
     category: 'players',
     clues: [
-      'I am a forward known for blistering speed.',
+      'I am a French forward known for blistering speed and decisive goals.',
       'I emerged at Monaco, starred at Paris Saint-Germain, then joined Real Madrid.',
       'I am French and scored a hat-trick in the 2022 World Cup final.',
     ],
@@ -89,7 +89,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am a clinical centre-forward and one of my generation\'s great strikers.',
+      'I am a Polish centre-forward famed for clinical, two-footed finishing.',
       'I starred for Borussia Dortmund and Bayern Munich before joining Barcelona.',
       'I am Polish and my national team\'s all-time top scorer.',
     ],
@@ -103,7 +103,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am a midfield maestro known for passing range and longevity.',
+      'I am a Croatian central midfielder known for my passing range and longevity.',
       'I played for Dinamo Zagreb and Tottenham before a trophy-laden Real Madrid career.',
       'I am Croatian and won the 2018 Ballon d\'Or.',
     ],
@@ -117,7 +117,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am a right-winger who cuts inside onto my left foot.',
+      'I am an Egyptian right-winger who cuts inside onto my left foot.',
       'I had spells at Chelsea, Fiorentina and Roma before becoming a Liverpool talisman.',
       'I am Egyptian and one of the Premier League\'s most prolific forwards.',
     ],
@@ -131,7 +131,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am a creative midfielder famous for vision and crossing.',
+      'I am a Belgian creative midfielder famous for my vision and pinpoint crossing.',
       'I left Chelsea, rebuilt my career at Wolfsburg, then became a star at Manchester City.',
       'I am Belgian and one of the finest playmakers of my era.',
     ],
@@ -145,7 +145,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am an elegant attacking midfielder remembered for sublime technique.',
+      'I am a French attacking midfielder remembered for sublime, elegant technique.',
       'I played for Juventus and Real Madrid and later managed Real Madrid to three straight Champions Leagues.',
       'I am French and scored twice in the 1998 World Cup final.',
     ],
@@ -161,7 +161,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am a centre-back known for reading the game rather than height.',
+      'I am an Italian centre-back who relied on reading the game rather than height.',
       'I captained my country to a World Cup and won the Ballon d\'Or the same year.',
       'I am Italian and lifted the trophy in 2006.',
     ],
@@ -175,7 +175,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am an attacking midfielder famed for driving runs through midfield.',
+      'I am a Brazilian attacking midfielder famed for driving runs through midfield.',
       'I starred for AC Milan, won the 2007 Champions League, then joined Real Madrid.',
       'I am Brazilian and the 2007 Ballon d\'Or winner.',
     ],
@@ -189,7 +189,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am a defender regarded as one of the greatest of all time.',
+      'I am an Italian defender, a one-club man regarded as one of the greatest ever.',
       'I spent my entire club career at one club, AC Milan, across more than two decades.',
       'I am Italian and won multiple European Cups at left-back and centre-back.',
     ],
@@ -203,9 +203,9 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am a forward and a founding figure of Total Football.',
+      'I am a Dutch forward and a visionary of 1970s attacking football.',
       'I starred for Ajax and Barcelona and later managed Barcelona\'s "Dream Team".',
-      'I am Dutch and won three Ballon d\'Ors in the 1970s.',
+      'I won three Ballon d\'Ors in the 1970s and gave my name to Total Football.',
     ],
     options: ['Johan Cruyff', 'Marco van Basten', 'Ruud Gullit', 'Dennis Bergkamp'],
     correctAnswer: 'Johan Cruyff',
@@ -217,9 +217,9 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am a striker nicknamed "O Fenômeno".',
+      'I am a Brazilian striker of the 1990s and 2000s, devastating one-on-one.',
       'I played for clubs including Barcelona, Inter Milan and Real Madrid despite serious knee injuries.',
-      'I am Brazilian and was the top scorer at the 2002 World Cup.',
+      'I was the top scorer at the 2002 World Cup and was nicknamed "O Fenômeno".',
     ],
     options: ['Ronaldo Nazário', 'Romário', 'Adriano', 'Ronaldinho'],
     correctAnswer: 'Ronaldo Nazário',
@@ -247,7 +247,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'nightmare',
     category: 'players',
     clues: [
-      'I am a forward known for explosive pace in the 1980s.',
+      'I am a Soviet forward known for explosive pace in the mid-1980s.',
       'I starred for Dynamo Kyiv and the Soviet Union national team.',
       'I won the 1986 Ballon d\'Or.',
     ],
@@ -816,7 +816,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'easy',
     category: 'players',
     clues: [
-      'I am a striker famous for pace and a late rise to the top.',
+      'I am an English striker famous for blistering pace and a late rise to the top.',
       'I played non-league football before joining Leicester City.',
       'I am English and was top scorer as Leicester won the Premier League in 2016.',
     ],
@@ -830,7 +830,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'easy',
     category: 'players',
     clues: [
-      'I am a goalkeeper known for rushing off my line as a "sweeper-keeper".',
+      'I am a German goalkeeper known for rushing off my line as a "sweeper-keeper".',
       'I made my name at Schalke 04 before a long career at Bayern Munich.',
       'I am German and won the World Cup in 2014.',
     ],
@@ -844,7 +844,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'easy',
     category: 'players',
     clues: [
-      'I am a centre-forward known for finishing and long-range passing.',
+      'I am an English centre-forward known for finishing and long-range passing.',
       'I came through Tottenham Hotspur before moving to Bayern Munich.',
       'I am English and my country\'s all-time leading goalscorer.',
     ],
@@ -858,7 +858,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'easy',
     category: 'players',
     clues: [
-      'I am a forward widely regarded as one of the greatest ever.',
+      'I am a Brazilian forward of the 1960s widely regarded as one of the greatest ever.',
       'I spent almost my whole career at Santos before a late spell at New York Cosmos.',
       'I am Brazilian and the only player to win three World Cups.',
     ],
@@ -872,7 +872,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'easy',
     category: 'players',
     clues: [
-      'I am a goalkeeper celebrated for longevity and shot-stopping.',
+      'I am an Italian goalkeeper celebrated for remarkable longevity and shot-stopping.',
       'I spent most of my career at Juventus with a season at Paris Saint-Germain.',
       'I am Italian and won the World Cup in 2006.',
     ],
@@ -886,7 +886,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'easy',
     category: 'players',
     clues: [
-      'I am a left-winger known for dribbling and pace.',
+      'I am a Brazilian left-winger known for direct dribbling and electric pace.',
       'I joined Real Madrid as a teenager from Flamengo.',
       'I am Brazilian and scored in a Champions League final win over Liverpool in 2022.',
     ],
@@ -902,7 +902,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am a commanding centre-back known for composure and aerial strength.',
+      'I am a Dutch centre-back known for composure and commanding aerial strength.',
       'I played for Celtic and Southampton before a record move to Liverpool.',
       'I am Dutch and captain of my national team.',
     ],
@@ -916,7 +916,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am a midfielder famed for tackling and box-to-box energy.',
+      'I am a French midfielder famed for tireless tackling and box-to-box energy.',
       'I won the Premier League and Champions League with Chelsea, then joined Real Madrid.',
       'I am French and known for my work rate in central midfield.',
     ],
@@ -930,7 +930,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am a striker remembered for a last-gasp title-winning goal.',
+      'I am an Argentine striker remembered for a last-gasp title-winning goal.',
       'I played for Independiente and Atlético Madrid before a decade at Manchester City.',
       'I am Argentine and City\'s record goalscorer.',
     ],
@@ -944,7 +944,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am a midfielder known for close control and decisive goals.',
+      'I am a Spanish midfielder known for silky close control and decisive goals.',
       'I came through Barcelona\'s academy and later played in Japan for Vissel Kobe.',
       'I am Spanish and scored the winning goal in the 2010 World Cup final.',
     ],
@@ -958,7 +958,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am a powerful striker known for big-game performances.',
+      'I am an Ivorian striker known for power and big-game performances.',
       'I starred at Marseille and Chelsea, scoring the equaliser and winning penalty in a Champions League final.',
       'I am Ivorian and a national icon.',
     ],
@@ -972,7 +972,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am a forward and one of the best headers of the ball of my era.',
+      'I am a Welsh forward and one of the best headers of the ball of my era.',
       'I played for Manchester United and Real Madrid, scoring in two Champions League finals.',
       'I am Welsh and famed for a stunning overhead-kick goal in a final.',
     ],
@@ -986,7 +986,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'medium',
     category: 'players',
     clues: [
-      'I am a tall goalkeeper known for big saves in finals.',
+      'I am a Belgian goalkeeper, exceptionally tall and known for big saves in finals.',
       'I played for Atlético Madrid and Chelsea before joining Real Madrid.',
       'I am Belgian and was man of the match in the 2022 Champions League final.',
     ],
@@ -1002,9 +1002,9 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am an attacking playmaker nicknamed "Il Divin Codino" (the Divine Ponytail).',
-      'I played for Fiorentina, Juventus and AC Milan.',
-      'I am Italian and famously missed the decisive penalty in the 1994 World Cup final.',
+      'I am an Italian attacking playmaker of the 1990s with a sublime touch.',
+      'I played for Fiorentina, Juventus and AC Milan and wore an iconic ponytail.',
+      'I missed the decisive penalty in the 1994 World Cup final and was nicknamed "Il Divin Codino" (the Divine Ponytail).',
     ],
     options: ['Roberto Baggio', 'Alessandro Del Piero', 'Francesco Totti', 'Gianfranco Zola'],
     correctAnswer: 'Roberto Baggio',
@@ -1016,9 +1016,9 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am a winger remembered for a controversial transfer between two Spanish giants.',
-      'I moved from Barcelona to Real Madrid in 2000.',
-      'I am Portuguese and won the 2000 Ballon d\'Or.',
+      'I am a Portuguese winger and one of the finest of the late 1990s.',
+      'I moved from Barcelona to Real Madrid in 2000 in a controversial transfer between the two Spanish giants.',
+      'I won the 2000 Ballon d\'Or.',
     ],
     options: ['Luís Figo', 'Rui Costa', 'Deco', 'Simão Sabrosa'],
     correctAnswer: 'Luís Figo',
@@ -1030,7 +1030,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am a striker known for clinical finishing in the penalty area.',
+      'I am a Brazilian striker of the 1990s, deadly inside the box.',
       'I starred for PSV and Barcelona and partnered Bebeto for my country.',
       'I am Brazilian and was the standout player as Brazil won the 1994 World Cup.',
     ],
@@ -1044,7 +1044,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am a left-footed forward with a fiery temperament.',
+      'I am a Bulgarian left-footed forward with a famously fiery temperament.',
       'I was a key part of Barcelona\'s "Dream Team" under Johan Cruyff.',
       'I am Bulgarian and won the 1994 Ballon d\'Or after a strong World Cup.',
     ],
@@ -1058,8 +1058,8 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am a powerful forward who played for Monaco, Paris Saint-Germain and AC Milan.',
-      'I am the only African player to win the Ballon d\'Or, in 1995.',
+      'I am a powerful West African forward and one of the finest strikers of the 1990s.',
+      'I played for Monaco, Paris Saint-Germain and AC Milan, and am the only African player to win the Ballon d\'Or, in 1995.',
       'I later became the president of my country, Liberia.',
     ],
     options: ['George Weah', 'Jay-Jay Okocha', 'Nwankwo Kanu', 'Abedi Pelé'],
@@ -1072,7 +1072,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am a tireless attacking midfielder with a powerful left foot.',
+      'I am a Czech attacking midfielder, tireless and with a powerful left foot.',
       'I played for Lazio and Juventus and was nicknamed the "Czech Cannon".',
       'I am Czech and won the 2003 Ballon d\'Or.',
     ],
@@ -1086,7 +1086,7 @@ export const QUESTIONS: Question[] = [
     difficulty: 'hard',
     category: 'players',
     clues: [
-      'I am a centre-forward and a lethal penalty-box finisher.',
+      'I am an English centre-forward and a lethal penalty-box finisher of the 1990s.',
       'I played for Blackburn Rovers and Newcastle United, turning down bigger moves to stay at my boyhood club.',
       'I am English and the all-time top scorer in the Premier League.',
     ],
@@ -1102,9 +1102,9 @@ export const QUESTIONS: Question[] = [
     difficulty: 'nightmare',
     category: 'players',
     clues: [
-      'I am a striker famous for spectacular volleys nicknamed after me.',
+      'I am a French striker of the late 1980s and early 1990s, famed for spectacular volleys.',
       'I starred for Marseille before moving to AC Milan.',
-      'I am French and won the 1991 Ballon d\'Or.',
+      'I won the 1991 Ballon d\'Or, and my acrobatic volleys were so iconic they were dubbed "Papinades".',
     ],
     options: ['Jean-Pierre Papin', 'Eric Cantona', 'David Ginola', 'Youri Djorkaeff'],
     correctAnswer: 'Jean-Pierre Papin',
@@ -1116,9 +1116,9 @@ export const QUESTIONS: Question[] = [
     difficulty: 'nightmare',
     category: 'players',
     clues: [
-      'I am a forward who won back-to-back Ballon d\'Ors in the late 1970s.',
+      'I am an English forward who starred across England and Germany in the 1970s.',
       'I played for Liverpool, Hamburg and Southampton.',
-      'I am English and later managed the national team.',
+      'I won back-to-back Ballon d\'Ors in the late 1970s and later managed the England national team.',
     ],
     options: ['Kevin Keegan', 'Trevor Francis', 'Tony Woodcock', 'Peter Beardsley'],
     correctAnswer: 'Kevin Keegan',
@@ -1130,9 +1130,9 @@ export const QUESTIONS: Question[] = [
     difficulty: 'nightmare',
     category: 'players',
     clues: [
-      'I am a graceful playmaker nicknamed the "Golden Boy" of Italian football.',
+      'I am a graceful Italian playmaker of the 1960s and 1970s.',
       'I spent nearly my entire career at AC Milan.',
-      'I am Italian and won the 1969 Ballon d\'Or.',
+      'I won the 1969 Ballon d\'Or and was nicknamed the "Golden Boy" of Italian football.',
     ],
     options: ['Gianni Rivera', 'Sandro Mazzola', 'Luigi Riva', 'Giacinto Facchetti'],
     correctAnswer: 'Gianni Rivera',
@@ -1144,9 +1144,9 @@ export const QUESTIONS: Question[] = [
     difficulty: 'nightmare',
     category: 'players',
     clues: [
-      'I am a forward who played for Borussia Mönchengladbach and Barcelona.',
-      'I scored in a European Cup final and won European trophies in the 1970s.',
-      'I am Danish and won the 1977 Ballon d\'Or.',
+      'I am a Danish forward who starred in West Germany and Spain in the 1970s.',
+      'I played for Borussia Mönchengladbach and Barcelona, scoring in a European Cup final.',
+      'I won the 1977 Ballon d\'Or.',
     ],
     options: ['Allan Simonsen', 'Preben Elkjær', 'Michael Laudrup', 'Brian Laudrup'],
     correctAnswer: 'Allan Simonsen',
@@ -2835,13 +2835,249 @@ export const QUESTIONS: Question[] = [
     difficulty: 'nightmare',
     category: 'history',
     clues: [
-      'I am an Argentine-born forward who became a Real Madrid legend in the 1950s.',
-      'I helped win the first five European Cups in a row.',
+      'I am an Argentine-born forward who dominated European football in the 1950s.',
+      'I became a Real Madrid legend and helped win the first five European Cups in a row.',
       'I scored in five consecutive European Cup finals.',
     ],
     options: ['Alfredo Di Stéfano', 'Ferenc Puskás', 'Raymond Kopa', 'Francisco Gento'],
     correctAnswer: 'Alfredo Di Stéfano',
     explanation: 'Alfredo Di Stéfano led Real Madrid to five straight European Cups (1956–1960).',
+  },
+
+  /* ====================================================================== */
+  /* WHO AM I? — expansion pack (16)                                          */
+  /* ====================================================================== */
+
+  // --- easy (4) ---
+  {
+    id: 'who-rooney-401',
+    type: 'who_am_i',
+    difficulty: 'easy',
+    category: 'players',
+    clues: [
+      'I am an English forward known for power, range and a fierce shot.',
+      'I broke through at Everton and became Manchester United\'s all-time top scorer.',
+      'I was England\'s record goalscorer and famous for an overhead kick against Manchester City.',
+    ],
+    options: ['Wayne Rooney', 'Steven Gerrard', 'Frank Lampard', 'Michael Owen'],
+    correctAnswer: 'Wayne Rooney',
+    explanation: 'Wayne Rooney is Manchester United\'s record scorer and was long England\'s leading marksman.',
+  },
+  {
+    id: 'who-ramos-401',
+    type: 'who_am_i',
+    difficulty: 'easy',
+    category: 'players',
+    clues: [
+      'I am a Spanish centre-back known for aggression, leadership and late goals.',
+      'I captained Real Madrid for years after starting out at Sevilla.',
+      'I headed a 93rd-minute equaliser in the 2014 Champions League final and won the 2010 World Cup.',
+    ],
+    options: ['Sergio Ramos', 'Gerard Piqué', 'Jordi Alba', 'Raúl'],
+    correctAnswer: 'Sergio Ramos',
+    explanation: 'Sergio Ramos\'s last-minute header in Lisbon set up Real Madrid\'s 2014 "La Décima".',
+  },
+  {
+    id: 'who-benzema-401',
+    type: 'who_am_i',
+    difficulty: 'easy',
+    category: 'players',
+    clues: [
+      'I am a French centre-forward known for link-up play and clinical finishing.',
+      'I left Lyon for Real Madrid, where I became one of the club\'s top scorers.',
+      'I won the 2022 Ballon d\'Or after a stunning Champions League campaign.',
+    ],
+    options: ['Karim Benzema', 'Olivier Giroud', 'Wissam Ben Yedder', 'Alexandre Lacazette'],
+    correctAnswer: 'Karim Benzema',
+    explanation: 'Karim Benzema won the 2022 Ballon d\'Or after firing Real Madrid to the Champions League.',
+  },
+  {
+    id: 'who-mane-401',
+    type: 'who_am_i',
+    difficulty: 'easy',
+    category: 'players',
+    clues: [
+      'I am a Senegalese forward known for blistering pace and direct running.',
+      'I starred at Southampton and Liverpool before moving to Bayern Munich.',
+      'I won the Champions League in 2019 and led Senegal to the 2022 Africa Cup of Nations title.',
+    ],
+    options: ['Sadio Mané', 'Riyad Mahrez', 'Kalidou Koulibaly', 'Pierre-Emerick Aubameyang'],
+    correctAnswer: 'Sadio Mané',
+    explanation: 'Sadio Mané won the 2019 Champions League with Liverpool and the 2022 AFCON with Senegal.',
+  },
+
+  // --- medium (4) ---
+  {
+    id: 'who-xavi-401',
+    type: 'who_am_i',
+    difficulty: 'medium',
+    category: 'players',
+    clues: [
+      'I am a Spanish central midfielder famed for short passing and tempo control.',
+      'I was the metronome of Barcelona\'s tiki-taka and later their head coach.',
+      'I won the 2010 World Cup and Euro 2008 and 2012 with Spain.',
+    ],
+    options: ['Xavi', 'Sergio Busquets', 'Cesc Fàbregas', 'David Silva'],
+    correctAnswer: 'Xavi',
+    explanation: 'Xavi orchestrated Barcelona and Spain\'s dominance before returning to coach the club.',
+  },
+  {
+    id: 'who-kroos-401',
+    type: 'who_am_i',
+    difficulty: 'medium',
+    category: 'players',
+    clues: [
+      'I am a German central midfielder renowned for pinpoint passing and composure.',
+      'I won the Champions League at Bayern Munich and several more at Real Madrid.',
+      'I was part of Germany\'s 2014 World Cup-winning side.',
+    ],
+    options: ['Toni Kroos', 'Bastian Schweinsteiger', 'Mesut Özil', 'Ilkay Gündoğan'],
+    correctAnswer: 'Toni Kroos',
+    explanation: 'Toni Kroos won the 2014 World Cup and multiple Champions Leagues with Real Madrid.',
+  },
+  {
+    id: 'who-cavani-401',
+    type: 'who_am_i',
+    difficulty: 'medium',
+    category: 'players',
+    clues: [
+      'I am a Uruguayan striker known for relentless pressing and poacher\'s finishing.',
+      'I starred at Napoli and became Paris Saint-Germain\'s all-time top scorer.',
+      'I later played for Manchester United and partnered Luis Suárez for Uruguay.',
+    ],
+    options: ['Edinson Cavani', 'Diego Forlán', 'Darwin Núñez', 'Luis Suárez'],
+    correctAnswer: 'Edinson Cavani',
+    explanation: 'Edinson Cavani is PSG\'s record scorer and a long-time Uruguay forward.',
+  },
+  {
+    id: 'who-griezmann-401',
+    type: 'who_am_i',
+    difficulty: 'medium',
+    category: 'players',
+    clues: [
+      'I am a French forward known for movement, vision and big-match goals.',
+      'I made my name at Real Sociedad and Atlético Madrid before a spell at Barcelona.',
+      'I top-scored at Euro 2016 and won the 2018 World Cup with France.',
+    ],
+    options: ['Antoine Griezmann', 'Olivier Giroud', 'Anthony Martial', 'Ousmane Dembélé'],
+    correctAnswer: 'Antoine Griezmann',
+    explanation: 'Antoine Griezmann was Euro 2016\'s top scorer and a key part of France\'s 2018 World Cup win.',
+  },
+
+  // --- hard (4) ---
+  {
+    id: 'who-vannistelrooy-401',
+    type: 'who_am_i',
+    difficulty: 'hard',
+    category: 'players',
+    clues: [
+      'I am a Dutch striker and one of the deadliest penalty-box poachers of my era.',
+      'I starred at PSV and Manchester United before moving to Real Madrid.',
+      'I won the Premier League Golden Boot and was famed for ruthless six-yard finishing.',
+    ],
+    options: ['Ruud van Nistelrooy', 'Dennis Bergkamp', 'Patrick Kluivert', 'Robin van Persie'],
+    correctAnswer: 'Ruud van Nistelrooy',
+    explanation: 'Ruud van Nistelrooy was a prolific poacher for PSV, Manchester United and Real Madrid.',
+  },
+  {
+    id: 'who-robertocarlos-401',
+    type: 'who_am_i',
+    difficulty: 'hard',
+    category: 'players',
+    clues: [
+      'I am a Brazilian left-back famous for overlapping runs and a thunderous left foot.',
+      'I spent the bulk of my career at Real Madrid after a spell at Inter Milan.',
+      'I scored an impossible swerving free-kick against France and won the 2002 World Cup.',
+    ],
+    options: ['Roberto Carlos', 'Cafu', 'Marcelo', 'Dani Alves'],
+    correctAnswer: 'Roberto Carlos',
+    explanation: 'Roberto Carlos, a Real Madrid icon, won the 2002 World Cup and is famed for his free-kicks.',
+  },
+  {
+    id: 'who-puyol-401',
+    type: 'who_am_i',
+    difficulty: 'hard',
+    category: 'players',
+    clues: [
+      'I am a Spanish centre-back known for fearless defending and a mane of curly hair.',
+      'I was a one-club captain at Barcelona during their golden era.',
+      'I headed the winning goal in the 2010 World Cup semi-final for Spain.',
+    ],
+    options: ['Carles Puyol', 'Gerard Piqué', 'Carlos Marchena', 'Joan Capdevila'],
+    correctAnswer: 'Carles Puyol',
+    explanation: 'Carles Puyol captained Barcelona and scored Spain\'s semi-final winner at the 2010 World Cup.',
+  },
+  {
+    id: 'who-totti-401',
+    type: 'who_am_i',
+    difficulty: 'hard',
+    category: 'players',
+    clues: [
+      'I am an Italian forward and playmaker who became a one-club legend.',
+      'I spent my entire career at Roma, wearing the number 10.',
+      'I won the 2006 World Cup with Italy and am one of Serie A\'s top scorers.',
+    ],
+    options: ['Francesco Totti', 'Alessandro Del Piero', 'Gianfranco Zola', 'Roberto Baggio'],
+    correctAnswer: 'Francesco Totti',
+    explanation: 'Francesco Totti spent his whole career at Roma and won the 2006 World Cup with Italy.',
+  },
+
+  // --- nightmare (4) ---
+  {
+    id: 'who-yashin-401',
+    type: 'who_am_i',
+    difficulty: 'nightmare',
+    category: 'players',
+    clues: [
+      'I am a Soviet goalkeeper of the 1950s and 1960s, dressed all in black.',
+      'I spent my entire career at Dynamo Moscow.',
+      'I am the only goalkeeper to win the Ballon d\'Or, in 1963, and was nicknamed the "Black Spider".',
+    ],
+    options: ['Lev Yashin', 'Rinat Dasayev', 'Dino Zoff', 'Gordon Banks'],
+    correctAnswer: 'Lev Yashin',
+    explanation: 'Lev Yashin, the "Black Spider", is the only goalkeeper to have won the Ballon d\'Or.',
+  },
+  {
+    id: 'who-gerdmuller-401',
+    type: 'who_am_i',
+    difficulty: 'nightmare',
+    category: 'players',
+    clues: [
+      'I am a German striker of the 1960s and 1970s with an astonishing scoring rate.',
+      'I was the spearhead of a dominant Bayern Munich side.',
+      'I scored the winning goal in the 1974 World Cup final and won the 1970 Ballon d\'Or.',
+    ],
+    options: ['Gerd Müller', 'Jürgen Klinsmann', 'Karl-Heinz Rummenigge', 'Uwe Seeler'],
+    correctAnswer: 'Gerd Müller',
+    explanation: 'Gerd Müller scored the winner in the 1974 World Cup final and was a Bayern Munich legend.',
+  },
+  {
+    id: 'who-eusebio-401',
+    type: 'who_am_i',
+    difficulty: 'nightmare',
+    category: 'players',
+    clues: [
+      'I am a Portuguese forward of the 1960s, born in Mozambique, with electric pace.',
+      'I starred for Benfica and reached a European Cup final.',
+      'I was top scorer at the 1966 World Cup and won the 1965 Ballon d\'Or.',
+    ],
+    options: ['Eusébio', 'Luís Figo', 'Rui Costa', 'Mário Coluna'],
+    correctAnswer: 'Eusébio',
+    explanation: 'Eusébio top-scored at the 1966 World Cup and won the 1965 Ballon d\'Or with Benfica.',
+  },
+  {
+    id: 'who-matthaus-401',
+    type: 'who_am_i',
+    difficulty: 'nightmare',
+    category: 'players',
+    clues: [
+      'I am a German midfielder and sweeper renowned for driving runs and longevity.',
+      'I played for Bayern Munich and Inter Milan across a long career.',
+      'I captained West Germany to the 1990 World Cup and won the 1990 Ballon d\'Or.',
+    ],
+    options: ['Lothar Matthäus', 'Andreas Brehme', 'Rudi Völler', 'Franz Beckenbauer'],
+    correctAnswer: 'Lothar Matthäus',
+    explanation: 'Lothar Matthäus captained West Germany to the 1990 World Cup and won that year\'s Ballon d\'Or.',
   },
 
   /* ====================================================================== */
