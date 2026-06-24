@@ -1,11 +1,17 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { StadiumBackground } from './StadiumBackground';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { setSoundEnabled, play } from '../../lib/sound';
 import { IconSound, IconMute } from '../ui/icons';
 
 /** App frame: stadium backdrop, brand header, and a centered content column. */
 export function AppShell({ children }: { children: ReactNode }) {
   const [soundOn, setSoundOn] = useLocalStorage('bk_sound', true);
+
+  // Keep the sound engine's flag in sync with the persisted toggle.
+  useEffect(() => {
+    setSoundEnabled(soundOn);
+  }, [soundOn]);
 
   return (
     <div className="relative flex min-h-[100dvh] flex-col">
@@ -26,7 +32,14 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <button
           type="button"
-          onClick={() => setSoundOn((s) => !s)}
+          onClick={() => {
+            setSoundOn((s) => {
+              const next = !s;
+              setSoundEnabled(next);
+              if (next) play('click'); // audible confirmation when enabling
+              return next;
+            });
+          }}
           aria-pressed={soundOn}
           aria-label={soundOn ? 'Mute sound' : 'Unmute sound'}
           title={soundOn ? 'Sound on' : 'Sound off'}

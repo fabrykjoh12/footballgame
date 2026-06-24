@@ -1,11 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useGame } from '../../context/GameProvider';
+import { play } from '../../lib/sound';
 import type { Player } from '../../types/game';
 import { MATCH_MODES } from '../../lib/matchModes';
 import { teamName } from '../../lib/teamName';
 import { accuracyPercent } from '../../lib/scoring';
 import { getPlayerTitle } from '../../lib/playerTitle';
 import { buildShareText } from '../../lib/shareResult';
+import { shareResultImage } from '../../lib/shareImage';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -14,6 +16,9 @@ import { IconTrophy, IconShare, IconCheck, IconBack } from '../ui/icons';
 export function FinalResult() {
   const { room, localPlayerId, isHost, serviceMode, rematch, leaveRoom } = useGame();
   const [shared, setShared] = useState(false);
+  const [imgState, setImgState] = useState<'idle' | 'working' | 'shared' | 'saved'>(
+    'idle',
+  );
 
   const winner = useMemo(() => {
     if (!room) return null;
@@ -23,6 +28,12 @@ export function FinalResult() {
     if (a.score !== b.score) return a.score > b.score ? a : b;
     return null; // genuine draw
   }, [room]);
+
+  // Final-whistle audio: fanfare if you won, plain whistle otherwise.
+  useEffect(() => {
+    if (room?.status !== 'finished') return;
+    play(winner?.id === localPlayerId ? 'win' : 'whistle');
+  }, [room?.status, winner?.id, localPlayerId]);
 
   if (!room) return null;
   const [a, b] = room.players;
@@ -40,6 +51,15 @@ export function FinalResult() {
     } catch {
       /* ignore */
     }
+  };
+
+  const shareImg = async () => {
+    setImgState('working');
+    const result = await shareResultImage(room);
+    setImgState(
+      result === 'shared' ? 'shared' : result === 'downloaded' ? 'saved' : 'idle',
+    );
+    if (result !== 'failed') setTimeout(() => setImgState('idle'), 2200);
   };
 
   return (
@@ -97,10 +117,31 @@ export function FinalResult() {
 
       {/* Actions */}
       <div className="mt-1 flex flex-col gap-2">
-        <Button variant="secondary" fullWidth onClick={share}>
-          {shared ? <IconCheck className="h-4 w-4 text-pitch" /> : <IconShare className="h-4 w-4" />}
-          {shared ? 'Result copied!' : 'Share result'}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" fullWidth onClick={share}>
+            {shared ? <IconCheck className="h-4 w-4 text-pitch" /> : <IconShare className="h-4 w-4" />}
+            {shared ? 'Copied!' : 'Copy text'}
+          </Button>
+          <Button
+            variant="secondary"
+            fullWidth
+            onClick={shareImg}
+            disabled={imgState === 'working'}
+          >
+            {imgState === 'shared' || imgState === 'saved' ? (
+              <IconCheck className="h-4 w-4 text-pitch" />
+            ) : (
+              <IconShare className="h-4 w-4" />
+            )}
+            {imgState === 'working'
+              ? 'Rendering…'
+              : imgState === 'shared'
+                ? 'Shared!'
+                : imgState === 'saved'
+                  ? 'Image saved!'
+                  : 'Share image'}
+          </Button>
+        </div>
 
         <div className="flex gap-2">
           {(isHost || serviceMode === 'local') && (

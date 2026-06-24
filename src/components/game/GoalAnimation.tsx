@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useGame } from '../../context/GameProvider';
 import type { GameEventKind } from '../../types/game';
 import { teamName } from '../../lib/teamName';
+import { play } from '../../lib/sound';
 
 const OVERLAY_MS = 1700;
 
@@ -26,6 +27,7 @@ export function GoalAnimation() {
 
   useEffect(() => {
     if (!current) return;
+    play('goal');
     const t = setTimeout(() => clearEvent(current.nonce), OVERLAY_MS);
     return () => clearTimeout(t);
   }, [current, clearEvent]);

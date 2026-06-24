@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useGame } from '../../context/GameProvider';
 import { useCountdown } from '../../hooks/useCountdown';
+import { play } from '../../lib/sound';
 import { MATCH_MODES } from '../../lib/matchModes';
 import { teamName } from '../../lib/teamName';
 import { Scoreboard } from '../layout/Scoreboard';
@@ -25,6 +26,19 @@ export function GamePage() {
     setLocked(false);
   }, [qId]);
 
+  // Referee whistle at kick-off.
+  useEffect(() => {
+    if (room?.status === 'starting') play('whistle');
+  }, [room?.status]);
+
+  // Ding / buzz when this player's result is revealed.
+  useEffect(() => {
+    if (room?.status === 'showing_result' && room.lastResult) {
+      const r = room.lastResult.results[localPlayerId];
+      if (r) play(r.isCorrect ? 'correct' : 'wrong');
+    }
+  }, [room?.status, room?.lastResult?.questionId, localPlayerId]);
+
   const countdown = useCountdown(
     room?.questionStartedAt ?? null,
     room?.settings.questionDurationMs ?? 15000,
@@ -48,6 +62,7 @@ export function GamePage() {
 
   const handleAnswer = (answer: string) => {
     if (hasAnswered || status !== 'in_question') return;
+    play('click');
     setPicked(answer);
     setLocked(true);
     void submitAnswer({
