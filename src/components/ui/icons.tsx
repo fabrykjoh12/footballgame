@@ -113,6 +113,13 @@ export const IconClock = (p: IconProps) => (
   </svg>
 );
 
+export const IconCoins = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M15 9a3.5 3.5 0 1 0 0 6M8.5 10.5h4M8.5 13h4" />
+  </svg>
+);
+
 export const IconBack = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M19 12H5M11 18l-6-6 6-6" />

@@ -43,6 +43,18 @@ describe('question database integrity', () => {
     }
   });
 
+  it('uses one consistent currency per transfer_fee question', () => {
+    for (const q of QUESTIONS) {
+      if (q.type !== 'transfer_fee') continue;
+      const symbols = new Set(q.options.map((o) => o[0]));
+      expect(symbols.size, q.id).toBe(1);
+      expect(['€', '£', '$'], q.id).toContain(q.options[0][0]);
+      for (const o of q.options) {
+        expect(/^[€£$]\d+m$/.test(o), `${q.id}:${o}`).toBe(true);
+      }
+    }
+  });
+
   it('keeps a healthy pool for each mini-game type', () => {
     const counts: Record<string, number> = {};
     for (const q of QUESTIONS) counts[q.type] = (counts[q.type] ?? 0) + 1;
@@ -51,6 +63,7 @@ describe('question database integrity', () => {
     expect(counts.higher_lower).toBeGreaterThanOrEqual(16);
     expect(counts.club_country).toBeGreaterThanOrEqual(16);
     expect(counts.guess_year).toBeGreaterThanOrEqual(8);
+    expect(counts.transfer_fee).toBeGreaterThanOrEqual(8);
   });
 
   it('has enough questions in each difficulty tier to fill every mode', () => {

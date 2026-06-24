@@ -13,7 +13,8 @@ export type QuestionType =
   | 'career_path'
   | 'higher_lower'
   | 'club_country'
-  | 'guess_year';
+  | 'guess_year'
+  | 'transfer_fee';
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'nightmare';
 
@@ -90,12 +91,22 @@ export interface GuessYearQuestion extends BaseQuestion {
   correctAnswer: string;
 }
 
+/** "TRANSFER FEE" — guess the headline fee of a famous move from 4 options. */
+export interface TransferFeeQuestion extends BaseQuestion {
+  type: 'transfer_fee';
+  prompt: string;
+  /** Four fee strings sharing one currency, e.g. "€222m". */
+  options: string[];
+  correctAnswer: string;
+}
+
 export type Question =
   | WhoAmIQuestion
   | CareerPathQuestion
   | HigherLowerQuestion
   | ClubCountryQuestion
-  | GuessYearQuestion;
+  | GuessYearQuestion
+  | TransferFeeQuestion;
 
 /* ------------------------------------------------------------------ */
 /* Match settings & difficulty modes                                   */

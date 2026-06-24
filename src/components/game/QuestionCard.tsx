@@ -10,6 +10,7 @@ import {
   IconTrophy,
   IconCheck,
   IconClock,
+  IconCoins,
 } from '../ui/icons';
 
 const TYPE_META = {
@@ -18,6 +19,7 @@ const TYPE_META = {
   higher_lower: { label: 'Higher or Lower', Icon: IconScale },
   club_country: { label: 'Football Trivia', Icon: IconTrophy },
   guess_year: { label: 'Guess the Year', Icon: IconClock },
+  transfer_fee: { label: 'Transfer Fee', Icon: IconCoins },
 } as const;
 
 interface QuestionCardProps {
@@ -70,6 +72,16 @@ export function QuestionCard({
           </p>
         </div>
       )}
+      {question.type === 'transfer_fee' && (
+        <div className="mb-4">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
+            What was the fee?
+          </h2>
+          <p className="text-lg font-semibold leading-snug sm:text-xl">
+            {question.prompt}
+          </p>
+        </div>
+      )}
 
       {/* Answers */}
       {question.type === 'higher_lower' ? (
@@ -81,6 +93,13 @@ export function QuestionCard({
         />
       ) : question.type === 'guess_year' ? (
         <GuessYearPicker
+          question={question}
+          selectedAnswer={selectedAnswer}
+          disabled={hasAnswered}
+          onAnswer={onAnswer}
+        />
+      ) : question.type === 'transfer_fee' ? (
+        <TransferFeePicker
           question={question}
           selectedAnswer={selectedAnswer}
           disabled={hasAnswered}
@@ -298,6 +317,45 @@ function GuessYearPicker({
             ].join(' ')}
           >
             {year}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function TransferFeePicker({
+  question,
+  selectedAnswer,
+  disabled,
+  onAnswer,
+}: {
+  question: Extract<Question, { type: 'transfer_fee' }>;
+  selectedAnswer: string | null;
+  disabled: boolean;
+  onAnswer: (answer: string) => void;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-2.5">
+      {question.options.map((fee) => {
+        const chosen = selectedAnswer === fee;
+        return (
+          <button
+            key={fee}
+            type="button"
+            disabled={disabled}
+            onClick={() => onAnswer(fee)}
+            aria-pressed={chosen}
+            aria-label={`Fee ${fee}`}
+            className={[
+              'answer-press flex min-h-[64px] items-center justify-center rounded-xl border font-mono text-xl font-bold tracking-tight',
+              chosen
+                ? 'border-pitch/70 bg-pitch/10 text-pitch ring-2 ring-pitch/40'
+                : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.09]',
+              disabled && !chosen ? 'opacity-55' : '',
+            ].join(' ')}
+          >
+            {fee}
           </button>
         );
       })}
