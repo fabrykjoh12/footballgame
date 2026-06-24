@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useGame } from '../../context/GameProvider';
+import { matchIdentities } from '../../lib/teamIdentity';
 
 interface GoalMark {
   minute: number;
@@ -46,6 +47,9 @@ export function MatchTimeline() {
   const progress = clamp01((room.currentQuestionIndex + resolved) / total);
   const minute = Math.round(progress * FULL_TIME);
 
+  const [a, b] = room.players;
+  const [idA, idB] = matchIdentities(a?.name ?? '', b?.name ?? '');
+
   return (
     <div className="select-none">
       <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-white/35">
@@ -69,11 +73,11 @@ export function MatchTimeline() {
             key={g.key}
             title={`Goal — ${g.minute}'`}
             aria-label={`Goal at ${g.minute} minutes`}
-            className={[
-              'absolute -top-1.5 h-2 w-2 -translate-x-1/2 rounded-full ring-2 ring-ink-900',
-              g.side === 'home' ? 'bg-pitch' : 'bg-gold',
-            ].join(' ')}
-            style={{ left: `${(g.minute / FULL_TIME) * 100}%` }}
+            className="absolute -top-1.5 h-2 w-2 -translate-x-1/2 rounded-full ring-2 ring-ink-900"
+            style={{
+              left: `${(g.minute / FULL_TIME) * 100}%`,
+              backgroundColor: g.side === 'home' ? idA.color : idB.color,
+            }}
           />
         ))}
       </div>

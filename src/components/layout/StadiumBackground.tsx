@@ -30,6 +30,16 @@ export function StadiumBackground() {
         {/* Bottom box */}
         <rect x="110" y="490" width="180" height="90" />
         <rect x="160" y="545" width="80" height="35" />
+        {/* Penalty arcs (the "D") + spots */}
+        <path d="M168 110 A 40 40 0 0 1 232 110" />
+        <path d="M168 490 A 40 40 0 0 0 232 490" />
+        <circle cx="200" cy="75" r="1.6" fill="#16ff7a" />
+        <circle cx="200" cy="525" r="1.6" fill="#16ff7a" />
+        {/* Corner arcs */}
+        <path d="M20 30 A 10 10 0 0 0 30 20" />
+        <path d="M370 20 A 10 10 0 0 0 380 30" />
+        <path d="M30 580 A 10 10 0 0 0 20 570" />
+        <path d="M380 570 A 10 10 0 0 0 370 580" />
       </svg>
 
       {/* Subtle vertical mowing stripes */}
