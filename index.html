@@ -18,7 +18,39 @@
     />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Fallback shown until React mounts (replaced on render). If it stays
+           visible, the app's JavaScript didn't load/run — which on a locked-down
+           network usually means the script was blocked. -->
+      <div id="boot" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#05070d;color:#fff;font-family:system-ui,-apple-system,sans-serif;text-align:center;padding:24px">
+        <div style="font-size:26px;font-weight:700;letter-spacing:-0.02em">
+          Ball <span style="color:#16ff7a">Knowledge</span>
+        </div>
+        <div id="boot-msg" style="color:#7e8aa0;font-size:14px">Loading the pitch…</div>
+      </div>
+    </div>
+    <noscript>
+      <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#05070d;color:#fff;font-family:system-ui,sans-serif;padding:24px;text-align:center">
+        Ball Knowledge needs JavaScript enabled to play.
+      </div>
+    </noscript>
+    <script>
+      // Surface load failures instead of leaving a blank white screen.
+      window.addEventListener(
+        'error',
+        function (e) {
+          var m = document.getElementById('boot-msg');
+          if (!m) return;
+          var detail = e && e.message ? e.message : 'a script or network error';
+          m.innerHTML =
+            "Couldn't load the game (" +
+            detail +
+            ").<br/>If you're on a restricted work network, the app's files may be blocked — try a phone on mobile data, or a different network.";
+          m.style.color = '#ff8a95';
+        },
+        true,
+      );
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
