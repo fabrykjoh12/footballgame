@@ -73,6 +73,7 @@ export class AblyGameService implements GameService {
   private eventListeners = new Set<(event: GameEvent) => void>();
   private connectionListeners = new Set<(state: ConnectionState) => void>();
   private connectionState: ConnectionState = 'connected';
+  private hasConnectedOnce = false;
 
   /** Guest-side: pin a question's countdown to local receipt time (anti-skew). */
   private rebasedQuestionKey: string | null = null;
@@ -395,13 +396,21 @@ export class AblyGameService implements GameService {
     const next = mapRealtimeState(state);
     if (!next) return; // ignore initialized / closing / closed (intentional)
 
+    const firstConnect = !this.hasConnectedOnce;
+    // Before the first successful connect, the provider's "Connecting…" UI
+    // already covers it — don't flash a reconnecting/failed banner.
+    if (next !== 'connected' && firstConnect) return;
+
     const wasDown = this.connectionState !== 'connected';
     this.connectionState = next;
     this.emitConnectionState(next);
 
-    // After recovering, a guest re-requests the authoritative state to resync.
-    if (next === 'connected' && wasDown && !this.isHost) {
-      void this.send('request_state', { playerId: this.localPlayerId });
+    if (next === 'connected') {
+      this.hasConnectedOnce = true;
+      // On a genuine reconnect, a guest re-requests authoritative state.
+      if (wasDown && !firstConnect && !this.isHost) {
+        void this.send('request_state', { playerId: this.localPlayerId });
+      }
     }
   }
 }
