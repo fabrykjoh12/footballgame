@@ -11,6 +11,7 @@ import { QuestionCard } from './QuestionCard';
 import { ResultReveal } from './ResultReveal';
 import { GoalAnimation } from './GoalAnimation';
 import { CommentaryTicker } from './CommentaryTicker';
+import { MatchTimeline } from './MatchTimeline';
 
 export function GamePage() {
   const { room, localPlayerId, isHost, opponent, submitAnswer, nextQuestion } =
@@ -77,6 +78,8 @@ export function GamePage() {
   return (
     <div className="flex flex-col gap-4 py-3">
       <GoalAnimation />
+
+      <MatchTimeline />
 
       <Scoreboard
         players={room.players}
