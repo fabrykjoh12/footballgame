@@ -1,0 +1,45 @@
+# Builds the app and publishes it to the gh-pages branch on every push.
+# GitHub Pages is configured to "Deploy from a branch" → gh-pages, so this
+# replaces the manual deploy. Multiplayer turns on automatically once the
+# VITE_ABLY_API_KEY repository secret is set (until then it deploys in demo
+# mode, which still works).
+name: Deploy preview
+
+on:
+  push:
+    branches: [main, 'claude/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Let the most recent push win, but don't cancel a run mid-publish.
+concurrency:
+  group: deploy-preview
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build (relative base for Project Pages)
+        run: npm run build:pages
+        env:
+          # Optional: add this repo secret to enable live Ably multiplayer.
+          VITE_ABLY_API_KEY: ${{ secrets.VITE_ABLY_API_KEY }}
+
+      - name: Publish to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          # peaceiris adds .nojekyll automatically.
