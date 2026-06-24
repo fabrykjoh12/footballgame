@@ -155,4 +155,64 @@ describe('MatchEngine', () => {
     expect(answers).toHaveLength(1);
     expect(answers[0].selectedAnswer).toBe('a');
   });
+
+  // --- Stoppage-time sudden death ---
+
+  function reachStoppage(h: ReturnType<typeof harness>) {
+    // One question, both correct → 0–0, then enter sudden death.
+    h.engine.beginMatch([q('q1')], [q('sd1'), q('sd2')]);
+    vi.advanceTimersByTime(1500);
+    h.engine.recordAnswer('h', { selectedAnswer: 'a', clueStage: 0, timeTakenMs: 1000 });
+    h.engine.recordAnswer('g', { selectedAnswer: 'a', clueStage: 0, timeTakenMs: 1000 });
+    vi.advanceTimersByTime(700);
+    h.engine.nextQuestion();
+  }
+
+  it('enters sudden death when level on goals at full time', () => {
+    const h = harness();
+    reachStoppage(h);
+    expect(h.room.status).toBe('in_question');
+    expect(h.room.stoppageRound).toBe(1);
+    expect(h.find('h').goals).toBe(0);
+    expect(h.find('g').goals).toBe(0);
+  });
+
+  it('wins it with a golden goal when one side takes the round', () => {
+    const h = harness();
+    reachStoppage(h);
+    h.engine.recordAnswer('h', { selectedAnswer: 'a', clueStage: 0, timeTakenMs: 1000 });
+    h.engine.recordAnswer('g', { selectedAnswer: 'b', clueStage: 0, timeTakenMs: 1000 });
+    vi.advanceTimersByTime(700);
+    expect(h.find('h').goals).toBe(1); // golden goal applied at the reveal
+    expect(h.find('g').goals).toBe(0);
+    expect(h.events.some((e) => e.playerId === 'h')).toBe(true);
+
+    h.engine.nextQuestion();
+    expect(h.room.status).toBe('finished');
+    expect(h.find('h').goals).toBeGreaterThan(h.find('g').goals);
+  });
+
+  it('plays another round when sudden death is drawn', () => {
+    const h = harness();
+    reachStoppage(h);
+    h.engine.recordAnswer('h', { selectedAnswer: 'a', clueStage: 0, timeTakenMs: 1000 });
+    h.engine.recordAnswer('g', { selectedAnswer: 'a', clueStage: 0, timeTakenMs: 1000 });
+    vi.advanceTimersByTime(700);
+    expect(h.find('h').goals).toBe(h.find('g').goals); // still level
+    h.engine.nextQuestion();
+    expect(h.room.status).toBe('in_question');
+    expect(h.room.stoppageRound).toBe(2);
+  });
+
+  it('falls back to the points decider when no tiebreakers exist', () => {
+    const h = harness();
+    h.engine.beginMatch([q('q1')]); // no reserves
+    vi.advanceTimersByTime(1500);
+    h.engine.recordAnswer('h', { selectedAnswer: 'a', clueStage: 0, timeTakenMs: 1000 });
+    h.engine.recordAnswer('g', { selectedAnswer: 'a', clueStage: 0, timeTakenMs: 1000 });
+    vi.advanceTimersByTime(700);
+    h.engine.nextQuestion();
+    expect(h.room.status).toBe('finished');
+    expect(h.room.stoppageRound ?? 0).toBe(0);
+  });
 });

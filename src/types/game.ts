@@ -235,6 +235,10 @@ export interface Room {
   questionStartedAt: number | null;
   /** Reveal payload for the current showing_result phase. */
   lastResult: QuestionResult | null;
+  /** Reserve sudden-death questions (host-picked) for stoppage time. */
+  tiebreakers?: Question[];
+  /** 0/undefined = normal play; n = the nth sudden-death round in progress. */
+  stoppageRound?: number;
   createdAt: number;
 }
 

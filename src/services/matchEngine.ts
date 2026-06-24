@@ -78,13 +78,15 @@ export class MatchEngine {
    * set. Resets every player's match stats, then runs a short "kick off"
    * phase before the first question.
    */
-  beginMatch(questions: Question[]): void {
+  beginMatch(questions: Question[], tiebreakers: Question[] = []): void {
     if (questions.length === 0) return;
     this.clearTimers();
     this.room = {
       ...this.room,
       status: 'starting',
       selectedQuestions: questions,
+      tiebreakers,
+      stoppageRound: 0,
       currentQuestionIndex: 0,
       questionStartedAt: null,
       lastResult: null,
@@ -111,12 +113,30 @@ export class MatchEngine {
       this.finish();
       return;
     }
-    const answers = { ...this.room.answers };
+    this.startQuestion(
+      { ...this.room, currentQuestionIndex: index, stoppageRound: 0 },
+      question,
+    );
+  }
+
+  /** Begin the nth sudden-death round (1-based) from the tiebreaker reserve. */
+  private beginStoppageRound(round: number): void {
+    this.clearTimers();
+    const question = (this.room.tiebreakers ?? [])[round - 1];
+    if (!question) {
+      this.finish();
+      return;
+    }
+    this.startQuestion({ ...this.room, stoppageRound: round }, question);
+  }
+
+  /** Shared "put a question live" transition for both normal play and SD. */
+  private startQuestion(baseRoom: Room, question: Question): void {
+    const answers = { ...baseRoom.answers };
     answers[question.id] = [];
     this.room = {
-      ...this.room,
+      ...baseRoom,
       status: 'in_question',
-      currentQuestionIndex: index,
       questionStartedAt: Date.now(),
       lastResult: null,
       answers,
@@ -174,6 +194,7 @@ export class MatchEngine {
 
     const question = this.currentQuestion();
     if (!question) return;
+    const inStoppage = (this.room.stoppageRound ?? 0) > 0;
     const totalTime = this.room.settings.questionDurationMs;
     const submitted = this.room.answers[question.id] ?? [];
 
@@ -185,7 +206,7 @@ export class MatchEngine {
     const overlayEvents: { playerId: string; kind: GameEventKind }[] = [];
 
     // Update players in a stable order so scoring is deterministic.
-    const players = this.room.players.map((player) => {
+    let players = this.room.players.map((player) => {
       const ans = submitted.find((a) => a.playerId === player.id);
       const selectedAnswer = ans?.selectedAnswer ?? null;
       const isCorrect = ans?.isCorrect ?? false;
@@ -203,8 +224,9 @@ export class MatchEngine {
       });
 
       const newScore = player.score + breakdown.total;
-      const newGoals = calculateGoalsFromPoints(newScore);
-      const scoredGoal = newGoals > goalsBefore[player.id];
+      // Sudden death is decided by a golden goal, not by point thresholds.
+      const newGoals = inStoppage ? player.goals : calculateGoalsFromPoints(newScore);
+      const scoredGoal = !inStoppage && newGoals > goalsBefore[player.id];
 
       const updated = {
         ...player,
@@ -253,7 +275,7 @@ export class MatchEngine {
     for (const p of players) scores[p.id] = p.score;
 
     // Cross-player events (1v1 only): equalizer + late winner, by goals.
-    if (players.length === 2) {
+    if (players.length === 2 && !inStoppage) {
       const isLastQuestion =
         this.room.currentQuestionIndex >= this.room.selectedQuestions.length - 1;
       for (let i = 0; i < players.length; i++) {
@@ -270,6 +292,22 @@ export class MatchEngine {
           meRes.events.push(getFootballEventLabel('equalizer'));
           overlayEvents.push({ playerId: me.id, kind: 'equalizer' });
         }
+      }
+    }
+
+    // Sudden-death golden goal: if exactly one side is correct, they win it.
+    if (inStoppage && players.length === 2) {
+      const [pa, pb] = players;
+      const aOk = results[pa.id].isCorrect;
+      const bOk = results[pb.id].isCorrect;
+      if (aOk !== bOk) {
+        const winnerId = aOk ? pa.id : pb.id;
+        players = players.map((p) =>
+          p.id === winnerId ? { ...p, goals: p.goals + 1 } : p,
+        );
+        results[winnerId].scoredGoal = true;
+        results[winnerId].events.push(getFootballEventLabel('late_winner'));
+        overlayEvents.push({ playerId: winnerId, kind: 'late_winner' });
       }
     }
 
@@ -317,11 +355,33 @@ export class MatchEngine {
   nextQuestion(): void {
     if (this.room.status !== 'showing_result') return;
     this.clearTimers();
+    const round = this.room.stoppageRound ?? 0;
+    const [a, b] = this.room.players;
+    const reserve = this.room.tiebreakers ?? [];
+
+    if (round > 0) {
+      // A golden goal made the scoreline decisive — otherwise play on.
+      if (a && b && a.goals !== b.goals) {
+        this.finish();
+      } else if (round < reserve.length) {
+        this.beginStoppageRound(round + 1);
+      } else {
+        this.finish(); // reserves exhausted — fall back to the points decider
+      }
+      return;
+    }
+
     const nextIndex = this.room.currentQuestionIndex + 1;
-    if (nextIndex >= this.room.selectedQuestions.length) {
-      this.finish();
-    } else {
+    if (nextIndex < this.room.selectedQuestions.length) {
       this.beginQuestion(nextIndex);
+      return;
+    }
+
+    // End of regulation: sudden death when level on goals and reserves exist.
+    if (a && b && a.goals === b.goals && reserve.length > 0) {
+      this.beginStoppageRound(1);
+    } else {
+      this.finish();
     }
   }
 
@@ -338,6 +398,8 @@ export class MatchEngine {
   /* ----------------------------- helpers ----------------------------- */
 
   currentQuestion(): Question | undefined {
+    const round = this.room.stoppageRound ?? 0;
+    if (round > 0) return (this.room.tiebreakers ?? [])[round - 1];
     return this.room.selectedQuestions[this.room.currentQuestionIndex];
   }
 

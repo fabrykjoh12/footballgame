@@ -78,6 +78,25 @@ export function kickoffLine(seed = 0): string {
   return pick(KICKOFF, seed);
 }
 
+export function stoppageLine(round: number, seed = 0): string {
+  if (round > 1) {
+    return pick(
+      [
+        `Still nothing between them — sudden-death round ${round}!`,
+        `Nerves of steel required — round ${round} of sudden death.`,
+      ],
+      seed,
+    );
+  }
+  return pick(
+    [
+      'Level at full time — it’s STOPPAGE TIME. Sudden death!',
+      'We cannot separate them — to sudden death we go!',
+    ],
+    seed,
+  );
+}
+
 export function halftimeLine(scoreline: string, seed = 0): string {
   return pick(
     [

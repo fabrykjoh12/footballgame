@@ -24,7 +24,7 @@ import type {
 } from '../types/game';
 import { defaultSettings } from '../lib/matchModes';
 import { generateRoomCode, normalizeRoomCode } from '../lib/roomCode';
-import { pickMatchQuestions } from '../lib/questionPicker';
+import { pickMatchQuestions, pickTiebreakers } from '../lib/questionPicker';
 import { uid } from '../lib/id';
 import { createAblyRealtime } from '../lib/ablyClient';
 import { mapRealtimeState } from './connectionMapping';
@@ -178,8 +178,9 @@ export class AblyGameService implements GameService {
 
   async startMatch(): Promise<void> {
     if (!this.isHost || !this.engine) return;
-    const questions = pickMatchQuestions(this.engine.getRoom().settings);
-    this.engine.beginMatch(questions);
+    const settings = this.engine.getRoom().settings;
+    const questions = pickMatchQuestions(settings);
+    this.engine.beginMatch(questions, pickTiebreakers(settings, questions));
   }
 
   async submitAnswer(input: SubmitAnswerInput): Promise<void> {

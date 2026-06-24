@@ -22,7 +22,7 @@ import type {
 } from '../types/game';
 import { defaultSettings } from '../lib/matchModes';
 import { generateRoomCode } from '../lib/roomCode';
-import { pickMatchQuestions } from '../lib/questionPicker';
+import { pickMatchQuestions, pickTiebreakers } from '../lib/questionPicker';
 import { uid } from '../lib/id';
 import { MatchEngine } from './matchEngine';
 import { decideBotAnswer } from './botPlayer';
@@ -191,8 +191,9 @@ export class LocalGameService implements GameService {
     if (!room || !this.engine) return;
     // Ensure there is an opponent before kicking off.
     if (room.players.length < 2) this.botJoin();
-    const questions = pickMatchQuestions(this.engine.getRoom().settings);
-    this.engine.beginMatch(questions);
+    const settings = this.engine.getRoom().settings;
+    const questions = pickMatchQuestions(settings);
+    this.engine.beginMatch(questions, pickTiebreakers(settings, questions));
   }
 
   /** Fan out room updates and drive bot answering during questions. */

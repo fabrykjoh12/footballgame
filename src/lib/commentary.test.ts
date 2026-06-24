@@ -3,6 +3,7 @@ import {
   kickoffLine,
   halftimeLine,
   fulltimeLine,
+  stoppageLine,
   questionCommentary,
   type Side,
 } from './commentary';
@@ -84,5 +85,10 @@ describe('commentary helpers', () => {
     expect(fulltimeLine('Sara FC', true, 0)).toContain('Sara FC');
     expect(fulltimeLine('Sara FC', true, 0)).toContain('on points');
     expect(fulltimeLine(null, false, 0)).toMatch(/draw|honours/i);
+  });
+
+  it('announces sudden death and later rounds', () => {
+    expect(stoppageLine(1, 0).toLowerCase()).toMatch(/sudden death|stoppage/);
+    expect(stoppageLine(2, 0)).toContain('round 2');
   });
 });

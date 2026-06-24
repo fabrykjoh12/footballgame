@@ -45,10 +45,11 @@ lazily `import()`-ed so the SDKs are **code-split out of the main bundle**.
 All three remote/local paths share one authoritative state machine:
 
 - **`src/services/matchEngine.ts`** owns the single `Room`, runs all timers
-  (question countdown, result auto-advance), applies scoring, and emits a fresh
-  `Room` snapshot on every transition. **In multiplayer, only the HOST runs the
-  engine** and broadcasts snapshots; guests render snapshots and send their
-  actions (join / answer) back to the host.
+  (question countdown, result auto-advance), applies scoring, runs **sudden-death
+  stoppage time** (golden goal off reserve `tiebreakers` when level on goals at
+  full time), and emits a fresh `Room` snapshot on every transition. **In
+  multiplayer, only the HOST runs the engine** and broadcasts snapshots; guests
+  render snapshots and send their actions (join / answer) back to the host.
 
 React wiring: `src/context/GameProvider.tsx` subscribes to the active service
 and exposes `room`, `localPlayer`, `opponent`, and actions via the `useGame()`

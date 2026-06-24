@@ -49,12 +49,21 @@ export function MatchTimeline() {
 
   const [a, b] = room.players;
   const [idA, idB] = matchIdentities(a?.name ?? '', b?.name ?? '');
+  const sr = room.stoppageRound ?? 0;
+  const minuteLabel = sr > 0 ? `90+${sr}'` : `${minute}'`;
 
   return (
     <div className="select-none">
       <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-white/35">
         <span>0'</span>
-        <span className="font-mono text-xs font-bold text-pitch">{minute}'</span>
+        <span
+          className={[
+            'font-mono text-xs font-bold',
+            sr > 0 ? 'text-gold' : 'text-pitch',
+          ].join(' ')}
+        >
+          {minuteLabel}
+        </span>
         <span>90'</span>
       </div>
       <div className="relative h-2 rounded-full bg-white/10">

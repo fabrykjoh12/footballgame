@@ -20,7 +20,11 @@ export function GamePage() {
   const [picked, setPicked] = useState<string | null>(null);
   const [locked, setLocked] = useState(false);
 
-  const question = room?.selectedQuestions[room.currentQuestionIndex];
+  const stoppageRound = room?.stoppageRound ?? 0;
+  const question =
+    stoppageRound > 0
+      ? room?.tiebreakers?.[stoppageRound - 1]
+      : room?.selectedQuestions[room.currentQuestionIndex];
   const qId = question?.id;
 
   // Reset local answer state whenever a new question begins.
@@ -98,6 +102,13 @@ export function GamePage() {
       )}
 
       <CommentaryTicker />
+
+      {stoppageRound > 0 && (
+        <div className="flex items-center justify-center gap-2 rounded-xl border border-gold/40 bg-gold/10 px-3 py-2 text-center text-sm font-bold uppercase tracking-wider text-gold motion-safe:animate-pulse">
+          ⏱ Stoppage Time — Sudden Death
+          {stoppageRound > 1 ? ` · Round ${stoppageRound}` : ''}
+        </div>
+      )}
 
       {status === 'starting' && <Kickoff players={room.players} mode={room.settings.mode} />}
 

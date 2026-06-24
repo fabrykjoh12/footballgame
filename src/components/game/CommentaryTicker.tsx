@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useGame } from '../../context/GameProvider';
 import { teamName } from '../../lib/teamName';
 import { COUNTERATTACK_MS } from '../../lib/scoring';
-import { kickoffLine, questionCommentary, type Side } from '../../lib/commentary';
+import {
+  kickoffLine,
+  questionCommentary,
+  stoppageLine,
+  type Side,
+} from '../../lib/commentary';
 import type { Player, Room } from '../../types/game';
 
 /** A live, single-line commentary bar that reacts to each revealed question. */
@@ -12,6 +17,7 @@ export function CommentaryTicker() {
   const [tick, setTick] = useState(0); // bumps to re-trigger the entrance animation
   const kickedOff = useRef(false);
   const lastQid = useRef<string | null>(null);
+  const lastRound = useRef(0);
 
   useEffect(() => {
     if (!room) return;
@@ -24,12 +30,21 @@ export function CommentaryTicker() {
     if (room.status === 'finished' || room.status === 'lobby') {
       kickedOff.current = false;
       lastQid.current = null;
+      lastRound.current = 0;
       return;
     }
 
     if (room.status === 'starting' && !kickedOff.current) {
       kickedOff.current = true;
       say(kickoffLine());
+      return;
+    }
+
+    // Announce each new sudden-death round.
+    const round = room.stoppageRound ?? 0;
+    if (room.status === 'in_question' && round > lastRound.current) {
+      lastRound.current = round;
+      say(stoppageLine(round));
       return;
     }
 

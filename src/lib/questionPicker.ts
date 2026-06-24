@@ -138,3 +138,25 @@ export function pickMatchQuestions(
   // question's answer positions so the correct answer isn't always in slot A.
   return shuffle(selected, rng).map((q) => randomizeAnswerOrder(q, rng));
 }
+
+/**
+ * Reserve questions for sudden-death stoppage time. Prefers quick, single-answer
+ * types (skips clue-based who_am_i) and excludes anything already in the match.
+ * Deterministic when a seed is set (offset so it differs from the main pick).
+ */
+export function pickTiebreakers(
+  settings: MatchSettings,
+  used: Question[],
+  count = 5,
+  pool: Question[] = QUESTIONS,
+): Question[] {
+  const rng: Rng = settings.seed != null ? mulberry32((settings.seed ^ 0x5eed) >>> 0) : Math.random;
+  const allowed = difficultiesForMode(settings.mode);
+  const usedIds = new Set(used.map((q) => q.id));
+  const candidates = pool.filter(
+    (q) => !usedIds.has(q.id) && q.type !== 'who_am_i' && allowed.includes(q.difficulty),
+  );
+  return shuffle(candidates, rng)
+    .slice(0, count)
+    .map((q) => randomizeAnswerOrder(q, rng));
+}
