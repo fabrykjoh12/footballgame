@@ -8,6 +8,7 @@ import { accuracyPercent } from '../../lib/scoring';
 import { getPlayerTitle } from '../../lib/playerTitle';
 import { buildShareText } from '../../lib/shareResult';
 import { shareResultImage } from '../../lib/shareImage';
+import { recordMatchResult } from '../../lib/profileStats';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -34,6 +35,11 @@ export function FinalResult() {
     if (room?.status !== 'finished') return;
     play(winner?.id === localPlayerId ? 'win' : 'whistle');
   }, [room?.status, winner?.id, localPlayerId]);
+
+  // Record the match into the local lifetime profile (idempotent).
+  useEffect(() => {
+    if (room?.status === 'finished') recordMatchResult(room, localPlayerId);
+  }, [room?.status, localPlayerId]);
 
   if (!room) return null;
   const [a, b] = room.players;

@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 import { useGame } from '../../context/GameProvider';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { isValidRoomCode, normalizeRoomCode } from '../../lib/roomCode';
+import {
+  getProfileStats,
+  lifetimeAccuracy,
+  resetProfileStats,
+  winRate,
+} from '../../lib/profileStats';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import {
@@ -48,6 +54,7 @@ export function HomePage() {
   const [name, setName] = useLocalStorage('bk_name', '');
   const [showJoin, setShowJoin] = useState(false);
   const [code, setCode] = useState('');
+  const [stats, setStats] = useState(() => getProfileStats());
 
   // Prefill the join code from a shared link (?room=BK7Q2).
   useEffect(() => {
@@ -185,6 +192,36 @@ export function HomePage() {
         </p>
       </Card>
 
+      {/* Lifetime record (local) */}
+      {stats.matchesPlayed > 0 && (
+        <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-white/70">
+              Your record
+            </h2>
+            <button
+              type="button"
+              onClick={() => setStats(resetProfileStats())}
+              className="text-[11px] text-white/30 hover:text-white/60"
+            >
+              Reset
+            </button>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            <ProfileStat value={String(stats.matchesPlayed)} label="Played" />
+            <ProfileStat value={`${winRate(stats)}%`} label="Win rate" />
+            <ProfileStat value={`${lifetimeAccuracy(stats)}%`} label="Accuracy" />
+            <ProfileStat value={String(stats.bestStreak)} label="Streak" />
+          </div>
+          {stats.lastTitle && (
+            <div className="mt-3 text-center text-xs text-white/45">
+              Last title:{' '}
+              <span className="font-semibold text-gold">{stats.lastTitle}</span>
+            </div>
+          )}
+        </Card>
+      )}
+
       {/* Feature cards */}
       <div className="mx-auto grid w-full max-w-2xl grid-cols-2 gap-3">
         {FEATURES.map((f) => (
@@ -194,6 +231,17 @@ export function HomePage() {
             <div className="mt-0.5 text-xs text-white/50">{f.desc}</div>
           </Card>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function ProfileStat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
+      <div className="font-display text-xl font-bold text-pitch">{value}</div>
+      <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/40">
+        {label}
       </div>
     </div>
   );
