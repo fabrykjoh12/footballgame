@@ -43,6 +43,20 @@ describe('question database integrity', () => {
     }
   });
 
+  it('spreads the guess_year answer across chronological slots (no middle bias)', () => {
+    const slots = [0, 0, 0, 0];
+    let n = 0;
+    for (const q of QUESTIONS) {
+      if (q.type !== 'guess_year') continue;
+      const sorted = [...q.options].sort((a, b) => Number(a) - Number(b));
+      slots[sorted.indexOf(q.correctAnswer)]++;
+      n++;
+    }
+    for (let i = 0; i < 4; i++) expect(slots[i], `slot ${i} unused`).toBeGreaterThan(0);
+    // No single chronological position may dominate the answers.
+    expect(Math.max(...slots) / n).toBeLessThanOrEqual(0.45);
+  });
+
   it('uses one consistent currency per transfer_fee question', () => {
     for (const q of QUESTIONS) {
       if (q.type !== 'transfer_fee') continue;
