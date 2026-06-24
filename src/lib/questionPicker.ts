@@ -26,6 +26,22 @@ export function shuffle<T>(arr: readonly T[]): T[] {
   return copy;
 }
 
+/**
+ * Randomizes where the correct answer sits, so it isn't always option "A".
+ * - Multiple-choice: shuffle the 4 options.
+ * - Higher/Lower: randomly swap the two sides.
+ * The `correctAnswer` string is untouched, so scoring is unaffected. Done once
+ * by the host at pick time and broadcast, so both players see one layout.
+ */
+export function randomizeAnswerOrder(q: Question): Question {
+  if (q.type === 'higher_lower') {
+    return Math.random() < 0.5
+      ? { ...q, leftOption: q.rightOption, rightOption: q.leftOption }
+      : q;
+  }
+  return { ...q, options: shuffle(q.options) };
+}
+
 function pickOfType(
   pool: Question[],
   type: QuestionType,
@@ -94,6 +110,7 @@ export function pickMatchQuestions(
     ...pickOfType(pool, 'club_country', dist.club_country, allowed),
   ];
 
-  // Shuffle the final order so mini-games are interleaved.
-  return shuffle(selected);
+  // Shuffle the final order so mini-games are interleaved, then randomize each
+  // question's answer positions so the correct answer isn't always in slot A.
+  return shuffle(selected).map(randomizeAnswerOrder);
 }
