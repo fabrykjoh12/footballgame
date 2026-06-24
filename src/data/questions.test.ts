@@ -57,6 +57,15 @@ describe('question database integrity', () => {
     expect(Math.max(...slots) / n).toBeLessThanOrEqual(0.45);
   });
 
+  it('gives every pitch_position the four canonical zones with a valid answer', () => {
+    const zones = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'];
+    for (const q of QUESTIONS) {
+      if (q.type !== 'pitch_position') continue;
+      expect(q.options, q.id).toEqual(zones);
+      expect(zones, q.id).toContain(q.correctAnswer);
+    }
+  });
+
   it('uses one consistent currency per transfer_fee question', () => {
     for (const q of QUESTIONS) {
       if (q.type !== 'transfer_fee') continue;
@@ -78,6 +87,7 @@ describe('question database integrity', () => {
     expect(counts.club_country).toBeGreaterThanOrEqual(16);
     expect(counts.guess_year).toBeGreaterThanOrEqual(8);
     expect(counts.transfer_fee).toBeGreaterThanOrEqual(8);
+    expect(counts.pitch_position).toBeGreaterThanOrEqual(8);
   });
 
   it('has enough questions in each difficulty tier to fill every mode', () => {

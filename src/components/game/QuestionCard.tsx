@@ -3,6 +3,7 @@ import { calculateBasePoints } from '../../lib/scoring';
 import { Card } from '../ui/Card';
 import { Badge, DifficultyBadge } from '../ui/Badge';
 import { AnswerOption, type AnswerState } from './AnswerOption';
+import { PITCH_ZONES } from '../../lib/positions';
 import {
   IconUsers,
   IconRoute,
@@ -11,6 +12,7 @@ import {
   IconCheck,
   IconClock,
   IconCoins,
+  IconPitch,
 } from '../ui/icons';
 
 const TYPE_META = {
@@ -20,6 +22,7 @@ const TYPE_META = {
   club_country: { label: 'Football Trivia', Icon: IconTrophy },
   guess_year: { label: 'Guess the Year', Icon: IconClock },
   transfer_fee: { label: 'Transfer Fee', Icon: IconCoins },
+  pitch_position: { label: 'On the Pitch', Icon: IconPitch },
 } as const;
 
 interface QuestionCardProps {
@@ -82,6 +85,16 @@ export function QuestionCard({
           </p>
         </div>
       )}
+      {question.type === 'pitch_position' && (
+        <div className="mb-4">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
+            Where did they play?
+          </h2>
+          <p className="text-lg font-semibold leading-snug sm:text-xl">
+            {question.prompt}
+          </p>
+        </div>
+      )}
 
       {/* Answers */}
       {question.type === 'higher_lower' ? (
@@ -101,6 +114,12 @@ export function QuestionCard({
       ) : question.type === 'transfer_fee' ? (
         <TransferFeePicker
           question={question}
+          selectedAnswer={selectedAnswer}
+          disabled={hasAnswered}
+          onAnswer={onAnswer}
+        />
+      ) : question.type === 'pitch_position' ? (
+        <PitchGrid
           selectedAnswer={selectedAnswer}
           disabled={hasAnswered}
           onAnswer={onAnswer}
@@ -356,6 +375,43 @@ function TransferFeePicker({
             ].join(' ')}
           >
             {fee}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function PitchGrid({
+  selectedAnswer,
+  disabled,
+  onAnswer,
+}: {
+  selectedAnswer: string | null;
+  disabled: boolean;
+  onAnswer: (answer: string) => void;
+}) {
+  // Forward at the top (attacking upfield), Goalkeeper at the back.
+  const lines = [...PITCH_ZONES].reverse();
+  return (
+    <div className="overflow-hidden rounded-2xl border border-pitch/25 bg-gradient-to-b from-pitch/[0.1] to-pitch/[0.02]">
+      {lines.map((zone, i) => {
+        const chosen = selectedAnswer === zone;
+        return (
+          <button
+            key={zone}
+            type="button"
+            disabled={disabled}
+            onClick={() => onAnswer(zone)}
+            aria-pressed={chosen}
+            className={[
+              'answer-press flex w-full items-center justify-center py-4 text-sm font-semibold uppercase tracking-[0.15em]',
+              i > 0 ? 'border-t border-dashed border-white/15' : '',
+              chosen ? 'bg-pitch/20 text-pitch' : 'text-white/70 hover:bg-white/[0.05]',
+              disabled && !chosen ? 'opacity-55' : '',
+            ].join(' ')}
+          >
+            {zone}
           </button>
         );
       })}

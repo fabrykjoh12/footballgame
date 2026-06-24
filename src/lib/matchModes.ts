@@ -12,10 +12,11 @@ export const DEFAULT_QUESTION_DURATION_MS = 15_000;
 export const MATCH_TYPE_DISTRIBUTION = {
   who_am_i: 3,
   career_path: 2,
-  higher_lower: 2,
+  higher_lower: 1,
   club_country: 1,
   guess_year: 1,
   transfer_fee: 1,
+  pitch_position: 1,
 } as const;
 
 export const MATCH_MODES: Record<MatchMode, MatchModeConfig> = {

@@ -6,7 +6,7 @@ Guidance for Claude Code (and humans) working in this repo.
 
 **Ball Knowledge** — a real-time 1v1 football (soccer) knowledge duel.
 Two players join a room with a short code and play a 10-question match built
-from six mini-games. Points convert into **goals** for a football-style score
+from seven mini-games. Points convert into **goals** for a football-style score
 ("Sara FC 3–2 Jonas United"). React + TypeScript + Vite + Tailwind. Fully
 playable offline vs a CPU; real-time multiplayer via Ably or Supabase when keys
 are present.
@@ -67,7 +67,7 @@ HomePage → LobbyPage → GamePage (QuestionCard / ResultReveal / GoalAnimation
 | Scoring & football-event rules (pure) | `src/lib/scoring.ts` |
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
-| Question database (240 Qs, 6 types) | `src/data/questions.ts` |
+| Question database (256 Qs, 7 types) | `src/data/questions.ts` |
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
 | Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |

@@ -45,6 +45,8 @@ export function randomizeAnswerOrder(q: Question, rng: Rng = Math.random): Quest
   if (q.type === 'guess_year') {
     return { ...q, options: [...q.options].sort((a, b) => Number(a) - Number(b)) };
   }
+  // Pitch zones are spatial (GK→Forward) — keep their fixed order.
+  if (q.type === 'pitch_position') return q;
   return { ...q, options: shuffle(q.options, rng) };
 }
 
@@ -129,6 +131,7 @@ export function pickMatchQuestions(
     ...pickOfType(pool, 'club_country', dist.club_country, allowed, rng, cats),
     ...pickOfType(pool, 'guess_year', dist.guess_year, allowed, rng, cats),
     ...pickOfType(pool, 'transfer_fee', dist.transfer_fee, allowed, rng, cats),
+    ...pickOfType(pool, 'pitch_position', dist.pitch_position, allowed, rng, cats),
   ];
 
   // Shuffle the final order so mini-games are interleaved, then randomize each

@@ -1,4 +1,5 @@
 import type { Question } from '../types/game';
+import { PITCH_ZONES } from '../lib/positions';
 
 /* ============================================================================
  * Ball Knowledge — seed question database.
@@ -2841,6 +2842,178 @@ export const QUESTIONS: Question[] = [
     options: ['Alfredo Di Stéfano', 'Ferenc Puskás', 'Raymond Kopa', 'Francisco Gento'],
     correctAnswer: 'Alfredo Di Stéfano',
     explanation: 'Alfredo Di Stéfano led Real Madrid to five straight European Cups (1956–1960).',
+  },
+
+  /* ====================================================================== */
+  /* ON THE PITCH (16) — unambiguous primary positions                       */
+  /* ====================================================================== */
+
+  // --- easy (4) ---
+  {
+    id: 'pos-buffon-301',
+    type: 'pitch_position',
+    difficulty: 'easy',
+    category: 'players',
+    prompt: 'What was Gianluigi Buffon’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Goalkeeper',
+    explanation: 'Buffon is one of the greatest goalkeepers of all time.',
+  },
+  {
+    id: 'pos-maldini-301',
+    type: 'pitch_position',
+    difficulty: 'easy',
+    category: 'players',
+    prompt: 'What was Paolo Maldini’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Defender',
+    explanation: 'Maldini was a legendary left-back and centre-back for AC Milan.',
+  },
+  {
+    id: 'pos-pirlo-301',
+    type: 'pitch_position',
+    difficulty: 'easy',
+    category: 'players',
+    prompt: 'What was Andrea Pirlo’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Midfielder',
+    explanation: 'Pirlo was a deep-lying playmaker in midfield.',
+  },
+  {
+    id: 'pos-henry-301',
+    type: 'pitch_position',
+    difficulty: 'easy',
+    category: 'players',
+    prompt: 'What was Thierry Henry’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Forward',
+    explanation: 'Henry was a prolific forward for Arsenal and France.',
+  },
+
+  // --- medium (4) ---
+  {
+    id: 'pos-casillas-301',
+    type: 'pitch_position',
+    difficulty: 'medium',
+    category: 'players',
+    prompt: 'What was Iker Casillas’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Goalkeeper',
+    explanation: 'Casillas, "San Iker", kept goal for Real Madrid and Spain.',
+  },
+  {
+    id: 'pos-ramos-301',
+    type: 'pitch_position',
+    difficulty: 'medium',
+    category: 'players',
+    prompt: 'What is Sergio Ramos’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Defender',
+    explanation: 'Ramos is a goal-scoring centre-back (and earlier a right-back).',
+  },
+  {
+    id: 'pos-modric-301',
+    type: 'pitch_position',
+    difficulty: 'medium',
+    category: 'players',
+    prompt: 'What is Luka Modrić’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Midfielder',
+    explanation: 'Modrić is a central midfielder and 2018 Ballon d’Or winner.',
+  },
+  {
+    id: 'pos-lewandowski-301',
+    type: 'pitch_position',
+    difficulty: 'medium',
+    category: 'players',
+    prompt: 'What is Robert Lewandowski’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Forward',
+    explanation: 'Lewandowski is an elite centre-forward.',
+  },
+
+  // --- hard (4) ---
+  {
+    id: 'pos-vandersar-301',
+    type: 'pitch_position',
+    difficulty: 'hard',
+    category: 'players',
+    prompt: 'What was Edwin van der Sar’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Goalkeeper',
+    explanation: 'Van der Sar kept goal for Ajax, Manchester United and the Netherlands.',
+  },
+  {
+    id: 'pos-cafu-301',
+    type: 'pitch_position',
+    difficulty: 'hard',
+    category: 'players',
+    prompt: 'What was Cafu’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Defender',
+    explanation: 'Cafu was an attacking right-back and Brazil’s most-capped player.',
+  },
+  {
+    id: 'pos-makelele-301',
+    type: 'pitch_position',
+    difficulty: 'hard',
+    category: 'players',
+    prompt: 'What was Claude Makélélé’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Midfielder',
+    explanation: 'Makélélé defined the holding-midfield role at Real Madrid and Chelsea.',
+  },
+  {
+    id: 'pos-inzaghi-301',
+    type: 'pitch_position',
+    difficulty: 'hard',
+    category: 'players',
+    prompt: 'What was Filippo Inzaghi’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Forward',
+    explanation: 'Pippo Inzaghi was a poacher-style striker for Juventus and Milan.',
+  },
+
+  // --- nightmare (4) ---
+  {
+    id: 'pos-yashin-301',
+    type: 'pitch_position',
+    difficulty: 'nightmare',
+    category: 'players',
+    prompt: 'What was Lev Yashin’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Goalkeeper',
+    explanation: 'Yashin, the "Black Spider", is the only goalkeeper to win the Ballon d’Or.',
+  },
+  {
+    id: 'pos-baresi-301',
+    type: 'pitch_position',
+    difficulty: 'nightmare',
+    category: 'players',
+    prompt: 'What was Franco Baresi’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Defender',
+    explanation: 'Baresi was a legendary sweeper/centre-back for AC Milan.',
+  },
+  {
+    id: 'pos-platini-301',
+    type: 'pitch_position',
+    difficulty: 'nightmare',
+    category: 'players',
+    prompt: 'What was Michel Platini’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Midfielder',
+    explanation: 'Platini was an attacking midfielder and three-time Ballon d’Or winner.',
+  },
+  {
+    id: 'pos-eusebio-301',
+    type: 'pitch_position',
+    difficulty: 'nightmare',
+    category: 'players',
+    prompt: 'What was Eusébio’s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Forward',
+    explanation: 'Eusébio, the "Black Panther", was a goal-scoring forward for Benfica and Portugal.',
   },
 
 ];

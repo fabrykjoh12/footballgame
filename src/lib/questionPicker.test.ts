@@ -98,10 +98,11 @@ describe('pickMatchQuestions', () => {
         expect(counts).toEqual({
           who_am_i: 3,
           career_path: 2,
-          higher_lower: 2,
+          higher_lower: 1,
           club_country: 1,
           guess_year: 1,
           transfer_fee: 1,
+          pitch_position: 1,
         });
 
         for (const q of qs) expect(allowed).toContain(q.difficulty);

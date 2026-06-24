@@ -14,7 +14,8 @@ export type QuestionType =
   | 'higher_lower'
   | 'club_country'
   | 'guess_year'
-  | 'transfer_fee';
+  | 'transfer_fee'
+  | 'pitch_position';
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'nightmare';
 
@@ -100,13 +101,23 @@ export interface TransferFeeQuestion extends BaseQuestion {
   correctAnswer: string;
 }
 
+/** "ON THE PITCH" — tap the player's primary role on a four-line pitch grid. */
+export interface PitchPositionQuestion extends BaseQuestion {
+  type: 'pitch_position';
+  prompt: string;
+  /** Always the four PITCH_ZONES (kept for MC validity + bot reuse). */
+  options: string[];
+  correctAnswer: string;
+}
+
 export type Question =
   | WhoAmIQuestion
   | CareerPathQuestion
   | HigherLowerQuestion
   | ClubCountryQuestion
   | GuessYearQuestion
-  | TransferFeeQuestion;
+  | TransferFeeQuestion
+  | PitchPositionQuestion;
 
 /* ------------------------------------------------------------------ */
 /* Match settings & difficulty modes                                   */
