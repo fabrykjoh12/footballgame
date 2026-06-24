@@ -3,13 +3,21 @@ import { calculateBasePoints } from '../../lib/scoring';
 import { Card } from '../ui/Card';
 import { Badge, DifficultyBadge } from '../ui/Badge';
 import { AnswerOption, type AnswerState } from './AnswerOption';
-import { IconUsers, IconRoute, IconScale, IconTrophy, IconCheck } from '../ui/icons';
+import {
+  IconUsers,
+  IconRoute,
+  IconScale,
+  IconTrophy,
+  IconCheck,
+  IconClock,
+} from '../ui/icons';
 
 const TYPE_META = {
   who_am_i: { label: 'Who Am I?', Icon: IconUsers },
   career_path: { label: 'Career Path', Icon: IconRoute },
   higher_lower: { label: 'Higher or Lower', Icon: IconScale },
   club_country: { label: 'Football Trivia', Icon: IconTrophy },
+  guess_year: { label: 'Guess the Year', Icon: IconClock },
 } as const;
 
 interface QuestionCardProps {
@@ -52,10 +60,27 @@ export function QuestionCard({
           {question.prompt}
         </p>
       )}
+      {question.type === 'guess_year' && (
+        <div className="mb-4">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
+            In which year?
+          </h2>
+          <p className="text-lg font-semibold leading-snug sm:text-xl">
+            {question.prompt}
+          </p>
+        </div>
+      )}
 
       {/* Answers */}
       {question.type === 'higher_lower' ? (
         <HigherLowerPicker
+          question={question}
+          selectedAnswer={selectedAnswer}
+          disabled={hasAnswered}
+          onAnswer={onAnswer}
+        />
+      ) : question.type === 'guess_year' ? (
+        <GuessYearPicker
           question={question}
           selectedAnswer={selectedAnswer}
           disabled={hasAnswered}
@@ -237,6 +262,45 @@ function HigherLowerPicker({
         <div className="flex items-center text-sm font-bold text-white/40">VS</div>
         {renderOption(question.rightOption.name)}
       </div>
+    </div>
+  );
+}
+
+function GuessYearPicker({
+  question,
+  selectedAnswer,
+  disabled,
+  onAnswer,
+}: {
+  question: Extract<Question, { type: 'guess_year' }>;
+  selectedAnswer: string | null;
+  disabled: boolean;
+  onAnswer: (answer: string) => void;
+}) {
+  return (
+    <div className="grid grid-cols-4 gap-2">
+      {question.options.map((year) => {
+        const chosen = selectedAnswer === year;
+        return (
+          <button
+            key={year}
+            type="button"
+            disabled={disabled}
+            onClick={() => onAnswer(year)}
+            aria-pressed={chosen}
+            aria-label={`Year ${year}`}
+            className={[
+              'answer-press flex min-h-[72px] flex-col items-center justify-center rounded-xl border font-mono text-lg font-bold',
+              chosen
+                ? 'border-pitch/70 bg-pitch/10 text-pitch ring-2 ring-pitch/40'
+                : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.09]',
+              disabled && !chosen ? 'opacity-55' : '',
+            ].join(' ')}
+          >
+            {year}
+          </button>
+        );
+      })}
     </div>
   );
 }

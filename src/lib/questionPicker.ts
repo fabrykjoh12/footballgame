@@ -39,6 +39,10 @@ export function randomizeAnswerOrder(q: Question): Question {
       ? { ...q, leftOption: q.rightOption, rightOption: q.leftOption }
       : q;
   }
+  // Years read best chronologically; the correct slot still varies by content.
+  if (q.type === 'guess_year') {
+    return { ...q, options: [...q.options].sort((a, b) => Number(a) - Number(b)) };
+  }
   return { ...q, options: shuffle(q.options) };
 }
 
@@ -63,27 +67,24 @@ function pickOfType(
 
 /**
  * Scale the base distribution to the requested questionCount, keeping the
- * 3:3:2:2 ratio as closely as possible (defaults to exactly that for 10).
+ * ratio as close as possible (defaults to the exact base mix for 10).
+ * Generic over the configured types, so adding a mini-game just works.
  */
 function distributionFor(count: number): Record<QuestionType, number> {
   const base = MATCH_TYPE_DISTRIBUTION;
-  const baseTotal =
-    base.who_am_i + base.career_path + base.higher_lower + base.club_country;
+  const keys = Object.keys(base) as QuestionType[];
+  const baseTotal = keys.reduce((sum, k) => sum + base[k], 0);
   if (count === baseTotal) return { ...base };
 
   const scale = count / baseTotal;
-  const dist: Record<QuestionType, number> = {
-    who_am_i: Math.round(base.who_am_i * scale),
-    career_path: Math.round(base.career_path * scale),
-    higher_lower: Math.round(base.higher_lower * scale),
-    club_country: Math.round(base.club_country * scale),
-  };
+  const dist = {} as Record<QuestionType, number>;
+  for (const k of keys) dist[k] = Math.round(base[k] * scale);
+
   // Correct any rounding drift against the requested count.
-  let total = dist.who_am_i + dist.career_path + dist.higher_lower + dist.club_country;
-  const order: QuestionType[] = ['who_am_i', 'career_path', 'higher_lower', 'club_country'];
+  let total = keys.reduce((sum, k) => sum + dist[k], 0);
   let idx = 0;
   while (total !== count) {
-    const key = order[idx % order.length];
+    const key = keys[idx % keys.length];
     if (total < count) {
       dist[key]++;
       total++;
@@ -108,6 +109,7 @@ export function pickMatchQuestions(
     ...pickOfType(pool, 'career_path', dist.career_path, allowed),
     ...pickOfType(pool, 'higher_lower', dist.higher_lower, allowed),
     ...pickOfType(pool, 'club_country', dist.club_country, allowed),
+    ...pickOfType(pool, 'guess_year', dist.guess_year, allowed),
   ];
 
   // Shuffle the final order so mini-games are interleaved, then randomize each

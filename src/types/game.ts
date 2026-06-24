@@ -7,12 +7,13 @@
  * `Question` union and a branch in the scoring/UI layers.
  */
 
-/** The four MVP mini-game types. */
+/** Mini-game types. */
 export type QuestionType =
   | 'who_am_i'
   | 'career_path'
   | 'higher_lower'
-  | 'club_country';
+  | 'club_country'
+  | 'guess_year';
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'nightmare';
 
@@ -80,11 +81,21 @@ export interface ClubCountryQuestion extends BaseQuestion {
   correctAnswer: string;
 }
 
+/** "GUESS THE YEAR" — football history; pick the year, shown chronologically. */
+export interface GuessYearQuestion extends BaseQuestion {
+  type: 'guess_year';
+  prompt: string;
+  /** Four year strings, e.g. "2016". Sorted ascending for display. */
+  options: string[];
+  correctAnswer: string;
+}
+
 export type Question =
   | WhoAmIQuestion
   | CareerPathQuestion
   | HigherLowerQuestion
-  | ClubCountryQuestion;
+  | ClubCountryQuestion
+  | GuessYearQuestion;
 
 /* ------------------------------------------------------------------ */
 /* Match settings & difficulty modes                                   */
