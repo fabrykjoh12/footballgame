@@ -23,6 +23,7 @@ import {
   type GameService,
   type MultiplayerProvider,
 } from '../services/gameService';
+import { dailySettings } from '../lib/dailyChallenge';
 
 interface GameContextValue {
   room: Room | null;
@@ -41,6 +42,7 @@ interface GameContextValue {
   createRoom: (name: string) => Promise<void>;
   joinRoom: (code: string, name: string) => Promise<void>;
   playDemo: (name: string) => Promise<void>;
+  playDaily: (name: string) => Promise<void>;
   updateSettings: (settings: Partial<MatchSettings>) => Promise<void>;
   startMatch: () => Promise<void>;
   submitAnswer: (input: SubmitAnswerInput) => Promise<void>;
@@ -134,6 +136,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
     (name: string) => startSession('demo', name),
     [startSession],
   );
+  const playDaily = useCallback(
+    async (name: string) => {
+      await startSession('demo', name);
+      // Fixed mode + today's seed → the same match for everyone, then kick off.
+      await serviceRef.current?.updateSettings(dailySettings());
+      await serviceRef.current?.startMatch();
+    },
+    [startSession],
+  );
 
   const updateSettings = useCallback(async (settings: Partial<MatchSettings>) => {
     await serviceRef.current?.updateSettings(settings);
@@ -195,6 +206,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     createRoom,
     joinRoom,
     playDemo,
+    playDaily,
     updateSettings,
     startMatch,
     submitAnswer,

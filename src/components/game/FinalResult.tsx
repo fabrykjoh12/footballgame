@@ -9,6 +9,7 @@ import { getPlayerTitle } from '../../lib/playerTitle';
 import { buildShareText } from '../../lib/shareResult';
 import { shareResultImage } from '../../lib/shareImage';
 import { recordMatchResult } from '../../lib/profileStats';
+import { recordDailyResult } from '../../lib/dailyChallenge';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -36,9 +37,11 @@ export function FinalResult() {
     play(winner?.id === localPlayerId ? 'win' : 'whistle');
   }, [room?.status, winner?.id, localPlayerId]);
 
-  // Record the match into the local lifetime profile (idempotent).
+  // Record the match into the local lifetime profile (and Daily, if applicable).
   useEffect(() => {
-    if (room?.status === 'finished') recordMatchResult(room, localPlayerId);
+    if (room?.status !== 'finished') return;
+    recordMatchResult(room, localPlayerId);
+    if (room.settings.isDaily) recordDailyResult(room, localPlayerId);
   }, [room?.status, localPlayerId]);
 
   if (!room) return null;

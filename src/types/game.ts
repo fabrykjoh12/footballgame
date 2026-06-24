@@ -115,6 +115,10 @@ export interface MatchSettings {
   questionCount: number;
   /** Per-question time budget in milliseconds. */
   questionDurationMs: number;
+  /** When set, question selection is deterministic (Daily Challenge). */
+  seed?: number;
+  /** Marks a Daily Challenge match so its result is recorded against the day. */
+  isDaily?: boolean;
 }
 
 /* ------------------------------------------------------------------ */

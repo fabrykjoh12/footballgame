@@ -8,6 +8,7 @@ import {
   resetProfileStats,
   winRate,
 } from '../../lib/profileStats';
+import { getDailyState, hasPlayedToday } from '../../lib/dailyChallenge';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import {
@@ -16,6 +17,7 @@ import {
   IconScale,
   IconTrophy,
   IconBolt,
+  IconClock,
 } from '../ui/icons';
 
 const FEATURES = [
@@ -46,6 +48,7 @@ export function HomePage() {
     createRoom,
     joinRoom,
     playDemo,
+    playDaily,
     connecting,
     error,
     multiplayerAvailable,
@@ -55,6 +58,8 @@ export function HomePage() {
   const [showJoin, setShowJoin] = useState(false);
   const [code, setCode] = useState('');
   const [stats, setStats] = useState(() => getProfileStats());
+  const [daily] = useState(() => getDailyState());
+  const playedDailyToday = hasPlayedToday(daily);
 
   // Prefill the join code from a shared link (?room=BK7Q2).
   useEffect(() => {
@@ -190,6 +195,62 @@ export function HomePage() {
               }).`
             : 'Demo mode active — Create/Join play vs a CPU. Add Ably or Supabase keys for live 1v1.'}
         </p>
+      </Card>
+
+      {/* Daily Challenge */}
+      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+        <div className="mb-2 flex items-center gap-2">
+          <IconClock className="h-5 w-5 text-gold" />
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
+            Daily Challenge
+          </h2>
+          {daily.streak > 0 && (
+            <span className="ml-auto text-xs font-bold text-gold">
+              🔥 {daily.streak}-day streak
+            </span>
+          )}
+        </div>
+
+        {playedDailyToday ? (
+          <>
+            <p className="text-xs leading-relaxed text-white/55">
+              Done for today — you scored{' '}
+              <span className="font-semibold text-pitch">
+                {daily.lastScore.toLocaleString()}
+              </span>
+              {daily.lastOutcome ? ` (${daily.lastOutcome})` : ''}. Best:{' '}
+              {daily.bestScore.toLocaleString()}.
+            </p>
+            <div className="mt-3">
+              <Button
+                variant="ghost"
+                fullWidth
+                disabled={connecting}
+                onClick={() => playDaily(name.trim() || 'You')}
+              >
+                Play again (practice)
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-xs leading-relaxed text-white/55">
+              The same 10 questions for everyone today.{' '}
+              {daily.streak > 0
+                ? `Keep your ${daily.streak}-day streak alive!`
+                : 'Play each day to build a streak.'}
+            </p>
+            <div className="mt-3">
+              <Button
+                fullWidth
+                disabled={connecting}
+                onClick={() => playDaily(name.trim() || 'You')}
+              >
+                Play today’s challenge
+              </Button>
+            </div>
+          </>
+        )}
       </Card>
 
       {/* Lifetime record (local) */}

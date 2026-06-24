@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { pickMatchQuestions, randomizeAnswerOrder, shuffle } from './questionPicker';
 import { defaultSettings, difficultiesForMode } from './matchModes';
-import type { MatchMode, Question } from '../types/game';
+import type { MatchMode, MatchSettings, Question } from '../types/game';
 
 describe('shuffle', () => {
   it('keeps all elements and leaves the source untouched', () => {
@@ -108,4 +108,39 @@ describe('pickMatchQuestions', () => {
       }
     });
   }
+});
+
+describe('pickMatchQuestions determinism (Daily Challenge)', () => {
+  const layout = (qs: Question[]) =>
+    qs.map((q) =>
+      q.type === 'higher_lower'
+        ? `${q.id}:${q.leftOption.name}|${q.rightOption.name}`
+        : `${q.id}:${q.options.join('|')}`,
+    );
+
+  it('produces an identical match for the same seed', () => {
+    const settings: MatchSettings = {
+      mode: 'serious',
+      questionCount: 10,
+      questionDurationMs: 15000,
+      seed: 99,
+    };
+    expect(layout(pickMatchQuestions(settings))).toEqual(
+      layout(pickMatchQuestions(settings)),
+    );
+  });
+
+  it('produces different matches for different seeds', () => {
+    const sig = (seed: number) =>
+      pickMatchQuestions({
+        mode: 'serious',
+        questionCount: 10,
+        questionDurationMs: 15000,
+        seed,
+      })
+        .map((q) => q.id)
+        .join(',');
+    const sigs = new Set([1, 2, 3, 4, 5].map(sig));
+    expect(sigs.size).toBeGreaterThan(1);
+  });
 });

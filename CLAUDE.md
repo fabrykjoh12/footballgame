@@ -68,6 +68,8 @@ HomePage → LobbyPage → GamePage (QuestionCard / ResultReveal / GoalAnimation
 | Question selection (per-type mix, difficulty, answer-position randomize) | `src/lib/questionPicker.ts` |
 | Question database (176 Qs, 5 types) | `src/data/questions.ts` |
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
+| Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
+| Local profile / lifetime stats | `src/lib/profileStats.ts` |
 | Realtime env detection (SDK-free) | `src/lib/realtimeConfig.ts` |
 | Components | `src/components/{layout,home,lobby,game,ui}` |
 | Styling tokens / animations | `tailwind.config.js`, `src/styles/globals.css` |
