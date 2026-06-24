@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useGame } from '../../context/GameProvider';
 import { MATCH_MODE_LIST } from '../../lib/matchModes';
+import { CATEGORY_OPTIONS } from '../../lib/categories';
+import type { Category } from '../../types/game';
 import { teamName } from '../../lib/teamName';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
@@ -22,6 +24,15 @@ export function LobbyPage() {
   if (!room) return null;
   const opponent = room.players.find((p) => p.id !== localPlayerId);
   const canStart = room.players.length >= 2;
+  const selectedCats = room.settings.categories ?? [];
+
+  const toggleCategory = (id: Category) => {
+    if (!isHost) return;
+    const set = new Set(selectedCats);
+    if (set.has(id)) set.delete(id);
+    else set.add(id);
+    void updateSettings({ categories: Array.from(set) });
+  };
 
   const copy = async (kind: 'code' | 'link') => {
     const text =
@@ -131,10 +142,51 @@ export function LobbyPage() {
             );
           })}
         </div>
+        {/* Topics (soft filter) */}
+        <div className="mt-4 border-t border-white/10 pt-3">
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-white/70">
+              Topics
+            </h3>
+            <span className="text-xs text-white/40">
+              {selectedCats.length === 0 ? 'All topics' : `${selectedCats.length} selected`}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORY_OPTIONS.map((c) => {
+              const on = selectedCats.includes(c.id);
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  disabled={!isHost}
+                  onClick={() => toggleCategory(c.id)}
+                  aria-pressed={on}
+                  className={[
+                    'answer-press rounded-full border px-3 py-1.5 text-xs font-medium',
+                    on
+                      ? 'border-pitch/60 bg-pitch/15 text-pitch'
+                      : 'border-white/10 bg-white/[0.03] text-white/55 hover:bg-white/[0.06]',
+                    !isHost ? 'cursor-default opacity-90' : '',
+                  ].join(' ')}
+                >
+                  {c.label}
+                </button>
+              );
+            })}
+          </div>
+          {isHost && (
+            <p className="mt-2 text-[11px] leading-relaxed text-white/35">
+              Leave empty for all topics. Picks lean toward your choices and top up
+              if a topic runs short.
+            </p>
+          )}
+        </div>
+
         <div className="mt-3 flex flex-wrap gap-2 text-white/40">
           <Badge tone="muted">{room.settings.questionCount} questions</Badge>
           <Badge tone="muted">{room.settings.questionDurationMs / 1000}s each</Badge>
-          <Badge tone="muted">3 Who Am I · 3 Career · 2 H/L · 2 Trivia</Badge>
+          <Badge tone="muted">6 mini-games mixed in</Badge>
         </div>
       </Card>
 

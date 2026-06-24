@@ -8,6 +8,7 @@
  */
 
 import type {
+  Category,
   Difficulty,
   MatchSettings,
   Question,
@@ -53,16 +54,28 @@ function pickOfType(
   count: number,
   allowed: Difficulty[],
   rng: Rng,
+  categories?: Category[],
 ): Question[] {
   const byType = pool.filter((q) => q.type === type);
-  const inTier = shuffle(byType.filter((q) => allowed.includes(q.difficulty)), rng);
+  const tier = byType.filter((q) => allowed.includes(q.difficulty));
 
-  const chosen = inTier.slice(0, count);
-  // Fallback: if a tier is short on a given type, top up from any difficulty
-  // of that type so a match always has a full slate of questions.
+  // Prefer the selected topics within the mode's difficulty tier.
+  const preferred =
+    categories && categories.length
+      ? tier.filter((q) => categories.includes(q.category))
+      : tier;
+
+  const chosen = shuffle(preferred, rng).slice(0, count);
+
+  // Top up from the rest of the tier (relax topic, keep the mode's difficulty).
   if (chosen.length < count) {
-    const remaining = shuffle(byType.filter((q) => !chosen.includes(q)), rng);
-    chosen.push(...remaining.slice(0, count - chosen.length));
+    const more = shuffle(tier.filter((q) => !chosen.includes(q)), rng);
+    chosen.push(...more.slice(0, count - chosen.length));
+  }
+  // Last resort: any difficulty of this type, so a match is always full.
+  if (chosen.length < count) {
+    const more = shuffle(byType.filter((q) => !chosen.includes(q)), rng);
+    chosen.push(...more.slice(0, count - chosen.length));
   }
   return chosen;
 }
@@ -108,13 +121,14 @@ export function pickMatchQuestions(
   const allowed = difficultiesForMode(settings.mode);
   const dist = distributionFor(settings.questionCount);
 
+  const cats = settings.categories;
   const selected: Question[] = [
-    ...pickOfType(pool, 'who_am_i', dist.who_am_i, allowed, rng),
-    ...pickOfType(pool, 'career_path', dist.career_path, allowed, rng),
-    ...pickOfType(pool, 'higher_lower', dist.higher_lower, allowed, rng),
-    ...pickOfType(pool, 'club_country', dist.club_country, allowed, rng),
-    ...pickOfType(pool, 'guess_year', dist.guess_year, allowed, rng),
-    ...pickOfType(pool, 'transfer_fee', dist.transfer_fee, allowed, rng),
+    ...pickOfType(pool, 'who_am_i', dist.who_am_i, allowed, rng, cats),
+    ...pickOfType(pool, 'career_path', dist.career_path, allowed, rng, cats),
+    ...pickOfType(pool, 'higher_lower', dist.higher_lower, allowed, rng, cats),
+    ...pickOfType(pool, 'club_country', dist.club_country, allowed, rng, cats),
+    ...pickOfType(pool, 'guess_year', dist.guess_year, allowed, rng, cats),
+    ...pickOfType(pool, 'transfer_fee', dist.transfer_fee, allowed, rng, cats),
   ];
 
   // Shuffle the final order so mini-games are interleaved, then randomize each

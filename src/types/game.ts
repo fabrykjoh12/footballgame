@@ -130,6 +130,8 @@ export interface MatchSettings {
   seed?: number;
   /** Marks a Daily Challenge match so its result is recorded against the day. */
   isDaily?: boolean;
+  /** Preferred question topics (soft filter; tops up if a topic is short). */
+  categories?: Category[];
 }
 
 /* ------------------------------------------------------------------ */

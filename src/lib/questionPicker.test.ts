@@ -111,6 +111,45 @@ describe('pickMatchQuestions', () => {
   }
 });
 
+describe('pickMatchQuestions topic filter', () => {
+  it('still builds a full, difficulty-valid match for a tiny topic', () => {
+    const allowed = difficultiesForMode('casual');
+    for (let i = 0; i < 20; i++) {
+      const qs = pickMatchQuestions({
+        mode: 'casual',
+        questionCount: 10,
+        questionDurationMs: 15000,
+        categories: ['history'],
+      });
+      expect(qs).toHaveLength(10);
+      for (const q of qs) expect(allowed).toContain(q.difficulty);
+    }
+  });
+
+  it('leans toward selected topics when the pool is rich', () => {
+    for (let i = 0; i < 20; i++) {
+      const qs = pickMatchQuestions({
+        mode: 'casual',
+        questionCount: 10,
+        questionDurationMs: 15000,
+        categories: ['players'],
+      });
+      expect(qs.filter((q) => q.category === 'players').length).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('treats empty categories as all topics', () => {
+    expect(
+      pickMatchQuestions({
+        mode: 'serious',
+        questionCount: 10,
+        questionDurationMs: 15000,
+        categories: [],
+      }),
+    ).toHaveLength(10);
+  });
+});
+
 describe('pickMatchQuestions determinism (Daily Challenge)', () => {
   const layout = (qs: Question[]) =>
     qs.map((q) =>

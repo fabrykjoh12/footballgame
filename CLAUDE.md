@@ -65,7 +65,8 @@ HomePage → LobbyPage → GamePage (QuestionCard / ResultReveal / GoalAnimation
 | --- | --- |
 | Domain types (source of truth) | `src/types/game.ts` |
 | Scoring & football-event rules (pure) | `src/lib/scoring.ts` |
-| Question selection (per-type mix, difficulty, answer-position randomize) | `src/lib/questionPicker.ts` |
+| Question selection (per-type mix, difficulty, topic filter, answer-position randomize) | `src/lib/questionPicker.ts` |
+| Topic/category filter options | `src/lib/categories.ts` |
 | Question database (192 Qs, 6 types) | `src/data/questions.ts` |
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
 | Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
