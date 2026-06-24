@@ -104,7 +104,10 @@ function RevealValues({ result }: { result: QuestionResult }) {
         isCorrect ? 'border-good/50 bg-good/10' : 'border-white/10 bg-white/[0.03]',
       ].join(' ')}
     >
-      <div className="truncate text-xs text-white/55">{name}</div>
+      <div className="truncate text-xs text-white/55">
+        {name}
+        {isCorrect && <span className="sr-only"> (correct)</span>}
+      </div>
       <div className="font-mono text-lg font-bold">
         {value}
         {v.unit ? <span className="ml-1 text-xs font-normal text-white/50">{v.unit}</span> : null}
@@ -144,6 +147,7 @@ function PlayerResultCard({
       </div>
 
       <div className="flex items-center gap-2">
+        <span className="sr-only">{isCorrect ? 'Correct.' : 'Incorrect.'}</span>
         <span
           className={[
             'grid h-6 w-6 place-items-center rounded-md',

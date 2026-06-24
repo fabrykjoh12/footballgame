@@ -118,15 +118,17 @@ export async function renderResultCard(room: Room): Promise<Blob | null> {
   );
   stat('BEST STREAK', String(a.bestStreak), String(b.bestStreak), 1000);
 
-  // Footer.
+  // Footer: mode tagline + where to play (drives shares back to the game).
   text(
-    `${MATCH_MODES[room.settings.mode].label}  ·  Prove your football IQ`,
-    1045,
-    22,
+    `${MATCH_MODES[room.settings.mode].label}  ·  6 mini-games  ·  Prove your football IQ`,
+    1036,
+    21,
     'rgba(255,255,255,0.4)',
     sans,
     '500',
   );
+  const playUrl = `${window.location.host}${window.location.pathname}`.replace(/\/$/, '');
+  if (playUrl) text(playUrl, 1062, 22, '#16ff7a', sans, '600');
 
   return await new Promise<Blob | null>((resolve) =>
     canvas.toBlob((blob) => resolve(blob), 'image/png'),
