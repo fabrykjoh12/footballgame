@@ -245,7 +245,13 @@ export class AblyGameService implements GameService {
     });
 
     await channel.attach();
-    await channel.presence.enter();
+    // Presence is only used to detect disconnects; if the key lacks the
+    // presence capability, multiplayer should still work.
+    try {
+      await channel.presence.enter();
+    } catch {
+      /* presence unavailable — non-fatal */
+    }
   }
 
   private async send(event: ChannelEvent, payload: unknown): Promise<void> {
