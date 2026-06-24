@@ -10,6 +10,7 @@ import { TimerBar } from './TimerBar';
 import { QuestionCard } from './QuestionCard';
 import { ResultReveal } from './ResultReveal';
 import { GoalAnimation } from './GoalAnimation';
+import { CommentaryTicker } from './CommentaryTicker';
 
 export function GamePage() {
   const { room, localPlayerId, isHost, opponent, submitAnswer, nextQuestion } =
@@ -92,6 +93,8 @@ export function GamePage() {
           {opponent.name} disconnected — they may rejoin, or you can finish out the match.
         </div>
       )}
+
+      <CommentaryTicker />
 
       {status === 'starting' && <Kickoff players={room.players} mode={room.settings.mode} />}
 
