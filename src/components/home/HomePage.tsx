@@ -74,9 +74,9 @@ export function HomePage() {
   const codeValid = isValidRoomCode(code);
 
   return (
-    <div className="flex flex-1 flex-col justify-center gap-8 py-6 animate-fade-in">
+    <div className="flex flex-1 flex-col justify-center gap-8 py-6">
       {/* Hero */}
-      <div className="text-center">
+      <div className="text-center animate-fade-in">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
           <IconBolt className="h-3.5 w-3.5 text-pitch" />
           Kahoot × Football Wordle × FIFA trivia
@@ -90,20 +90,29 @@ export function HomePage() {
       </div>
 
       {/* Entry card */}
-      <Card strong className="mx-auto w-full max-w-md p-5 sm:p-6">
-        <label htmlFor="player-name" className="mb-1.5 block text-sm font-medium text-white/70">
+      <Card
+        strong
+        className="mx-auto w-full max-w-md p-6 animate-rise-in [animation-delay:90ms] sm:p-7"
+      >
+        <label
+          htmlFor="player-name"
+          className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/50"
+        >
           Your name
         </label>
-        <input
-          id="player-name"
-          value={name}
-          onChange={(e) => setName(e.target.value.slice(0, 18))}
-          placeholder="e.g. Sara"
-          autoComplete="off"
-          className="mb-4 w-full rounded-xl border border-white/10 bg-ink-800/60 px-4 py-3 text-white placeholder:text-white/30 focus:border-pitch/50"
-        />
+        <div className="relative mb-6">
+          <IconUsers className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+          <input
+            id="player-name"
+            value={name}
+            onChange={(e) => setName(e.target.value.slice(0, 18))}
+            placeholder="e.g. Sara"
+            autoComplete="off"
+            className="input-field pl-10 text-base"
+          />
+        </div>
 
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-3">
           <Button
             size="lg"
             fullWidth
@@ -124,7 +133,7 @@ export function HomePage() {
               Join Room
             </Button>
           ) : (
-            <div className="flex flex-col gap-2 rounded-xl border border-white/10 bg-ink-800/40 p-3 animate-scale-in">
+            <div className="flex flex-col gap-2.5 rounded-2xl border border-white/10 bg-ink-900/40 p-3 animate-scale-in">
               <input
                 value={code}
                 onChange={(e) => setCode(normalizeRoomCode(e.target.value).slice(0, 8))}
@@ -132,7 +141,7 @@ export function HomePage() {
                 autoComplete="off"
                 inputMode="text"
                 aria-label="Room code"
-                className="w-full rounded-lg border border-white/10 bg-ink-900/60 px-4 py-3 text-center font-mono text-lg tracking-[0.25em] uppercase placeholder:tracking-normal placeholder:text-white/30 focus:border-pitch/50"
+                className="input-field text-center font-mono text-lg uppercase tracking-[0.25em] placeholder:tracking-normal"
               />
               <div className="flex gap-2">
                 <Button
@@ -153,10 +162,10 @@ export function HomePage() {
             </div>
           )}
 
-          <div className="my-1 flex items-center gap-3 text-[11px] uppercase tracking-widest text-white/30">
-            <span className="h-px flex-1 bg-white/10" />
+          <div className="my-2 flex items-center gap-3 text-[11px] uppercase tracking-widest text-white/30">
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent to-white/15" />
             or
-            <span className="h-px flex-1 bg-white/10" />
+            <span className="h-px flex-1 bg-gradient-to-l from-transparent to-white/15" />
           </div>
 
           <Button
@@ -284,7 +293,7 @@ export function HomePage() {
       )}
 
       {/* Feature cards */}
-      <div className="mx-auto grid w-full max-w-2xl grid-cols-2 gap-3">
+      <div className="mx-auto grid w-full max-w-2xl grid-cols-2 gap-3 animate-fade-in [animation-delay:200ms]">
         {FEATURES.map((f) => (
           <Card key={f.title} className="p-4">
             <f.icon className="mb-2 h-5 w-5 text-pitch" />

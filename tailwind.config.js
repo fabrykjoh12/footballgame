@@ -34,6 +34,13 @@ export default {
         'glow-lg': '0 0 60px rgba(22, 255, 122, 0.45)',
         gold: '0 0 28px rgba(255, 210, 74, 0.45)',
         card: '0 10px 40px rgba(0, 0, 0, 0.45)',
+        // Elevation scale for consistent depth.
+        'elev-1': '0 1px 2px rgba(0,0,0,0.35), 0 4px 12px rgba(0,0,0,0.30)',
+        'elev-2': '0 2px 6px rgba(0,0,0,0.40), 0 16px 48px rgba(0,0,0,0.55)',
+      },
+      transitionTimingFunction: {
+        // Crisp, premium ease-out (expo-like) for entrances & lifts.
+        premium: 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
       backgroundImage: {
         'pitch-radial':
@@ -47,6 +54,10 @@ export default {
         'scale-in': {
           '0%': { opacity: '0', transform: 'scale(0.92)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        'rise-in': {
+          '0%': { opacity: '0', transform: 'translateY(16px) scale(0.985)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
         },
         'slide-up': {
           '0%': { opacity: '0', transform: 'translateY(24px)' },
@@ -84,6 +95,7 @@ export default {
       animation: {
         'fade-in': 'fade-in 0.4s ease-out both',
         'scale-in': 'scale-in 0.35s cubic-bezier(0.22,1,0.36,1) both',
+        'rise-in': 'rise-in 0.55s cubic-bezier(0.16,1,0.3,1) both',
         'slide-up': 'slide-up 0.45s cubic-bezier(0.22,1,0.36,1) both',
         shake: 'shake 0.4s ease-in-out',
         bump: 'bump 0.5s ease-out',
