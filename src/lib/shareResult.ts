@@ -29,8 +29,9 @@ export function buildShareText(room: Room): string {
       room.selectedQuestions.length,
     )}% acc`;
 
+  const levelOnGoals = a.goals === b.goals;
   const result = winner
-    ? `🏆 ${teamName(winner.name)} win!`
+    ? `🏆 ${teamName(winner.name)} win${levelOnGoals ? ' on points!' : '!'}`
     : '🤝 Honours even — it’s a draw!';
 
   return [

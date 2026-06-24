@@ -51,6 +51,8 @@ export function FinalResult() {
   const total = room.selectedQuestions.length;
   const youWon = winner?.id === localPlayerId;
   const isDraw = winner === null;
+  // Level on goals but a winner exists → it was decided on points.
+  const onPoints = !isDraw && a.goals === b.goals;
 
   const share = async () => {
     try {
@@ -96,21 +98,33 @@ export function FinalResult() {
           </span>
         </div>
 
-        <div className="mt-1 font-mono text-sm text-white/50">
+        <div
+          className={[
+            'mt-1 font-mono text-sm',
+            onPoints ? 'font-semibold text-pitch' : 'text-white/50',
+          ].join(' ')}
+        >
           {a.score} – {b.score} points
         </div>
 
         <div className="mt-4 text-lg font-semibold">
           {isDraw ? (
-            <span className="text-white/80">🤝 It’s a draw!</span>
+            <span className="text-white/80">🤝 Dead level — it’s a draw!</span>
           ) : youWon ? (
-            <span className="text-gradient-pitch">🎉 You win!</span>
+            <span className="text-gradient-pitch">
+              🎉 You win{onPoints ? ' on points!' : '!'}
+            </span>
           ) : (
             <span className="text-white/70">
-              {teamName(winner!.name)} wins
+              {teamName(winner!.name)} win{onPoints ? ' on points' : 's'}
             </span>
           )}
         </div>
+        {onPoints && (
+          <p className="mt-1 text-xs text-white/45">
+            Goals were level, so the higher points total takes it.
+          </p>
+        )}
       </Card>
 
       {/* Stats */}

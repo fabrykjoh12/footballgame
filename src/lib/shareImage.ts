@@ -93,13 +93,14 @@ export async function renderResultCard(room: Room): Promise<Blob | null> {
 
   text(`${a.score} – ${b.score} points`, 775, 30, 'rgba(255,255,255,0.5)', sans, '500');
 
-  // Result banner.
-  text(
-    winner ? `${teamName(winner.name)} win` : 'Honours even — a draw',
-    860,
-    44,
-    '#ffd24a',
-  );
+  // Result banner (note when a level scoreline was decided on points).
+  const levelOnGoals = a.goals === b.goals;
+  const banner = !winner
+    ? 'Honours even — a draw'
+    : levelOnGoals
+      ? `${teamName(winner.name)} win on points`
+      : `${teamName(winner.name)} win`;
+  text(banner, 860, 42, '#ffd24a');
 
   // Compact stats.
   const stat = (label: string, va: string, vb: string, y: number) => {
