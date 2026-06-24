@@ -78,7 +78,7 @@ export function FinalResult() {
       <Confetti celebratory={youWon || isDraw} />
 
       {/* Headline */}
-      <Card strong glow className="overflow-hidden p-6 text-center">
+      <Card strong glow className="overflow-hidden p-6 text-center animate-rise-in">
         <div className="mb-2 inline-flex items-center gap-2 text-gold">
           <IconTrophy className="h-5 w-5" />
           <span className="text-xs font-bold uppercase tracking-[0.2em]">

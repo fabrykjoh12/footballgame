@@ -122,6 +122,7 @@ export function GamePage() {
           </div>
           <TimerBar fraction={countdown.fraction} secondsLeft={countdown.secondsLeft} />
           <QuestionCard
+            key={question.id}
             question={question}
             clueStage={clueStage}
             selectedAnswer={selectedAnswer}

@@ -47,8 +47,10 @@ export function AnswerOption({
         state === 'correct' ? ' (correct answer)' : state === 'incorrect' ? ' (your answer, wrong)' : ''
       }`}
       className={[
-        'answer-press group flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left',
-        'transition-colors duration-150 disabled:cursor-default',
+        'group flex w-full items-center gap-3 rounded-xl border px-4 py-3.5 text-left select-none',
+        'transition-[transform,box-shadow,background-color,border-color,color] duration-200 ease-premium',
+        'enabled:active:scale-[0.98] motion-safe:enabled:hover:-translate-y-0.5',
+        'disabled:cursor-default',
         STATE_CLASSES[state],
       ].join(' ')}
     >

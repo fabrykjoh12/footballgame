@@ -76,9 +76,9 @@
     background-image: linear-gradient(120deg, #fff3c4 0%, #ffd24a 60%, #e0b020 100%);
   }
 
-  /* Tap target helper for answer buttons. */
+  /* Tap-press feedback for interactive surfaces. */
   .answer-press {
-    @apply transition-transform duration-100 active:scale-[0.97];
+    @apply transition-transform duration-200 ease-premium active:scale-[0.97];
   }
 }
 

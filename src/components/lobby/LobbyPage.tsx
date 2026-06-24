@@ -60,7 +60,7 @@ export function LobbyPage() {
       </div>
 
       {/* Room code */}
-      <Card strong className="p-5 text-center">
+      <Card strong className="p-6 text-center animate-rise-in">
         <div className="text-xs uppercase tracking-[0.2em] text-white/40">
           Room code
         </div>

@@ -45,7 +45,7 @@ export function QuestionCard({
   const meta = TYPE_META[question.type];
 
   return (
-    <Card strong className="p-4 sm:p-5 animate-scale-in">
+    <Card strong className="p-4 sm:p-5 animate-fade-in">
       {/* Header */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Badge tone="pitch">
