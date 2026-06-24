@@ -31,6 +31,9 @@ jobs:
 
       - run: npm ci
 
+      - name: Unit tests
+        run: npm test
+
       - name: Build (relative base for Project Pages)
         run: npm run build:pages
         env:

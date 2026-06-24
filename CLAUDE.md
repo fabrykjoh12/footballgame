@@ -22,10 +22,12 @@ npm run dev      # dev server at http://localhost:5173
 npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
+npm test         # vitest run (unit tests for lib/ + matchEngine)
 ```
 
-There is no test runner yet and no ESLint config — `npm run build` (strict
-`tsc`) is the gate. Keep it green.
+Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). CI runs the
+tests before deploying. There's no ESLint config. Tests live next to sources
+as `*.test.ts` and are excluded from the app build. Keep both green.
 
 ## Architecture (read this first)
 
