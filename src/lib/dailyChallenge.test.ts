@@ -1,5 +1,14 @@
-import { describe, it, expect } from 'vitest';
-import { nextStreak, hasPlayedToday, dailySettings, type DailyState } from './dailyChallenge';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import {
+  nextStreak,
+  hasPlayedToday,
+  dailySettings,
+  getDailyState,
+  recordDailyResult,
+  type DailyState,
+} from './dailyChallenge';
+import { todayString } from './seededRandom';
+import type { Player, Question, Room } from '../types/game';
 
 function state(partial: Partial<DailyState>): DailyState {
   return {
@@ -48,5 +57,79 @@ describe('dailySettings', () => {
     // Same day → same seed; different day → different seed.
     expect(dailySettings('2026-06-24').seed).toBe(s.seed);
     expect(dailySettings('2026-06-25').seed).not.toBe(s.seed);
+  });
+});
+
+function dailyRoom(me: Partial<Player>, opp: Partial<Player>): Room {
+  const player = (id: string, over: Partial<Player>): Player => ({
+    id,
+    name: id,
+    isHost: false,
+    connected: true,
+    score: 0,
+    goals: 0,
+    correctAnswers: 0,
+    streak: 0,
+    bestStreak: 0,
+    fastestAnswerMs: null,
+    ...over,
+  });
+  const selectedQuestions: Question[] = Array.from({ length: 10 }, (_, i) => ({
+    id: `q${i}`,
+    type: 'club_country',
+    difficulty: 'easy',
+    category: 'clubs',
+    prompt: '?',
+    options: ['a', 'b', 'c', 'd'],
+    correctAnswer: 'a',
+    explanation: '',
+  }));
+  return {
+    roomCode: 'BK1',
+    hostId: 'me',
+    players: [player('me', me), player('opp', opp)],
+    settings: { mode: 'serious', questionCount: 10, questionDurationMs: 15000, isDaily: true },
+    currentQuestionIndex: 0,
+    selectedQuestions,
+    answers: {},
+    scores: {},
+    status: 'finished',
+    questionStartedAt: null,
+    lastResult: null,
+    createdAt: 1,
+  };
+}
+
+describe('recordDailyResult', () => {
+  beforeEach(() => {
+    const store = new Map<string, string>();
+    vi.stubGlobal('localStorage', {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => void store.set(k, String(v)),
+      removeItem: (k: string) => void store.delete(k),
+      clear: () => store.clear(),
+    });
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("records today's result and is idempotent for the same day", () => {
+    const r = dailyRoom({ score: 4200, goals: 3 }, { score: 1000, goals: 1 });
+    const s = recordDailyResult(r, 'me');
+    expect(s.lastPlayedDate).toBe(todayString());
+    expect(s.lastScore).toBe(4200);
+    expect(s.lastOutcome).toBe('win');
+    expect(s.bestScore).toBe(4200);
+    expect(s.streak).toBe(1);
+    expect(s.playsTotal).toBe(1);
+
+    // Replaying the same day must not double-count.
+    const again = recordDailyResult(r, 'me');
+    expect(again.playsTotal).toBe(1);
+    expect(getDailyState().playsTotal).toBe(1);
+  });
+
+  it('records a loss outcome', () => {
+    const s = recordDailyResult(dailyRoom({ score: 800, goals: 0 }, { score: 2000, goals: 2 }), 'me');
+    expect(s.lastOutcome).toBe('loss');
   });
 });
