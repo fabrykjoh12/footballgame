@@ -51,8 +51,9 @@ src/
 - **Phase 0 (bootstrap)** ✅ — Vite + TS strict + Tailwind + Vitest.
 - **Phase 1 (game loop hardening)** ✅ — full FSM, CPU transport, scoring,
   tiebreakers, error handling, and a playable end-to-end CPU match.
-- **Phase 2 (the 6 mini-game engines)** ◻️ — Multiple Choice is the reference
-  implementation; the registry falls back to it for the other five until each
-  lands. Adding one is a folder + a registry entry — zero engine changes.
+- **Phase 2 (the 6 mini-game engines)** ✅ — all six implemented against one
+  `MiniGame` contract: Multiple Choice, Higher/Lower, Career Path, Odd One Out,
+  Guess the Year (closeness-scored), and True/False. Adding a seventh is a folder
+  + a registry entry — zero engine changes.
 - **Phases 3–4 (immersion UI, PWA/optimization)** ◻️ — early pieces (team themes,
   timeline, commentary) are in; the rest are scoped in the roadmap.

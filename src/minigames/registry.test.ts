@@ -28,11 +28,19 @@ describe('buildSequence', () => {
 });
 
 describe('getMiniGame', () => {
-  it('returns a game for every id (fallback until Phase 2)', () => {
+  it('returns a game for every id', () => {
     for (const id of MINI_GAME_IDS) {
       const game = getMiniGame(id);
       expect(game).toBeDefined();
       expect(typeof game.generate).toBe('function');
     }
+  });
+
+  it('maps each id to its own matching engine (no shared fallback)', () => {
+    for (const id of MINI_GAME_IDS) {
+      expect(getMiniGame(id).id).toBe(id);
+    }
+    const titles = MINI_GAME_IDS.map((id) => getMiniGame(id).title);
+    expect(new Set(titles).size).toBe(MINI_GAME_IDS.length);
   });
 });

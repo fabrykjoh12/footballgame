@@ -330,12 +330,16 @@ interface MiniGame<TPayload, TAnswer> {
 6. **True / False (Rapid Fire)** — fast binary calls under a tight clock.
 
 **Key milestones**
-- [ ] `MiniGame` interface + `MiniGameProps` + `MiniGameShell.tsx`
-- [ ] `registry.ts` + `MiniGameId` union
-- [ ] Each of the 6 games as an isolated module with its own unit tests (`generate`/`score`/`cpuAnswer`)
-- [ ] A typed **question bank** (`data/`) — pure JSON/TS data, validated at build, no media
-- [ ] Difficulty tuning per game; CPU `cpuAnswer` calibrated against skill levels
-- [ ] Engine picks a varied, non-repeating sequence of 10 across the 6 games
+- [x] `MiniGame` interface + `MiniGameProps` + `MiniGameShell.tsx`
+- [x] `registry.ts` + `MiniGameId` union
+- [x] Each of the 6 games as an isolated module with its own unit tests (`generate`/`score`/`cpuAnswer`)
+- [x] A typed **question bank** (`data/`) — pure TS data, no media
+- [x] Difficulty tuning per game; CPU `cpuAnswer` calibrated against skill levels
+- [x] Engine picks a varied, non-repeating sequence of 10 across the 6 games (bag shuffle)
+
+> **Status: Phase 2 complete.** All six engines are registered and drawn into matches.
+> Guess the Year uses bespoke closeness scoring (near-misses still reward quality);
+> the rest use the shared `outcomeFromCorrectness` helper.
 
 **Files created/modified:** `minigames/types.ts`, `minigames/registry.ts`,
 `minigames/MiniGameShell.tsx`, `minigames/<game>/index.tsx` ×6, `data/questionBank.ts`,

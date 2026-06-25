@@ -1,24 +1,31 @@
 /**
  * Mini-game registry — the single map the engine consults.
  *
- * Only Multiple Choice is implemented in this phase; the other five ids fall
- * back to it so the full 10-question loop is playable end-to-end today. Phase 2
- * replaces each fallback with its real engine — and the match loop needs zero
- * changes when it does.
+ * All six engines are implemented; the engine asks the registry for a game by
+ * id and treats them uniformly. Adding a seventh is one entry here + one folder.
  */
 
 import type { AnswerValue, Difficulty, MiniGameId } from '../types/match.ts';
 import type { Rng } from '../lib/rng.ts';
 import type { MiniGame } from './types.ts';
 import { multipleChoiceGame } from './multiple_choice/index.tsx';
+import { higherLowerGame } from './higher_lower/index.tsx';
+import { trueFalseGame } from './true_false/index.tsx';
+import { oddOneOutGame } from './odd_one_out/index.tsx';
+import { guessTheYearGame } from './guess_the_year/index.tsx';
+import { careerPathGame } from './career_path/index.tsx';
 
-const IMPLEMENTED: Partial<Record<MiniGameId, MiniGame<unknown, AnswerValue>>> = {
+const REGISTRY: Record<MiniGameId, MiniGame<unknown, AnswerValue>> = {
   multiple_choice: multipleChoiceGame as MiniGame<unknown, AnswerValue>,
+  higher_lower: higherLowerGame as MiniGame<unknown, AnswerValue>,
+  true_false: trueFalseGame as MiniGame<unknown, AnswerValue>,
+  odd_one_out: oddOneOutGame as MiniGame<unknown, AnswerValue>,
+  guess_the_year: guessTheYearGame as MiniGame<unknown, AnswerValue>,
+  career_path: careerPathGame as MiniGame<unknown, AnswerValue>,
 };
 
 export function getMiniGame(id: MiniGameId): MiniGame<unknown, AnswerValue> {
-  // Fallback keeps the loop playable until every engine exists (Phase 2).
-  return IMPLEMENTED[id] ?? (multipleChoiceGame as MiniGame<unknown, AnswerValue>);
+  return REGISTRY[id];
 }
 
 /** Build the per-match sequence of mini-games (length QUESTIONS_PER_MATCH). */
