@@ -6,6 +6,7 @@ import {
   readRuntimeEnv,
 } from '../../transport/MatchTransport.ts';
 import { soundEngine } from '../../lib/sound.ts';
+import { useOnlineStatus } from '../../lib/useOnlineStatus.ts';
 import type { Difficulty } from '../../types/match.ts';
 
 const DIFFICULTIES: Difficulty[] = ['casual', 'pro', 'legend'];
@@ -14,6 +15,7 @@ export function MainMenuScreen() {
   const settings = useSettings();
   const { startCpuMatch } = useMatch();
   const canPlayOnline = onlineAvailable(readRuntimeEnv());
+  const online = useOnlineStatus();
 
   const handlePlay = () => {
     // Unlock audio within the user gesture before the match starts.
@@ -32,6 +34,24 @@ export function MainMenuScreen() {
         <p className="mt-2 text-sm text-ink-muted">
           A 1v1 football knowledge duel. Turn trivia into a live scoreline.
         </p>
+        <div className="mt-3 flex justify-center">
+          <span
+            className={[
+              'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium',
+              online
+                ? 'bg-white/5 text-ink-muted'
+                : 'bg-amber-400/10 text-amber-200',
+            ].join(' ')}
+          >
+            <span
+              className={[
+                'h-1.5 w-1.5 rounded-full',
+                online ? 'bg-neon' : 'bg-amber-300',
+              ].join(' ')}
+            />
+            {online ? 'Online · CPU ready' : 'Offline · CPU still playable'}
+          </span>
+        </div>
       </header>
 
       <div className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-pitch-900/60 p-6 backdrop-blur">

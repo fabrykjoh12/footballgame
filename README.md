@@ -28,6 +28,39 @@ npm run build      # production build
 Copy `.env.example` to `.env` to configure online play (optional). With no keys,
 the app runs fully offline against the CPU.
 
+## PWA & offline
+
+The production build (`npm run build`) emits a web app manifest and a service
+worker (via `vite-plugin-pwa`) that precaches the entire app shell. After the
+first load the app is **installable** on mobile/desktop and **fully playable
+offline** against the CPU — the question banks ship in the bundle, so no network
+is required. Online multiplayer is the only network-dependent feature, and it is
+gated behind the env keys below.
+
+Icons and the favicon are generated SVGs (`public/icons/`, `public/favicon.svg`)
+— no raster/photo assets, consistent with the project's zero-media policy.
+
+## Deployment
+
+The build outputs a static `dist/` that deploys to any static host
+(Netlify, Vercel, GitHub Pages, Cloudflare Pages):
+
+```bash
+npm run build      # → dist/
+npm run preview    # serve the built app locally to sanity-check the SW/PWA
+```
+
+Configure online play in production by setting the env vars below in your host's
+dashboard; with none set, the "Play Online" entry stays hidden and CPU play is
+unaffected:
+
+| Variable | Purpose |
+|---|---|
+| `VITE_ABLY_KEY` | Ably real-time key (option A) |
+| `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` | Supabase real-time (option B) |
+
+CI (`.github/workflows/ci.yml`) runs typecheck → test → build on every PR.
+
 ## Architecture at a glance
 
 A match is a **finite state machine** (`src/engine/matchReducer.ts`) — a pure
