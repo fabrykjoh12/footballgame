@@ -9,6 +9,7 @@
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import {
+  HALFTIME_AT,
   initialState,
   matchReducer,
   type MatchState,
@@ -28,6 +29,8 @@ import { readRuntimeEnv, type MatchTransport } from '../transport/MatchTransport
 const REVEAL_DELAY_MS = 2200;
 const BOTH_ANSWERED_PAUSE_MS = 600;
 const TIEBREAK_TIME_LIMIT_SEC = 8;
+/** How long the half-time interstitial lingers before auto-resuming. */
+const HALFTIME_MS = 6000;
 
 interface ActiveQuestion {
   /** Reducer-facing index (0..9) or a synthetic id for tiebreaker rounds. */
@@ -53,6 +56,8 @@ export interface MatchEngine {
   startCpuMatch: (playerName: string, difficulty: Difficulty) => void;
   selectMode: (mode: 'cpu' | 'online') => void;
   answer: (value: AnswerValue) => void;
+  /** Skip the half-time break and kick off the second half immediately. */
+  resumeFromHalfTime: () => void;
   reset: () => void;
 }
 
@@ -197,6 +202,11 @@ export function useMatchEngine(): MatchEngine {
     });
   }, []);
 
+  const resumeFromHalfTime = useCallback(() => {
+    if (stateRef.current.phase.kind !== 'half_time') return;
+    startQuestion(HALFTIME_AT);
+  }, [startQuestion]);
+
   const reset = useCallback(() => {
     configRef.current?.transport.disconnect();
     configRef.current = null;
@@ -245,13 +255,16 @@ export function useMatchEngine(): MatchEngine {
     return () => clearTimeout(id);
   }, [phase.kind, phase.kind === 'in_question' ? phase.deadline : 0]);
 
-  // After the reveal pause, advance to the next question / tiebreaker / end.
+  // After the reveal pause, advance to the next question / half-time /
+  // tiebreaker / end.
   useEffect(() => {
     if (phase.kind !== 'question_reveal') return;
     const id = setTimeout(() => {
       const played = stateRef.current.results.length;
       if (played >= QUESTIONS_PER_MATCH) {
         dispatch({ type: 'MATCH/NEXT' });
+      } else if (played === HALFTIME_AT) {
+        dispatch({ type: 'MATCH/HALF_TIME' });
       } else {
         startQuestion(played);
       }
@@ -259,13 +272,29 @@ export function useMatchEngine(): MatchEngine {
     return () => clearTimeout(id);
   }, [phase.kind, phase.kind === 'question_reveal' ? phase.index : -1, startQuestion]);
 
+  // Half-time break: auto-resume into the second half after a pause (the
+  // player can also skip it manually via resumeFromHalfTime).
+  useEffect(() => {
+    if (phase.kind !== 'half_time') return;
+    const id = setTimeout(() => startQuestion(HALFTIME_AT), HALFTIME_MS);
+    return () => clearTimeout(id);
+  }, [phase.kind, startQuestion]);
+
   // Each tiebreaker round opens a fresh sudden-death question.
   useEffect(() => {
     if (phase.kind !== 'tiebreaker') return;
     startTiebreakerQuestion(phase.round);
   }, [phase.kind, phase.kind === 'tiebreaker' ? phase.round : -1, startTiebreakerQuestion]);
 
-  return { state, question, startCpuMatch, selectMode, answer, reset };
+  return {
+    state,
+    question,
+    startCpuMatch,
+    selectMode,
+    answer,
+    resumeFromHalfTime,
+    reset,
+  };
 }
 
 // ---------------------------------------------------------------------------

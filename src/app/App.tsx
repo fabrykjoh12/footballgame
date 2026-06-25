@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
-import { AppSettingsProvider } from './providers/AppSettingsProvider.tsx';
+import { AppSettingsProvider, useSettings } from './providers/AppSettingsProvider.tsx';
 import { MatchProvider, useMatch } from './providers/MatchProvider.tsx';
 import { MatchErrorBoundary } from './MatchErrorBoundary.tsx';
+import { useMatchSound } from '../engine/useMatchSound.ts';
 import { MainMenuScreen } from './screens/MainMenuScreen.tsx';
 import { MatchmakingScreen } from './screens/MatchmakingScreen.tsx';
 import { CountdownScreen } from './screens/CountdownScreen.tsx';
 import { GameplayScreen } from './screens/GameplayScreen.tsx';
+import { HalfTimeScreen } from './screens/HalfTimeScreen.tsx';
 import { PostMatchScreen } from './screens/PostMatchScreen.tsx';
 import { ErrorScreen } from './screens/ErrorScreen.tsx';
 import { applyTeamTheme } from '../ui/theme/teamThemes.ts';
@@ -40,6 +42,14 @@ function Router() {
     case 'question_reveal':
     case 'tiebreaker':
       return <GameplayScreen />;
+    case 'half_time':
+      return (
+        <HalfTimeScreen
+          scoreline={phase.scoreline}
+          player={player}
+          opponent={opponent}
+        />
+      );
     case 'post_match':
       return <PostMatchScreen summary={phase.summary} />;
     case 'error':
@@ -64,7 +74,9 @@ export function App() {
 }
 
 function AppShell() {
-  const { reset } = useMatch();
+  const { state, reset } = useMatch();
+  const { soundOn } = useSettings();
+  useMatchSound(state, soundOn);
   return (
     <MatchErrorBoundary onReset={reset}>
       <Router />

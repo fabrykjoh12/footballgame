@@ -5,6 +5,7 @@ import {
   onlineAvailable,
   readRuntimeEnv,
 } from '../../transport/MatchTransport.ts';
+import { soundEngine } from '../../lib/sound.ts';
 import type { Difficulty } from '../../types/match.ts';
 
 const DIFFICULTIES: Difficulty[] = ['casual', 'pro', 'legend'];
@@ -13,6 +14,12 @@ export function MainMenuScreen() {
   const settings = useSettings();
   const { startCpuMatch } = useMatch();
   const canPlayOnline = onlineAvailable(readRuntimeEnv());
+
+  const handlePlay = () => {
+    // Unlock audio within the user gesture before the match starts.
+    if (settings.soundOn) soundEngine.resume();
+    startCpuMatch(settings.playerName, settings.difficulty);
+  };
 
   return (
     <div className="relative mx-auto flex min-h-dvh max-w-xl flex-col justify-center gap-8 px-5 py-10">
@@ -60,9 +67,30 @@ export function MainMenuScreen() {
           </div>
         </div>
 
+        <label className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm">
+          <span className="text-ink-muted">Sound effects</span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={settings.soundOn}
+            onClick={() => settings.update({ soundOn: !settings.soundOn })}
+            className={[
+              'relative h-6 w-11 rounded-full transition',
+              settings.soundOn ? 'bg-neon/70' : 'bg-white/15',
+            ].join(' ')}
+          >
+            <span
+              className={[
+                'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all',
+                settings.soundOn ? 'left-[22px]' : 'left-0.5',
+              ].join(' ')}
+            />
+          </button>
+        </label>
+
         <button
           type="button"
-          onClick={() => startCpuMatch(settings.playerName, settings.difficulty)}
+          onClick={handlePlay}
           className="rounded-xl bg-neon-grad px-4 py-3.5 font-display text-base font-bold text-pitch-950 shadow-neon transition hover:brightness-110 active:scale-[0.99]"
         >
           Play vs CPU

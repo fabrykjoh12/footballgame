@@ -55,5 +55,9 @@ src/
   `MiniGame` contract: Multiple Choice, Higher/Lower, Career Path, Odd One Out,
   Guess the Year (closeness-scored), and True/False. Adding a seventh is a folder
   + a registry entry — zero engine changes.
-- **Phases 3–4 (immersion UI, PWA/optimization)** ◻️ — early pieces (team themes,
-  timeline, commentary) are in; the rest are scoped in the roadmap.
+- **Phase 3 (immersion UI/UX)** ✅ (mostly) — team themes, animated scoreboard,
+  match timeline, momentum bar, live commentary, a half-time interstitial, and
+  synthesized Web Audio cues (toggleable, no audio files). A deeper responsive
+  audit remains.
+- **Phase 4 (PWA/optimization)** ◻️ — installability, offline asset caching, and
+  bundle/code-split work are scoped in the roadmap.

@@ -356,22 +356,28 @@ can draw any mix of them without engine changes.
 dynamic live text commentary. This is the layer that makes trivia *feel* like football.
 
 **Key milestones**
-- [ ] **Team color themes** — each player gets a generated team identity (name + two-color
-      palette). `teamThemes.ts` derives Tailwind CSS variables; the whole UI tints to the
-      active player. Deterministic from a seed so rematches stay consistent.
-- [ ] **Scoreboard** — live "Sara FC 3–2 Jonas United" with animated score changes on each
-      correct answer (number roll / goal flash).
-- [ ] **Match timeline progression bar** — a horizontal pitch-minute bar (1'→90') mapping
-      the 10 questions to match minutes; goals plotted as markers.
-- [ ] **Commentary ticker** — a `CommentaryEngine` that generates contextual text lines
-      ("GOAL! Sara strikes on the counter after a crisp answer!") from match events. Pure
-      function of event + state; pooled templates with variable slots, no external data.
-- [ ] **SVG pitch layouts** — subtle animated pitch background, possession/momentum hints.
-- [ ] **Transitions & micro-interactions** — countdown kickoff, question reveal, half-time,
-      full-time whistle; respect `prefers-reduced-motion`.
-- [ ] **Sound (optional, generated)** — short synthesized cues (Web Audio), toggleable, no
-      copyrighted audio files.
-- [ ] Responsive layout pass — mobile-first, thumb-reachable controls.
+- [x] **Team color themes** — generated team identity (name + palette) via `teamThemes.ts`,
+      bound to CSS variables (`--team-home/away`); the UI tints to the active match.
+      Deterministic from the match seed so rematches stay consistent.
+- [x] **Scoreboard** — live "Sara FC 3–2 Jonas United" with a `score-pop` animation on
+      each scoring change.
+- [x] **Match timeline progression bar** — horizontal 1'→90' bar mapping the 10 questions
+      to match minutes; goals plotted as markers.
+- [x] **Commentary ticker** — `commentaryEngine.ts` generates contextual lines from match
+      events; pure function of event + state, pooled templates, no external data.
+- [x] **SVG pitch layouts + momentum** — subtle pitch backdrop plus a `MomentumBar` derived
+      from recent results.
+- [x] **Transitions & micro-interactions** — countdown kickoff, question reveal, **half-time
+      interstitial** (a real FSM phase), full-time whistle; `prefers-reduced-motion` honored
+      globally in CSS.
+- [x] **Sound (optional, generated)** — synthesized Web Audio cues (kickoff/goal/correct/
+      wrong/whistle/half-time) in `lib/sound.ts`, toggleable in the menu, zero audio files,
+      silent no-op where unavailable. `useMatchSound` reacts to FSM transitions.
+- [~] Responsive layout pass — mobile-first layouts in place; a deeper device-matrix audit
+      remains.
+
+> **Status: Phase 3 largely complete.** Remaining: a deeper responsive/device audit and
+> optional extras (e.g. number-roll scoreboard, possession visualisation).
 
 **Files created/modified:** `ui/theme/teamThemes.ts`, `ui/scoreboard/Scoreboard.tsx`,
 `ui/timeline/MatchTimeline.tsx`, `ui/commentary/CommentaryTicker.tsx`,

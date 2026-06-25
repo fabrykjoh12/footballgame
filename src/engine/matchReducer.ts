@@ -45,6 +45,7 @@ export type MatchPhase =
       opponentOutcome: AnswerOutcome | null;
     }
   | { kind: 'question_reveal'; index: number; result: QuestionResult }
+  | { kind: 'half_time'; scoreline: Scoreline }
   | {
       kind: 'tiebreaker';
       round: number;
@@ -96,12 +97,15 @@ export type MatchAction =
   | { type: 'QUESTION/OPPONENT_OUTCOME'; outcome: AnswerOutcome }
   | { type: 'QUESTION/REVEAL' }
   | { type: 'MATCH/NEXT' }
+  | { type: 'MATCH/HALF_TIME' }
   | { type: 'TIEBREAKER/PLAYER_OUTCOME'; outcome: AnswerOutcome }
   | { type: 'TIEBREAKER/OPPONENT_OUTCOME'; outcome: AnswerOutcome }
   | { type: 'MATCH/ERROR'; code: MatchError['code']; recoverable?: boolean }
   | { type: 'MATCH/RESET' };
 
 const COUNTDOWN_FROM = 3;
+/** Questions played before the half-time break (5 of 10). */
+export const HALFTIME_AT = QUESTIONS_PER_MATCH / 2;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -177,10 +181,12 @@ export function matchReducer(
     }
 
     case 'QUESTION/START': {
-      // Legal from countdown(0), or from question_reveal via MATCH/NEXT path.
+      // Legal from countdown(0), from a reveal (next question), or resuming
+      // the second half after the break.
       const ok =
         (state.phase.kind === 'countdown' && state.phase.secondsLeft === 0) ||
-        state.phase.kind === 'question_reveal';
+        state.phase.kind === 'question_reveal' ||
+        state.phase.kind === 'half_time';
       if (!ok) return state;
       if (action.index !== state.results.length) {
         return errorState(state, 'ILLEGAL_TRANSITION');
@@ -246,6 +252,16 @@ export function matchReducer(
         ...state,
         results: [...state.results, result],
         phase: { kind: 'question_reveal', index, result },
+      };
+    }
+
+    case 'MATCH/HALF_TIME': {
+      // Reached only at the midpoint reveal; the engine routes here instead of
+      // starting the second half immediately.
+      if (state.phase.kind !== 'question_reveal') return state;
+      return {
+        ...state,
+        phase: { kind: 'half_time', scoreline: currentScoreline(state) },
       };
     }
 

@@ -210,6 +210,46 @@ describe('match FSM: full match', () => {
   });
 });
 
+describe('match FSM: half-time', () => {
+  function atMidpointReveal(): MatchState {
+    let s = started();
+    s = run(s, [
+      { type: 'MATCH/COUNTDOWN_TICK' },
+      { type: 'MATCH/COUNTDOWN_TICK' },
+      { type: 'MATCH/COUNTDOWN_TICK' },
+    ]);
+    for (let i = 0; i < 5; i++) {
+      s = playQuestion(s, out(true, 0.9), out(false, 0));
+    }
+    return s;
+  }
+
+  it('enters half-time from the midpoint reveal with the current scoreline', () => {
+    let s = atMidpointReveal();
+    expect(s.results).toHaveLength(5);
+    s = matchReducer(s, { type: 'MATCH/HALF_TIME' });
+    expect(s.phase.kind).toBe('half_time');
+    if (s.phase.kind !== 'half_time') throw new Error('not half_time');
+    expect(s.phase.scoreline).toEqual({ home: 5, away: 0 });
+  });
+
+  it('resumes the second half via QUESTION/START from half-time', () => {
+    let s = matchReducer(atMidpointReveal(), { type: 'MATCH/HALF_TIME' });
+    s = matchReducer(s, {
+      type: 'QUESTION/START',
+      index: 5,
+      miniGame: 'multiple_choice',
+      deadline: 0,
+    });
+    expect(s.phase).toMatchObject({ kind: 'in_question', index: 5 });
+  });
+
+  it('ignores HALF_TIME outside of a reveal', () => {
+    const s = matchReducer(started(), { type: 'MATCH/HALF_TIME' });
+    expect(s.phase.kind).toBe('countdown');
+  });
+});
+
 describe('match FSM: resilience', () => {
   it('captures errors into an error phase', () => {
     const s = matchReducer(started(), {

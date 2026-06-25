@@ -5,6 +5,7 @@ import { tallyScoreline } from '../../engine/scoring.ts';
 import { getMiniGame } from '../../minigames/registry.ts';
 import { MiniGameShell } from '../../minigames/MiniGameShell.tsx';
 import { Scoreboard } from '../../ui/scoreboard/Scoreboard.tsx';
+import { MomentumBar } from '../../ui/scoreboard/MomentumBar.tsx';
 import { MatchTimeline } from '../../ui/timeline/MatchTimeline.tsx';
 import { CommentaryTicker } from '../../ui/commentary/CommentaryTicker.tsx';
 import {
@@ -42,6 +43,7 @@ export function GameplayScreen() {
   return (
     <div className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-4 px-4 py-5">
       <Scoreboard player={player} opponent={opponent} scoreline={scoreline} clock={clock} />
+      <MomentumBar results={state.results} playerSide={player.side} />
       <MatchTimeline results={state.results} currentIndex={state.results.length} />
 
       <div className="flex-1">
