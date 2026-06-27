@@ -22,7 +22,7 @@ sign-in with cross-device progress sync** (Firebase Auth), a
 per-device **question-freshness**, Daily Challenge, local profile/stats, sound,
 share-as-image, live commentary, a 0–90' match timeline, **sudden-death stoppage
 time**, a lobby topic filter, deterministic per-team kit colours, a premium UI
-pass, and **233 unit tests** gating an auto-deploy pipeline.
+pass, and **241 unit tests** gating an auto-deploy pipeline.
 
 > "Football" always means **European football / soccer**. Never use real club
 > badges or player photos — visuals are gradients, pitch patterns, icons, type.
@@ -38,7 +38,7 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (233 tests across lib/, data/, services/)
+npm test         # vitest run (241 tests across lib/, data/, services/)
 ```
 
 Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). **CI runs the
@@ -163,6 +163,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Live commentary text generator (pure) | `src/lib/commentary.ts` |
 | Question-as-attack football framing (pure; per-answer Big Chance / Good Attack / Half Chance / Woodwork / Shot Saved / Turnover / GOAL, + Momentum/Late-Pressure accents) | `src/lib/attackFraming.ts` |
 | Match-timeline event builder (pure; turns each question into goal/chance/save marks via attackFraming; minute mapping) | `src/lib/matchTimeline.ts` |
+| Post-match summary (pure; possession-style knowledge share, shots/chances, best/weakest category, biggest moment, Man of the Match, timeline replay) | `src/lib/matchStats.ts` |
 | Deterministic per-team kit colours | `src/lib/teamIdentity.ts` |
 | Pitch zones constant | `src/lib/positions.ts` |
 | Sound (Web Audio, synth, no files) | `src/lib/sound.ts` |
@@ -289,7 +290,7 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-`npm test` runs **233 tests** across 26 files: `scoring` (incl. **`guessAccuracy` +
+`npm test` runs **241 tests** across 27 files: `scoring` (incl. **`guessAccuracy` +
 closeness-scaled points** for Guess the Number), `questionPicker` (distribution,
 difficulty, anti-bias shuffle, determinism, topic filter, **history-avoidance**
 that exhausts unseen questions first but stays deterministic when seeded),
@@ -360,7 +361,7 @@ Gotchas:
   (image+text), commentary (now an `aria-live` region), timeline, sudden death,
   topic filter, kit colours, premium UI across all screens, **solo arcade modes**
   (Survival / Time Attack / Gauntlet), **themed Cup Runs**, and a **Connections**
-  *(beta)* typed mode, 233 tests + CI.
+  *(beta)* typed mode, 241 tests + CI.
 - 🧪 **Connections is shipped as BETA.** It works and is unit-tested + browser-
   smoked, but it's flagged Beta in the UI because the `accept` lists are
   hand-curated — a valid but obscure player can read as wrong (softened by the
