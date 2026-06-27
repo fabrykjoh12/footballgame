@@ -11,11 +11,12 @@ import { FinalResult } from './components/game/FinalResult';
 import { CareerHub } from './components/career/CareerHub';
 import { CareerResult } from './components/career/CareerResult';
 import { GameModesHub } from './components/solo/GameModesHub';
+import { ConnectionsGame } from './components/connections/ConnectionsGame';
 import { CupHub } from './components/cup/CupHub';
 import { CupResult } from './components/cup/CupResult';
 
 /** Top-level singleplayer view when no match is in progress. */
-type View = 'home' | 'career' | 'modes' | 'cup';
+type View = 'home' | 'career' | 'modes' | 'cup' | 'connections';
 
 /** Brief gate while a signed-in session's progress is restored. */
 function SyncSplash() {
@@ -55,11 +56,13 @@ function Screens() {
   if (view === 'career') return <CareerHub onExit={() => setView('home')} />;
   if (view === 'modes') return <GameModesHub onExit={() => setView('home')} />;
   if (view === 'cup') return <CupHub onExit={() => setView('home')} />;
+  if (view === 'connections') return <ConnectionsGame onExit={() => setView('home')} />;
   return (
     <HomePage
       onOpenCareer={() => setView('career')}
       onOpenModes={() => setView('modes')}
       onOpenCup={() => setView('cup')}
+      onOpenConnections={() => setView('connections')}
     />
   );
 }

@@ -51,10 +51,12 @@ export function HomePage({
   onOpenCareer,
   onOpenModes,
   onOpenCup,
+  onOpenConnections,
 }: {
   onOpenCareer: () => void;
   onOpenModes: () => void;
   onOpenCup: () => void;
+  onOpenConnections: () => void;
 }) {
   const {
     createRoom,
@@ -358,6 +360,28 @@ export function HomePage({
         <div className="mt-3">
           <Button fullWidth onClick={onOpenModes}>
             Browse modes <IconArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </Card>
+
+      {/* Connections (name a player who played for both clubs) */}
+      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+        <div className="mb-2 flex items-center gap-2">
+          <IconRoute className="h-5 w-5 text-pitch" />
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
+            Connections
+          </h2>
+          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
+            Singleplayer
+          </span>
+        </div>
+        <p className="text-xs leading-relaxed text-white/55">
+          Two clubs, one answer: <span className="font-semibold text-white/75">type a player who
+          turned out for both</span>. Ten puzzles, ramping from easy to nightmare — surnames are fine.
+        </p>
+        <div className="mt-3">
+          <Button fullWidth onClick={onOpenConnections}>
+            Play Connections <IconArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </Card>
