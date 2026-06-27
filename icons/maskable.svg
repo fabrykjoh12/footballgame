@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Ball Knowledge">
+  <defs>
+    <linearGradient id="neonM" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7dffab"/>
+      <stop offset="1" stop-color="#1f9e4d"/>
+    </linearGradient>
+  </defs>
+  <!-- Full-bleed background for the maskable safe zone -->
+  <rect width="512" height="512" fill="#04140c"/>
+  <!-- Content kept within the central 80% safe zone -->
+  <circle cx="256" cy="216" r="92" fill="none" stroke="#39ff7a" stroke-opacity="0.18" stroke-width="3"/>
+  <text x="256" y="300" text-anchor="middle" font-family="'Space Grotesk', system-ui, sans-serif"
+        font-size="180" font-weight="700" fill="url(#neonM)" letter-spacing="-8">BK</text>
+</svg>
