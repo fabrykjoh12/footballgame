@@ -14,7 +14,7 @@ when keys are present.
 
 Built and working: 10 mini-games, **1,111 questions**, live Ably 1v1 (verified +
 hardened), a singleplayer **Career Mode** (climb from League Two to the Premier
-League), **solo arcade game modes** (Survival / Time Attack / Gauntlet), a typed **Connections** mode (name a player who played for both clubs), **themed Cup
+League), **solo arcade game modes** (Survival / Time Attack / Gauntlet), a typed **Connections** mode *(beta)* — name a player who played for both clubs, **themed Cup
 Runs** (knockout tournaments), **optional
 sign-in with cross-device progress sync** (Firebase Auth), a
 **friends list with friend codes + invite-to-room** (no dictating codes), an
@@ -200,6 +200,21 @@ streaks/stats; the streak bonus only applies then. The match engine derives
   unconfigured. This is **independent of multiplayer** (Ably/Supabase). Save
   sites notify via a `bk:progress-changed` window event from each
   `save()`/`saveCareer()`. Setup in `FIREBASE_SETUP.md`.
+- **Connections** *(beta)* — a typed singleplayer mode: "name a player who has
+  played for BOTH clubs". Self-contained (`lib/connections.ts` +
+  `data/connections.ts` + `components/connections/`), mirroring the solo-modes
+  pattern — **no match-engine changes**. 27 curated club-pair puzzles with
+  generous, fact-checked `accept` lists across all four difficulty tiers (men's
+  football only). Answers are **typed with forgiving fuzzy matching**
+  (`normalizeName` strips accents/case/punctuation; accepts full name, surname,
+  multi-word surname, or alias) and a **spelling autocomplete** (`suggestNames`)
+  sourced from the whole player-name pool so suggestions never single out the
+  current answer. A run is 10 puzzles ramping easy→nightmare, per-puzzle clock,
+  speed+streak scoring, a reveal listing every accepted player, best score in
+  `bk_connections_v1`, and a dedicated freshness ring (`bk_conn_history_v1`).
+  Reached via a home card + the `'connections'` view in `App.tsx`. **UI flagged
+  "Beta"** (home card + in-game badge) — the matcher is forgiving but accept-lists
+  are hand-curated, so an obscure valid answer can still read as wrong.
 - **Daily Challenge** — one deterministic puzzle/day (seed from the date via
   `seededRandom`), tracked streak + best score in `dailyChallenge.ts`; home card.
 - **Local profile** — lifetime matches/win-rate/accuracy/best-streak in
@@ -272,7 +287,7 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-18 test files (`npm test`, 154 tests): `scoring` (incl. **`guessAccuracy` +
+`npm test` runs **205 tests** across 23 files: `scoring` (incl. **`guessAccuracy` +
 closeness-scaled points** for Guess the Number), `questionPicker` (distribution,
 difficulty, anti-bias shuffle, determinism, topic filter, **history-avoidance**
 that exhausts unseen questions first but stays deterministic when seeded),
@@ -284,7 +299,9 @@ schedule, standings, fixtures, deterministic AI sim, promotion/relegation),
 `friends` (codes, invite link/text, list de-dupe), `leaderboard` (board ids),
 `leagues` (join codes, standings aggregation/tie-breaks/dedupe),
 `soloModes` (gauntlet/survival/time-attack selection + grading), `soloProgress`
-(best-score folding), `cup` (bracket progression, trophies, didWinTie),
+(best-score folding), `connections` (fuzzy name matching, accept-list integrity —
+every accepted player matches its own puzzle, picker freshness, closeness/streak
+scoring, autocomplete suggestions), `cup` (bracket progression, trophies, didWinTie),
 `progress` (sign-in reconcile rules), `commentary`, `teamIdentity`,
 `connectionMapping`, `dailyChallenge`, `seededRandom`, `shareResult`,
 `profileStats`. Add a test when you add an invariant or a rule.
@@ -339,7 +356,16 @@ Gotchas:
   invite-to-room** (local-first share link, plus online live push invites when
   signed in), **online daily + all-time leaderboard** (Firestore), sound, share
   (image+text), commentary (now an `aria-live` region), timeline, sudden death,
-  topic filter, kit colours, premium UI across all screens, 205 tests + CI.
+  topic filter, kit colours, premium UI across all screens, **solo arcade modes**
+  (Survival / Time Attack / Gauntlet), **themed Cup Runs**, and a **Connections**
+  *(beta)* typed mode, 205 tests + CI.
+- 🧪 **Connections is shipped as BETA.** It works and is unit-tested + browser-
+  smoked, but it's flagged Beta in the UI because the `accept` lists are
+  hand-curated — a valid but obscure player can read as wrong (softened by the
+  "Accepted: …" reveal). To harden it out of beta: expand accept-lists + puzzle
+  count, optionally add a Daily Connections, and consider a "report this answer"
+  affordance. Data lives in `src/data/connections.ts`; matcher in
+  `src/lib/connections.ts`.
 - ⏳ Open: **friends / leaderboard / friend-leagues online layer** is built +
   code-split + gated on Firebase sign-in, but **not device-tested** (needs two
   signed-in accounts). **Friend leagues** = private season tables fed by each
@@ -364,6 +390,42 @@ Gotchas:
   features just no-op). Steps + the full ruleset in `FIREBASE_SETUP.md`. The owner is doing
   all setup **web-only** (no terminal); the Firestore *Rules* editor is the
   Firestore one (`service cloud.firestore`), NOT Realtime Database (JSON).
+
+## Roadmap — next things we can do
+
+Concrete, mostly-scoped ideas for a future session (roughly ordered by
+bang-for-buck; none are committed yet — confirm with the owner before building):
+
+- **Harden Connections out of beta** — expand the curated `accept` lists and add
+  more club pairs; add a **Daily Connections** (one seeded puzzle/day with a
+  streak, like the Daily Challenge); optionally a "this should've been accepted"
+  report affordance to grow the lists. Eventually fold it into the 1v1 mix as an
+  11th type once the matcher is battle-tested (it'd need a `QuestionCard` text
+  branch + a host-side accept-list grade in `matchEngine.submitAnswer`).
+- **More content** — keep growing the 1,111-question bank (the batched
+  `questionsBX.ts` + integrity-test pipeline is proven); watch the per-type /
+  per-difficulty pool depth (smallest Casual pools are guess_the_number ~25,
+  spot_the_lie ~27).
+- **Get the online layer live** — finish the owner-side Firebase console steps
+  (`FIREBASE_SETUP.md`) and device-test friends + leaderboards + friend leagues
+  with two signed-in accounts. This unlocks the biggest built-but-dark surface.
+- **Retention loop** — daily streak rewards, a "comeback" nudge, and surfacing
+  achievements/leaderboard placement more prominently on the home screen.
+- **Trustworthy ranked** — scoring is host/client-trusted today; a real ranked
+  mode needs server-side validation (a thin Cloud Function or Supabase RPC that
+  re-derives the score from the answer log). Big lift; only if competitive play
+  becomes a goal.
+- **New mini-game ideas that fit the constraints** (10-question, 1v1, men's
+  football, license-free): "Starting XI" (name N players from a famous lineup),
+  "Top Scorer" (rank goal tallies), "Same Number" (players who wore a shirt
+  number), "Manager Merry-go-round" (typed, like Connections but for managers).
+- **Multiplayer tournament bracket** (>2 players in a lobby) — discussed, not
+  built; needs new lobby infra beyond the current 2-slot room. Largest lift here.
+- **Polish** — bundle code-splitting (main chunk is ~720 kB; the build warns),
+  more share-card variety, and accessibility passes on the newest screens.
+
+See `GAME_OVERVIEW.md` for a portable, self-contained summary of the whole game
+(useful for handing to another tool/AI for outside opinions).
 
 ## Gotchas
 

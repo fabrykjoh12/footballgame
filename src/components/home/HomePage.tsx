@@ -371,7 +371,10 @@ export function HomePage({
           <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
             Connections
           </h2>
-          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
+          <span className="ml-auto rounded-full border border-gold/30 bg-gold/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold">
+            Beta
+          </span>
+          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
             Singleplayer
           </span>
         </div>

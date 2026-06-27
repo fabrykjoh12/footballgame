@@ -127,9 +127,14 @@ export function ConnectionsGame({ onExit }: { onExit: () => void }) {
         <Button variant="ghost" size="sm" onClick={onExit}>
           <IconBack className="h-4 w-4" /> Quit
         </Button>
-        <Badge tone="pitch">
-          <IconRoute className="h-4 w-4" /> Connections
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge tone="pitch">
+            <IconRoute className="h-4 w-4" /> Connections
+          </Badge>
+          <span className="rounded-full border border-gold/30 bg-gold/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold">
+            Beta
+          </span>
+        </div>
       </div>
 
       {/* HUD */}
