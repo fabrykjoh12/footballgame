@@ -34,7 +34,7 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (86 tests across lib/, data/, services/)
+npm test         # vitest run (111 tests across lib/, data/, services/)
 ```
 
 Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). **CI runs the
@@ -65,18 +65,24 @@ All paths share one authoritative state machine:
 
 React wiring: `src/context/GameProvider.tsx` subscribes to the active service and
 exposes `room`, `localPlayer`, `opponent`, `connectionState`, and actions
-(`createRoom`, `joinRoom`, `playDemo`, `playDaily`, `updateSettings`,
-`startMatch`, `submitAnswer`, `nextQuestion`, `rematch`, `leaveRoom`) via the
-`useGame()` hook. `src/App.tsx` routes screens purely off `room.status`
-(`lobby → starting/in_question/showing_result → finished`); `AppShell` is inside
-the provider and shows a global connection banner.
+(`createRoom`, `joinRoom`, `playDemo`, `playDaily`, `playCareer`,
+`updateSettings`, `startMatch`, `submitAnswer`, `nextQuestion`, `rematch`,
+`leaveRoom`, `pauseMatch`/`resumeMatch`) via the `useGame()` hook. `src/App.tsx`
+routes screens off `room.status` (`lobby → starting/in_question/showing_result →
+finished`) plus a tiny top-level `view` state (`home`/`career`) for the
+singleplayer menus when no match is live; a finished room routes to
+`CareerResult` when `settings.careerMatch`, else `FinalResult`. The tree is
+`AuthProvider → GameProvider → AppShell → Screens`; `AppShell` shows the global
+connection banner + the header `AccountButton`, and `Screens` shows a brief
+"Restoring your progress…" splash while a signed-in session hydrates.
 
 ```
 HomePage → LobbyPage → GamePage (MatchTimeline / Scoreboard / CommentaryTicker /
            QuestionCard / ResultReveal / GoalAnimation) → FinalResult
+HomePage → CareerHub → (career fixture = a local match) → CareerResult → CareerHub
 ```
 
-## The nine mini-games
+## The ten mini-games
 
 All are variants of the `Question` discriminated union (`types/game.ts`). Each
 has a `QuestionCard` render branch, a `scoring.ts` `BASE_POINTS`/`MAX_SPEED_BONUS`
@@ -135,7 +141,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Scoring, goals, events, sudden-death helpers (pure) | `src/lib/scoring.ts` |
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize, tiebreakers) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
-| Question database (610 Qs, 9 types) | `src/data/questions.ts` |
+| Question database (624 Qs, 10 types) | `src/data/questions.ts` |
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
 | Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
@@ -283,13 +289,16 @@ device-tested**.
 
 ## Deployment — auto-deploy via GitHub Actions
 
-`.github/workflows/deploy.yml` ("Deploy preview") runs on **push to `main` or
-`claude/**`** (and `workflow_dispatch`): `npm ci` → `npm test` → `npm run
-build:pages` (with the `VITE_ABLY_API_KEY` secret) → publishes `./dist` to the
-**`gh-pages`** branch (`peaceiris/actions-gh-pages`). Live at
-`https://fabrykjoh12.github.io/footballgame/` (Pages → deploy from `gh-pages`).
-Tests must pass or the deploy is blocked. To enable live multiplayer on the
-deploy, add the `VITE_ABLY_API_KEY` repo secret (Settings → Secrets → Actions).
+`.github/workflows/deploy.yml` ("Deploy preview") runs on **push to `main`**
+(and `workflow_dispatch`): `npm ci` → `npm test` → `npm run build:pages` →
+publishes `./dist` to the **`gh-pages`** branch (`peaceiris/actions-gh-pages`).
+Live at `https://fabrykjoh12.github.io/footballgame/` (Pages → deploy from
+`gh-pages`). Tests must pass or the deploy is blocked. The build step forwards
+**all** optional secrets as env: `VITE_ABLY_API_KEY`, `VITE_SUPABASE_URL`/
+`VITE_SUPABASE_ANON_KEY`, and the `VITE_FIREBASE_*` set — each only takes effect
+once you add it under Settings → Secrets → Actions. Trigger a fresh deploy after
+adding a secret (the build bakes env in at compile time): push, or Actions →
+Deploy preview → Run workflow, or `git commit --allow-empty`.
 
 Gotchas:
 - **Base path:** Project Pages serve under `/footballgame/`; we build with
@@ -309,9 +318,19 @@ Gotchas:
 - ⏳ Open: **online leaderboard** (the Firebase sign-in + Firestore now provide
   the auth/backend foundation; a public ranked board still needs its own
   collection + server-trusted scoring). **Supabase multiplayer path** built but
-  not device-tested; the **Firebase sign-in flow** is built but not yet
-  device-tested against a live Firebase project. A full **two-device playtest**
-  is still owed.
+  not device-tested.
+- 🔧 Firebase sign-in — current operational state (as of last session): the
+  `VITE_FIREBASE_*` repo secrets are **added** and the live site shows the **Sign
+  in** button (modal verified on device). **Still pending on the owner's side**
+  in the Firebase console: (1) enable the sign-in providers under Authentication
+  → Sign-in method (**Email/Password** is simplest + most reliable; Google +
+  email-link optional) — until then sign-in returns `auth/operation-not-allowed`;
+  (2) add `fabrykjoh12.github.io` to Authentication → Settings → Authorized
+  domains (for Google + email-link redirects); (3) create Firestore + publish the
+  `progress/{uid}` security rules so cross-device **sync** turns on (sign-in works
+  without it — sync just no-ops). Steps in `FIREBASE_SETUP.md`. The owner is doing
+  all setup **web-only** (no terminal); the Firestore *Rules* editor is the
+  Firestore one (`service cloud.firestore`), NOT Realtime Database (JSON).
 
 ## Gotchas
 
@@ -324,3 +343,12 @@ Gotchas:
 - Daily Challenge and team kit colours are **deterministic** (seeded / hashed) —
   don't introduce `Math.random()` into those paths.
 - React `StrictMode` is on (dev double-invokes effects); keep effects idempotent.
+- **Full-screen overlays/modals must render via `createPortal(…, document.body)`**
+  (see `AccountButton.tsx` at `z-[100]`). Nesting an overlay inside the header
+  let the home screen's animated cards (transform/opacity → own stacking
+  contexts) interleave with it; a body-portal escapes all ancestor stacking.
+- **Glass surfaces are ~6% opaque + `backdrop-blur`** — fine on the dark stadium
+  bg, but a modal layered over bright content needs a *solid* panel (`bg-ink-800`)
+  or it reads as see-through when a browser skips the blur.
+- Career fixtures count toward lifetime profile stats too (`CareerResult` calls
+  `recordMatchResult`); the per-fixture record is idempotent via a match `sig`.
