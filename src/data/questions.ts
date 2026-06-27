@@ -6898,4 +6898,252 @@ export const QUESTIONS: Question[] = [
     explanation: 'Owen (2001), Nedvěd (2003) and Shevchenko (2004) won it; Henry never did.',
   },
 
+  /* ====================================================================== */
+  /* BATCH 1301 — more nightmare tier (men's football)                       */
+  /* ====================================================================== */
+
+  // --- who_am_i (3) ---
+  {
+    id: 'who-garrincha-1301',
+    type: 'who_am_i',
+    difficulty: 'nightmare',
+    category: 'players',
+    clues: [
+      'I am a Brazilian winger of the 1950s and 60s, famed for dribbling despite bent legs.',
+      'I starred for Botafogo and Brazil.',
+      'I won the 1958 and 1962 World Cups alongside Pelé.',
+    ],
+    options: ['Garrincha', 'Didi', 'Vavá', 'Jairzinho'],
+    correctAnswer: 'Garrincha',
+    explanation: 'Garrincha was Brazil\'s magical winger of the 1958 and 1962 World Cups.',
+  },
+  {
+    id: 'who-puskas-1301',
+    type: 'who_am_i',
+    difficulty: 'nightmare',
+    category: 'players',
+    clues: [
+      'I am a Hungarian forward of the 1950s, part of the "Mighty Magyars".',
+      'I later starred for Real Madrid.',
+      'FIFA\'s award for the best goal of the year is named after me.',
+    ],
+    options: ['Ferenc Puskás', 'Sándor Kocsis', 'Nándor Hidegkuti', 'Flórián Albert'],
+    correctAnswer: 'Ferenc Puskás',
+    explanation: 'The FIFA Puskás Award is named after Ferenc Puskás.',
+  },
+  {
+    id: 'who-platini-1301',
+    type: 'who_am_i',
+    difficulty: 'nightmare',
+    category: 'players',
+    clues: [
+      'I am a French attacking midfielder of the 1980s.',
+      'I starred for Juventus and captained France.',
+      'I won three consecutive Ballon d\'Ors from 1983 to 1985.',
+    ],
+    options: ['Michel Platini', 'Jean Tigana', 'Alain Giresse', 'Zinedine Zidane'],
+    correctAnswer: 'Michel Platini',
+    explanation: 'Platini won three straight Ballon d\'Ors in the mid-1980s.',
+  },
+
+  // --- career_path (2) ---
+  {
+    id: 'career-r9-1301',
+    type: 'career_path',
+    difficulty: 'nightmare',
+    category: 'transfers',
+    path: ['Cruzeiro', 'PSV', 'Barcelona', 'Inter', 'Real Madrid', 'AC Milan'],
+    options: ['Ronaldo Nazário', 'Romário', 'Adriano', 'Robinho'],
+    correctAnswer: 'Ronaldo Nazário',
+    explanation: 'Ronaldo "O Fenômeno" played for PSV, Barcelona, Inter, Real Madrid and Milan.',
+  },
+  {
+    id: 'career-vieira-1301',
+    type: 'career_path',
+    difficulty: 'nightmare',
+    category: 'transfers',
+    path: ['Cannes', 'AC Milan', 'Arsenal', 'Juventus', 'Inter', 'Manchester City'],
+    options: ['Patrick Vieira', 'Claude Makélélé', 'Emmanuel Petit', 'Gilberto Silva'],
+    correctAnswer: 'Patrick Vieira',
+    explanation: 'Vieira starred at Arsenal before Juventus, Inter and Manchester City.',
+  },
+
+  // --- higher_lower (2) ---
+  {
+    id: 'hol-seriea-inter-milan-1301',
+    type: 'higher_lower',
+    difficulty: 'nightmare',
+    category: 'leagues',
+    prompt: 'Which Milan club has won MORE Serie A titles?',
+    leftOption: { name: 'Inter', value: 20 },
+    rightOption: { name: 'AC Milan', value: 19 },
+    correctAnswer: 'Inter',
+    unit: 'Serie A titles',
+    explanation: 'Inter edge AC Milan on Serie A titles.',
+  },
+  {
+    id: 'hol-wcgoals-klose-r9-1301',
+    type: 'higher_lower',
+    difficulty: 'nightmare',
+    category: 'world_cup',
+    prompt: 'Who has scored MORE World Cup goals?',
+    leftOption: { name: 'Miroslav Klose', value: 16 },
+    rightOption: { name: 'Ronaldo Nazário', value: 15 },
+    correctAnswer: 'Miroslav Klose',
+    unit: 'WC goals',
+    explanation: 'Klose is the World Cup\'s all-time top scorer with 16, one ahead of Ronaldo.',
+  },
+
+  // --- club_country (3) ---
+  {
+    id: 'cc-shakhtar-1301',
+    type: 'club_country',
+    difficulty: 'nightmare',
+    category: 'clubs',
+    prompt: 'Shakhtar Donetsk are a club from which country?',
+    options: ['Ukraine', 'Russia', 'Poland', 'Romania'],
+    correctAnswer: 'Ukraine',
+    explanation: 'Shakhtar Donetsk are a Ukrainian club.',
+  },
+  {
+    id: 'cc-galatasaray-1301',
+    type: 'club_country',
+    difficulty: 'hard',
+    category: 'clubs',
+    prompt: 'Galatasaray are a club from which country?',
+    options: ['Turkey', 'Greece', 'Cyprus', 'Bulgaria'],
+    correctAnswer: 'Turkey',
+    explanation: 'Galatasaray are based in Istanbul, Turkey.',
+  },
+  {
+    id: 'cc-olympiacos-1301',
+    type: 'club_country',
+    difficulty: 'hard',
+    category: 'clubs',
+    prompt: 'Olympiacos are a club from which country?',
+    options: ['Greece', 'Cyprus', 'Turkey', 'Italy'],
+    correctAnswer: 'Greece',
+    explanation: 'Olympiacos are based in Piraeus, Greece.',
+  },
+
+  // --- guess_year (2) ---
+  {
+    id: 'year-cameroon-90-1301',
+    type: 'guess_year',
+    difficulty: 'nightmare',
+    category: 'world_cup',
+    prompt: 'In which year did Cameroon reach the World Cup quarter-finals in Italy?',
+    options: ['1986', '1990', '1994', '1998'],
+    correctAnswer: '1990',
+    explanation: 'Cameroon stunned the 1990 World Cup, reaching the quarter-finals.',
+  },
+  {
+    id: 'year-milan-barca-94-1301',
+    type: 'guess_year',
+    difficulty: 'nightmare',
+    category: 'champions_league',
+    prompt: 'In which year did AC Milan thrash Barcelona 4–0 in the Champions League final?',
+    options: ['1988', '1990', '1992', '1994'],
+    correctAnswer: '1994',
+    explanation: 'AC Milan beat Barcelona 4–0 in the 1994 final.',
+  },
+
+  // --- transfer_fee (2) ---
+  {
+    id: 'fee-shevchenko-1301',
+    type: 'transfer_fee',
+    difficulty: 'nightmare',
+    category: 'transfers',
+    prompt: 'Roughly how much did Chelsea pay AC Milan for Andriy Shevchenko in 2006?',
+    options: ['£20m', '£30m', '£40m', '£55m'],
+    correctAnswer: '£30m',
+    explanation: 'Shevchenko joined Chelsea for around £30m in 2006.',
+  },
+  {
+    id: 'fee-vieri-1301',
+    type: 'transfer_fee',
+    difficulty: 'nightmare',
+    category: 'transfers',
+    prompt: 'Roughly how much did Inter pay Lazio for Christian Vieri in 1999 (a world record then)?',
+    options: ['€26m', '€36m', '€46m', '€60m'],
+    correctAnswer: '€46m',
+    explanation: 'Vieri\'s ~€46m move to Inter was a world record in 1999.',
+  },
+
+  // --- pitch_position (2) ---
+  {
+    id: 'pos-zoff-1301',
+    type: 'pitch_position',
+    difficulty: 'nightmare',
+    category: 'players',
+    prompt: 'What was Dino Zoff\'s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Goalkeeper',
+    explanation: 'Dino Zoff was a goalkeeper who captained Italy to the 1982 World Cup.',
+  },
+  {
+    id: 'pos-cafu-1301',
+    type: 'pitch_position',
+    difficulty: 'hard',
+    category: 'players',
+    prompt: 'What was Cafu\'s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Defender',
+    explanation: 'Cafu was an attacking right-back for Brazil, Roma and AC Milan.',
+  },
+
+  // --- odd_one_out (2) ---
+  {
+    id: 'odd-ec-leeds-1301',
+    type: 'odd_one_out',
+    difficulty: 'nightmare',
+    category: 'champions_league',
+    prompt: 'Which of these clubs has NEVER won the European Cup / Champions League?',
+    options: ['Hamburg', 'Steaua Bucharest', 'Red Star Belgrade', 'Leeds United'],
+    correctAnswer: 'Leeds United',
+    explanation: 'Hamburg, Steaua and Red Star all won it; Leeds lost the 1975 final.',
+  },
+  {
+    id: 'odd-wc-baggio-1301',
+    type: 'odd_one_out',
+    difficulty: 'nightmare',
+    category: 'world_cup',
+    prompt: 'Which of these did NOT win the World Cup?',
+    options: ['Paolo Rossi', 'Romário', 'Ronaldo Nazário', 'Roberto Baggio'],
+    correctAnswer: 'Roberto Baggio',
+    explanation: 'Baggio was a 1994 runner-up; the others all won the World Cup.',
+  },
+
+  // --- spot_the_lie (2) ---
+  {
+    id: 'stl-eurocup-winners-1301',
+    type: 'spot_the_lie',
+    difficulty: 'nightmare',
+    category: 'champions_league',
+    prompt: 'Which of these statements is FALSE?',
+    options: [
+      'Marseille won the 1993 Champions League',
+      'Red Star Belgrade won the 1991 European Cup',
+      'Steaua Bucharest won the 1986 European Cup',
+      'Leeds United won the European Cup in 1975',
+    ],
+    correctAnswer: 'Leeds United won the European Cup in 1975',
+    explanation: 'Leeds lost the 1975 final; they have never won the European Cup.',
+  },
+  {
+    id: 'stl-legends2-1301',
+    type: 'spot_the_lie',
+    difficulty: 'nightmare',
+    category: 'players',
+    prompt: 'Which of these statements is FALSE?',
+    options: [
+      'Lev Yashin won the Ballon d\'Or',
+      'Michel Platini won three straight Ballon d\'Ors',
+      'Ferenc Puskás starred for Real Madrid',
+      'Garrincha was an Italian defender',
+    ],
+    correctAnswer: 'Garrincha was an Italian defender',
+    explanation: 'Garrincha was a Brazilian winger, not an Italian defender.',
+  },
+
 ];

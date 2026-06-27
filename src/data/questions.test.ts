@@ -88,6 +88,22 @@ describe('question database integrity', () => {
     expect(counts.guess_year).toBeGreaterThanOrEqual(8);
     expect(counts.transfer_fee).toBeGreaterThanOrEqual(8);
     expect(counts.pitch_position).toBeGreaterThanOrEqual(8);
+    expect(counts.odd_one_out).toBeGreaterThanOrEqual(8);
+    expect(counts.spot_the_lie).toBeGreaterThanOrEqual(8);
+  });
+
+  it('gives every type at least one question in each difficulty tier it needs', () => {
+    // spot_the_lie and odd_one_out are drawn once per match across all modes,
+    // so each must have a question available in every difficulty tier.
+    const tiers = ['easy', 'medium', 'hard', 'nightmare'] as const;
+    for (const type of ['odd_one_out', 'spot_the_lie'] as const) {
+      for (const tier of tiers) {
+        const n = QUESTIONS.filter(
+          (q) => q.type === type && q.difficulty === tier,
+        ).length;
+        expect(n, `${type}/${tier}`).toBeGreaterThan(0);
+      }
+    }
   });
 
   it('has enough questions in each difficulty tier to fill every mode', () => {
