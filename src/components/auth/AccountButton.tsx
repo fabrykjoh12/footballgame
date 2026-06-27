@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '../../context/AuthProvider';
 import { Button } from '../ui/Button';
 import { IconUser, IconLogout, IconClose, IconCheck } from '../ui/icons';
@@ -71,12 +72,12 @@ function AuthModal({ onClose }: { onClose: () => void }) {
     }
   };
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label={user ? 'Account' : 'Sign in'}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/90 px-5 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-ink-900/90 px-5 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
     >
       <div
@@ -182,6 +183,7 @@ function AuthModal({ onClose }: { onClose: () => void }) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
