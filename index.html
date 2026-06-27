@@ -1,24 +1,71 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/footballgame/favicon.svg" />
-    <link rel="apple-touch-icon" href="/footballgame/icons/icon.svg" />
+    <link rel="icon" type="image/svg+xml" href="./ball.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#39ff7a" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Ball Knowledge" />
+    <meta name="theme-color" content="#05070d" />
     <meta
       name="description"
-      content="Ball Knowledge — a real-time 1v1 European football knowledge duel."
+      content="Ball Knowledge — Prove your football IQ against your friends in a real-time 1v1 knowledge duel."
     />
-    <title>Ball Knowledge</title>
-    <script type="module" crossorigin src="/footballgame/assets/index-DKyToelw.js"></script>
-    <link rel="modulepreload" crossorigin href="/footballgame/assets/react-vendor-SIwY82C9.js">
-    <link rel="stylesheet" crossorigin href="/footballgame/assets/index-DFBcsddo.css">
-  <link rel="manifest" href="/footballgame/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/footballgame/registerSW.js"></script></head>
+    <!-- Social link previews (when the game URL is shared). -->
+    <meta property="og:title" content="Ball Knowledge — Prove your football IQ" />
+    <meta
+      property="og:description"
+      content="A real-time 1v1 football knowledge duel across six mini-games. Points become goals — beat your friends."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://fabrykjoh12.github.io/footballgame/" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Ball Knowledge — Prove your football IQ" />
+    <meta
+      name="twitter:description"
+      content="A real-time 1v1 football knowledge duel across six mini-games. Points become goals."
+    />
+    <title>Ball Knowledge — Prove your football IQ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="module" crossorigin src="./assets/index-BxIe4j_-.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CLj4rp0O.css">
+  </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Fallback shown until React mounts (replaced on render). If it stays
+           visible, the app's JavaScript didn't load/run — which on a locked-down
+           network usually means the script was blocked. -->
+      <div id="boot" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#05070d;color:#fff;font-family:system-ui,-apple-system,sans-serif;text-align:center;padding:24px">
+        <div style="font-size:26px;font-weight:700;letter-spacing:-0.02em">
+          Ball <span style="color:#16ff7a">Knowledge</span>
+        </div>
+        <div id="boot-msg" style="color:#7e8aa0;font-size:14px">Loading the pitch…</div>
+      </div>
+    </div>
+    <noscript>
+      <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#05070d;color:#fff;font-family:system-ui,sans-serif;padding:24px;text-align:center">
+        Ball Knowledge needs JavaScript enabled to play.
+      </div>
+    </noscript>
+    <script>
+      // Surface load failures instead of leaving a blank white screen.
+      window.addEventListener(
+        'error',
+        function (e) {
+          var m = document.getElementById('boot-msg');
+          if (!m) return;
+          var detail = e && e.message ? e.message : 'a script or network error';
+          m.innerHTML =
+            "Couldn't load the game (" +
+            detail +
+            ").<br/>If you're on a restricted work network, the app's files may be blocked — try a phone on mobile data, or a different network.";
+          m.style.color = '#ff8a95';
+        },
+        true,
+      );
+    </script>
   </body>
 </html>
