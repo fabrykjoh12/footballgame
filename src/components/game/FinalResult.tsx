@@ -14,6 +14,8 @@ import { refreshAchievements } from '../../lib/achievements';
 import type { AchievementDef } from '../../lib/achievements';
 import { getOpponentRecord, h2hSummary } from '../../lib/headToHead';
 import { dailyBoardId, submitScore, submitPersonalBest } from '../../lib/leaderboard';
+import { submitDailyToLeagues } from '../../lib/leaguesLocal';
+import { todayString } from '../../lib/seededRandom';
 import { useAuth } from '../../context/AuthProvider';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -57,6 +59,8 @@ export function FinalResult() {
       void submitPersonalBest({ uid: user.id, name: me.name, score: me.score });
       if (room.settings.isDaily) {
         void submitScore(dailyBoardId(), { uid: user.id, name: me.name, score: me.score });
+        // Feed the Daily score into every friend league the player belongs to.
+        void submitDailyToLeagues({ uid: user.id, name: me.name }, todayString(), me.score);
       }
     }
   }, [room?.status, localPlayerId, user]);

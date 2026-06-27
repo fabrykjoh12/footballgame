@@ -20,7 +20,7 @@ League), **optional sign-in with cross-device progress sync** (Firebase Auth), a
 per-device **question-freshness**, Daily Challenge, local profile/stats, sound,
 share-as-image, live commentary, a 0–90' match timeline, **sudden-death stoppage
 time**, a lobby topic filter, deterministic per-team kit colours, a premium UI
-pass, and **154 unit tests** gating an auto-deploy pipeline.
+pass, and **162 unit tests** gating an auto-deploy pipeline.
 
 > "Football" always means **European football / soccer**. Never use real club
 > badges or player photos — visuals are gradients, pitch patterns, icons, type.
@@ -36,7 +36,7 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (154 tests across lib/, data/, services/)
+npm test         # vitest run (162 tests across lib/, data/, services/)
 ```
 
 Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). **CI runs the
@@ -154,6 +154,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Head-to-head record vs each opponent (local) | `src/lib/headToHead.ts` |
 | Friends list + friend codes + invite-to-room (local-first; Firestore online layer) | `src/lib/friends.ts`, `src/context/FriendsProvider.tsx`, `src/components/friends/` |
 | Online leaderboard (daily + all-time, Firestore; SDK-free wrappers) | `src/lib/leaderboard.ts`, `src/components/home/TrophyCabinet.tsx` |
+| Private friend leagues (Daily-fed season tables; pure standings + Firestore) | `src/lib/leagues.ts`, `src/lib/leaguesLocal.ts`, `src/context/LeaguesProvider.tsx`, `src/components/leagues/` |
 | Live commentary text generator (pure) | `src/lib/commentary.ts` |
 | Deterministic per-team kit colours | `src/lib/teamIdentity.ts` |
 | Pitch zones constant | `src/lib/positions.ts` |
@@ -276,6 +277,7 @@ scoring, **sudden death**, timeout) with fake timers, `career` (round-robin
 schedule, standings, fixtures, deterministic AI sim, promotion/relegation),
 `achievements` (unlock thresholds), `headToHead` (W/D/L tally, idempotency),
 `friends` (codes, invite link/text, list de-dupe), `leaderboard` (board ids),
+`leagues` (join codes, standings aggregation/tie-breaks/dedupe),
 `progress` (sign-in reconcile rules), `commentary`, `teamIdentity`,
 `connectionMapping`, `dailyChallenge`, `seededRandom`, `shareResult`,
 `profileStats`. Add a test when you add an invariant or a rule.
@@ -330,9 +332,12 @@ Gotchas:
   invite-to-room** (local-first share link, plus online live push invites when
   signed in), **online daily + all-time leaderboard** (Firestore), sound, share
   (image+text), commentary (now an `aria-live` region), timeline, sudden death,
-  topic filter, kit colours, premium UI across all screens, 154 tests + CI.
-- ⏳ Open: **friends/leaderboard online layer** is built + code-split + gated on
-  Firebase sign-in, but **not device-tested** (needs two signed-in accounts);
+  topic filter, kit colours, premium UI across all screens, 162 tests + CI.
+- ⏳ Open: **friends / leaderboard / friend-leagues online layer** is built +
+  code-split + gated on Firebase sign-in, but **not device-tested** (needs two
+  signed-in accounts). **Friend leagues** = private season tables fed by each
+  member's Daily Challenge score (pure standings engine in `leagues.ts` is
+  tested; sync needs Firebase + the league rules in `FIREBASE_SETUP.md`);
   the local-first friends + share-link invite path works anonymously today.
   Leaderboard scoring is **client-trusted** (host runs the engine) — fine for
   casual boards, not safe for ranked without server-side validation. **Supabase

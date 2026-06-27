@@ -112,15 +112,36 @@ service cloud.firestore {
       allow read: if signedIn();
       allow write: if signedIn() && request.auth.uid == uid;
     }
+
+    // Private friend leagues. A league doc is readable by its members; the
+    // owner creates it; a signed-in user may update it only if they end up a
+    // member (this is how joining by code works). Each member may write only
+    // their own result rows.
+    match /leagues/{leagueId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.memberUids;
+      allow create: if signedIn() && request.auth.uid == request.resource.data.ownerUid;
+      allow update: if signedIn() && request.auth.uid in request.resource.data.memberUids;
+
+      match /results/{resultId} {
+        allow read: if signedIn();
+        allow write: if signedIn() && request.auth.uid == request.resource.data.uid;
+      }
+    }
+    // League join-code → id lookup.
+    match /leagueCodes/{code} {
+      allow read: if signedIn();
+      allow write: if signedIn();
+    }
   }
 }
 ```
 
 This covers everything: `progress/{uid}` (private sync), `users/{uid}` (public
 profile + your `friends`/`invites` sub-collections), `friendCodes/{code}` (the
-add-by-code lookup), and `leaderboards/{board}/entries/{uid}` (daily + all-time
-boards). The friends/leaderboard features stay hidden until sign-in is enabled,
-and the app still works fully anonymously without any of this.
+add-by-code lookup), `leaderboards/{board}/entries/{uid}` (daily + all-time
+boards), and `leagues/{id}` + `leagueCodes/{code}` (private friend leagues — the
+Daily-fed season tables). All these features stay hidden until sign-in is
+enabled, and the app still works fully anonymously without any of this.
 
 ---
 

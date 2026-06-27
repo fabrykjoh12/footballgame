@@ -26,6 +26,7 @@ import {
 } from 'firebase/auth';
 import {
   addDoc,
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -37,6 +38,8 @@ import {
   orderBy,
   query,
   setDoc,
+  updateDoc,
+  where,
   type Firestore,
 } from 'firebase/firestore';
 import { firebaseConfig } from '../lib/firebaseConfig';
@@ -340,4 +343,106 @@ export async function fetchLeaderboard(boardId: string, topN = 50): Promise<Lead
   );
   const snap = await getDocs(q);
   return snap.docs.map((d) => d.data() as LeaderboardEntry);
+}
+
+/* ------------------------------------------------------------------ */
+/* Private friend leagues (online layer)                               */
+/* ------------------------------------------------------------------ */
+
+export interface LeagueMemberDoc {
+  uid: string;
+  name: string;
+}
+
+export interface LeagueDoc {
+  id: string;
+  name: string;
+  code: string;
+  ownerUid: string;
+  members: LeagueMemberDoc[];
+  memberUids: string[];
+  createdAt: number;
+}
+
+export interface LeagueResultDoc {
+  uid: string;
+  key: string;
+  points: number;
+  at: number;
+}
+
+/** Create a league and register its join code. */
+export async function createLeague(league: {
+  id: string;
+  name: string;
+  code: string;
+  owner: LeagueMemberDoc;
+}): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) return;
+  const code = league.code.toUpperCase();
+  await setDoc(doc(ctx.db, 'leagues', league.id), {
+    id: league.id,
+    name: league.name,
+    code,
+    ownerUid: league.owner.uid,
+    members: [league.owner],
+    memberUids: [league.owner.uid],
+    createdAt: Date.now(),
+  });
+  await setDoc(doc(ctx.db, 'leagueCodes', code), { leagueId: league.id });
+}
+
+/** Resolve a join code to a league id, or null. */
+export async function resolveLeagueCode(code: string): Promise<string | null> {
+  const ctx = ensure();
+  if (!ctx) return null;
+  const snap = await getDoc(doc(ctx.db, 'leagueCodes', code.toUpperCase()));
+  return snap.exists() ? ((snap.data() as { leagueId?: string }).leagueId ?? null) : null;
+}
+
+/** Add a member to a league (idempotent via arrayUnion). */
+export async function joinLeague(leagueId: string, member: LeagueMemberDoc): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) return;
+  await updateDoc(doc(ctx.db, 'leagues', leagueId), {
+    members: arrayUnion(member),
+    memberUids: arrayUnion(member.uid),
+  });
+}
+
+/** All leagues the user belongs to. */
+export async function listLeagues(uid: string): Promise<LeagueDoc[]> {
+  const ctx = ensure();
+  if (!ctx) return [];
+  const q = query(collection(ctx.db, 'leagues'), where('memberUids', 'array-contains', uid));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => d.data() as LeagueDoc);
+}
+
+export async function getLeague(leagueId: string): Promise<LeagueDoc | null> {
+  const ctx = ensure();
+  if (!ctx) return null;
+  const snap = await getDoc(doc(ctx.db, 'leagues', leagueId));
+  return snap.exists() ? (snap.data() as LeagueDoc) : null;
+}
+
+/**
+ * Submit a member's result. Keyed by `${uid}_${key}` so resubmitting the same
+ * day overwrites rather than duplicates.
+ */
+export async function submitLeagueResult(
+  leagueId: string,
+  result: LeagueResultDoc,
+): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) return;
+  await setDoc(doc(ctx.db, 'leagues', leagueId, 'results', `${result.uid}_${result.key}`), result);
+}
+
+export async function fetchLeagueResults(leagueId: string): Promise<LeagueResultDoc[]> {
+  const ctx = ensure();
+  if (!ctx) return [];
+  const snap = await getDocs(collection(ctx.db, 'leagues', leagueId, 'results'));
+  return snap.docs.map((d) => d.data() as LeagueResultDoc);
 }
