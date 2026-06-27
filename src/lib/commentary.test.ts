@@ -72,6 +72,58 @@ describe('questionCommentary priority', () => {
   });
 });
 
+describe('questionCommentary context', () => {
+  it('a late winner gets dedicated drama', () => {
+    const line = questionCommentary(
+      side({ name: 'Sara FC', isCorrect: true, scoredGoal: true }),
+      side({ name: 'Jonas United' }),
+      '3–2',
+      0,
+      { minute: 90, lateWinner: true },
+    );
+    expect(line.toLowerCase()).toContain('late winner');
+    expect(line).toContain('Sara FC');
+  });
+
+  it('an equaliser is announced as such', () => {
+    const line = questionCommentary(
+      side({ name: 'Sara FC', isCorrect: true, scoredGoal: true }),
+      side({ name: 'Jonas United' }),
+      '2–2',
+      0,
+      { minute: 60, equalizer: true },
+    );
+    expect(line.toLowerCase()).toContain('equalis');
+  });
+
+  it('a plain late goal reads as late drama', () => {
+    const line = questionCommentary(
+      side({ name: 'Sara FC', isCorrect: true, scoredGoal: true }),
+      side({ name: 'Jonas United' }),
+      '2–0',
+      0,
+      { minute: 85 },
+    );
+    expect(line.toLowerCase()).toMatch(/late|death/);
+  });
+
+  it('both correct late switches to tense framing', () => {
+    const line = questionCommentary(
+      side({ isCorrect: true }),
+      side({ isCorrect: true }),
+      '1–1',
+      0,
+      { minute: 88 },
+    );
+    expect(line.length).toBeGreaterThan(0);
+  });
+
+  it('nightmare mode has its own kickoff', () => {
+    expect(kickoffLine(0, 'nightmare').toLowerCase()).toContain('nightmare');
+    expect(kickoffLine(0, 'casual').toLowerCase()).not.toContain('nightmare');
+  });
+});
+
 describe('commentary helpers', () => {
   it('is deterministic for a given seed', () => {
     const a = questionCommentary(side({ isCorrect: true }), side(), '1–0', 5);

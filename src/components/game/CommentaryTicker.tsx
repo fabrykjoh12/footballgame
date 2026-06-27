@@ -2,10 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useGame } from '../../context/GameProvider';
 import { teamName } from '../../lib/teamName';
 import { COUNTERATTACK_MS } from '../../lib/scoring';
+import { minuteForQuestion } from '../../lib/matchTimeline';
 import {
   kickoffLine,
   questionCommentary,
   stoppageLine,
+  LATE_MINUTE,
   type Side,
 } from '../../lib/commentary';
 import type { Player, Room } from '../../types/game';
@@ -18,6 +20,7 @@ export function CommentaryTicker() {
   const kickedOff = useRef(false);
   const lastQid = useRef<string | null>(null);
   const lastRound = useRef(0);
+  const prevGoals = useRef<{ h: number; a: number }>({ h: 0, a: 0 });
 
   useEffect(() => {
     if (!room) return;
@@ -31,12 +34,13 @@ export function CommentaryTicker() {
       kickedOff.current = false;
       lastQid.current = null;
       lastRound.current = 0;
+      prevGoals.current = { h: 0, a: 0 };
       return;
     }
 
     if (room.status === 'starting' && !kickedOff.current) {
       kickedOff.current = true;
-      say(kickoffLine());
+      say(kickoffLine(0, room.settings.mode));
       return;
     }
 
@@ -54,8 +58,33 @@ export function CommentaryTicker() {
       lastQid.current = id;
       const [a, b] = room.players;
       if (!a || !b) return;
-      const scoreline = `${a.goals}–${b.goals}`;
-      say(questionCommentary(sideFor(a, room), sideFor(b, room), scoreline, room.currentQuestionIndex));
+
+      const before = prevGoals.current;
+      const after = { h: a.goals, a: b.goals };
+      const sr = room.stoppageRound ?? 0;
+      const total = room.selectedQuestions.length || 10;
+      const minute = sr > 0 ? 90 + sr : minuteForQuestion(room.currentQuestionIndex, total);
+
+      // Detect cross-player drama from the before/after scoreline.
+      const homeScored = after.h > before.h;
+      const awayScored = after.a > before.a;
+      const oneScored = homeScored !== awayScored; // exactly one side scored
+      const wasLevel = before.h === before.a;
+      const nowLevel = after.h === after.a;
+      const equalizer = oneScored && !wasLevel && nowLevel;
+      const lateWinner = oneScored && minute >= LATE_MINUTE && !nowLevel && (wasLevel || leadFlipped(before, after));
+
+      prevGoals.current = after;
+
+      const scoreline = `${after.h}–${after.a}`;
+      say(
+        questionCommentary(sideFor(a, room), sideFor(b, room), scoreline, room.currentQuestionIndex, {
+          minute,
+          mode: room.settings.mode,
+          equalizer,
+          lateWinner,
+        }),
+      );
     }
   }, [room]);
 
@@ -84,6 +113,16 @@ export function CommentaryTicker() {
       </span>
     </div>
   );
+}
+
+/** Did the side that's now ahead change (a fresh go-ahead goal)? */
+function leadFlipped(
+  before: { h: number; a: number },
+  after: { h: number; a: number },
+): boolean {
+  const leadBefore = Math.sign(before.h - before.a);
+  const leadAfter = Math.sign(after.h - after.a);
+  return leadAfter !== 0 && leadAfter !== leadBefore;
 }
 
 function sideFor(p: Player, room: Room): Side {
