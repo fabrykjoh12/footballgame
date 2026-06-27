@@ -69,7 +69,20 @@ export function GameplayScreen() {
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-4 px-4 py-5">
-      <Scoreboard player={player} opponent={opponent} scoreline={scoreline} clock={clock} />
+      <div className="flex items-center gap-3">
+        <div className="flex-1">
+          <Scoreboard player={player} opponent={opponent} scoreline={scoreline} clock={clock} />
+        </div>
+        <button
+          type="button"
+          onClick={pauseMatch}
+          aria-label="Pause match"
+          className="shrink-0 rounded-xl border border-white/10 bg-black/30 px-3 py-3 text-ink-muted transition hover:border-neon/50 hover:text-neon focus:outline-none focus-visible:ring-2 focus-visible:ring-neon"
+        >
+          {/* pause glyph */}
+          <span aria-hidden="true" className="text-lg leading-none">⏸</span>
+        </button>
+      </div>
       <MomentumBar results={state.results} playerSide={player.side} />
       <MatchTimeline results={state.results} currentIndex={state.results.length} />
 
@@ -103,14 +116,6 @@ export function GameplayScreen() {
       </div>
 
       <CommentaryTicker lines={commentary} />
-
-      <button
-        type="button"
-        onClick={pauseMatch}
-        className="mx-auto text-xs font-medium text-ink-muted underline-offset-4 transition hover:text-neon hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-neon"
-      >
-        Pause
-      </button>
 
       {paused && <PauseOverlay onResume={resumeMatch} onQuit={reset} />}
     </div>

@@ -1,10 +1,13 @@
 import { useMatch } from '../providers/MatchProvider.tsx';
 import { useSettings } from '../providers/AppSettingsProvider.tsx';
+import { useStats } from '../providers/StatsProvider.tsx';
+import { StatsStrip } from '../../ui/stats/StatsStrip.tsx';
 import type { MatchSummary } from '../../types/match.ts';
 
 export function PostMatchScreen({ summary }: { summary: MatchSummary }) {
   const { startCpuMatch, reset } = useMatch();
   const settings = useSettings();
+  const { stats } = useStats();
 
   const { player, opponent, scoreline } = summary;
   const homeTeam = player.side === 'home' ? player.team : opponent.team;
@@ -55,6 +58,13 @@ export function PostMatchScreen({ summary }: { summary: MatchSummary }) {
           value={`${accuracy(summary, 'player')}%`}
         />
         <Stat label="Questions" value={`${summary.results.length}`} />
+      </div>
+
+      <div className="w-full border-t border-white/10 pt-4">
+        <p className="mb-2 text-center text-[11px] uppercase tracking-widest text-ink-muted">
+          Career record
+        </p>
+        <StatsStrip stats={stats} />
       </div>
 
       <div className="flex w-full flex-col gap-3 sm:flex-row">
