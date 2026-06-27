@@ -12,7 +12,7 @@ score ("Sara FC 3–2 Jonas United"). React + TypeScript + Vite + Tailwind.
 Fully playable offline vs a CPU; real-time multiplayer via Ably (or Supabase)
 when keys are present.
 
-Built and working: 10 mini-games, **624 questions**, live Ably 1v1 (verified +
+Built and working: 10 mini-games, **739 questions**, live Ably 1v1 (verified +
 hardened), a singleplayer **Career Mode** (climb from League Two to the Premier
 League), **optional sign-in with cross-device progress sync** (Firebase Auth), a
 **friends list with friend codes + invite-to-room** (no dictating codes), an
@@ -143,7 +143,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Scoring, goals, events, sudden-death helpers (pure) | `src/lib/scoring.ts` |
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize, tiebreakers) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
-| Question database (624 Qs, 10 types) | `src/data/questions.ts` |
+| Question database (739 Qs, 10 types) | `src/data/questions.ts` |
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
 | Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
@@ -321,7 +321,7 @@ Gotchas:
 
 ## Status & open items
 
-- ✅ Done: 10 mini-games, 624 Qs, live Ably 1v1 + hardening (incl. **guest-side
+- ✅ Done: 10 mini-games, 739 Qs, live Ably 1v1 + hardening (incl. **guest-side
   host-drop detection** → reconnecting/failed instead of a frozen match),
   **Career Mode** (singleplayer league climb), **optional sign-in + cross-device
   progress sync** (Firebase Auth email link), Daily Challenge, profile/stats,
