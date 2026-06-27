@@ -50,9 +50,11 @@ const FEATURES = [
 export function HomePage({
   onOpenCareer,
   onOpenModes,
+  onOpenCup,
 }: {
   onOpenCareer: () => void;
   onOpenModes: () => void;
+  onOpenCup: () => void;
 }) {
   const {
     createRoom,
@@ -356,6 +358,30 @@ export function HomePage({
         <div className="mt-3">
           <Button fullWidth onClick={onOpenModes}>
             Browse modes <IconArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </Card>
+
+      {/* Cup Runs (themed knockout tournaments) */}
+      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+        <div className="mb-2 flex items-center gap-2">
+          <IconTrophy className="h-5 w-5 text-gold" />
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
+            Cup Runs
+          </h2>
+          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
+            Singleplayer
+          </span>
+        </div>
+        <p className="text-xs leading-relaxed text-white/55">
+          Themed knockout tournaments — the <span className="font-semibold text-white/75">Champions
+          Run</span>, <span className="font-semibold text-white/75">World Cup Dream</span> and a quick{' '}
+          <span className="font-semibold text-white/75">Cup Sprint</span>. Win every tie to lift the
+          trophy.
+        </p>
+        <div className="mt-3">
+          <Button fullWidth onClick={onOpenCup}>
+            Enter a cup <IconArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </Card>

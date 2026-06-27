@@ -14,14 +14,15 @@ when keys are present.
 
 Built and working: 10 mini-games, **991 questions**, live Ably 1v1 (verified +
 hardened), a singleplayer **Career Mode** (climb from League Two to the Premier
-League), **solo arcade game modes** (Survival / Time Attack / Gauntlet), **optional
+League), **solo arcade game modes** (Survival / Time Attack / Gauntlet), **themed Cup
+Runs** (knockout tournaments), **optional
 sign-in with cross-device progress sync** (Firebase Auth), a
 **friends list with friend codes + invite-to-room** (no dictating codes), an
 **online daily/all-time leaderboard**, **achievements**, **head-to-head records**,
 per-device **question-freshness**, Daily Challenge, local profile/stats, sound,
 share-as-image, live commentary, a 0–90' match timeline, **sudden-death stoppage
 time**, a lobby topic filter, deterministic per-team kit colours, a premium UI
-pass, and **176 unit tests** gating an auto-deploy pipeline.
+pass, and **187 unit tests** gating an auto-deploy pipeline.
 
 > "Football" always means **European football / soccer**. Never use real club
 > badges or player photos — visuals are gradients, pitch patterns, icons, type.
@@ -37,7 +38,7 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (176 tests across lib/, data/, services/)
+npm test         # vitest run (187 tests across lib/, data/, services/)
 ```
 
 Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). **CI runs the
@@ -149,6 +150,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
 | Solo arcade modes (Survival / Time Attack / Gauntlet; self-contained, no match engine) | `src/lib/soloModes.ts`, `src/lib/soloProgress.ts`, `src/components/solo/` |
+| Themed Cup Runs (knockout tournaments over local matches, like Career) | `src/lib/cup.ts`, `src/components/cup/` |
 | Optional sign-in + cross-device progress sync (Firebase) | `src/context/AuthProvider.tsx`, `src/lib/progress.ts`, `src/lib/firebaseConfig.ts`, `src/services/firebaseBackend.ts`, `src/components/auth/` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |
 | Per-device question-history (recent-repeat avoidance, local) | `src/lib/questionHistory.ts` |
@@ -281,7 +283,7 @@ schedule, standings, fixtures, deterministic AI sim, promotion/relegation),
 `friends` (codes, invite link/text, list de-dupe), `leaderboard` (board ids),
 `leagues` (join codes, standings aggregation/tie-breaks/dedupe),
 `soloModes` (gauntlet/survival/time-attack selection + grading), `soloProgress`
-(best-score folding),
+(best-score folding), `cup` (bracket progression, trophies, didWinTie),
 `progress` (sign-in reconcile rules), `commentary`, `teamIdentity`,
 `connectionMapping`, `dailyChallenge`, `seededRandom`, `shareResult`,
 `profileStats`. Add a test when you add an invariant or a rule.
@@ -336,7 +338,7 @@ Gotchas:
   invite-to-room** (local-first share link, plus online live push invites when
   signed in), **online daily + all-time leaderboard** (Firestore), sound, share
   (image+text), commentary (now an `aria-live` region), timeline, sudden death,
-  topic filter, kit colours, premium UI across all screens, 176 tests + CI.
+  topic filter, kit colours, premium UI across all screens, 187 tests + CI.
 - ⏳ Open: **friends / leaderboard / friend-leagues online layer** is built +
   code-split + gated on Firebase sign-in, but **not device-tested** (needs two
   signed-in accounts). **Friend leagues** = private season tables fed by each

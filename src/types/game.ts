@@ -184,6 +184,8 @@ export interface MatchSettings {
   isDaily?: boolean;
   /** Marks a Career Mode fixture so its result feeds the league table. */
   careerMatch?: boolean;
+  /** Marks a Cup Run knockout tie so its result advances the bracket. */
+  cupMatch?: boolean;
   /** Preferred question topics (soft filter; tops up if a topic is short). */
   categories?: Category[];
 }
