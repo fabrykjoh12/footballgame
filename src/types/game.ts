@@ -239,6 +239,8 @@ export interface Room {
   tiebreakers?: Question[];
   /** 0/undefined = normal play; n = the nth sudden-death round in progress. */
   stoppageRound?: number;
+  /** When true, the match clock and the opponent are frozen (manual pause). */
+  paused?: boolean;
   createdAt: number;
 }
 
@@ -293,6 +295,13 @@ export interface GameService {
   /** Host-only: advance from the result reveal to the next question. */
   nextQuestion(): Promise<void>;
   rematch(): Promise<void>;
+
+  /**
+   * Freeze / unfreeze the live match (clock + opponent) for both sides.
+   * Optional: backends that can't coordinate a shared pause omit these.
+   */
+  pause?(): Promise<void>;
+  resume?(): Promise<void>;
 
   /** Subscribe to room snapshots. Returns an unsubscribe fn. */
   onRoomUpdate(cb: (room: Room | null) => void): () => void;

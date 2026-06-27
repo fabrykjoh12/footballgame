@@ -215,4 +215,37 @@ describe('MatchEngine', () => {
     expect(h.room.status).toBe('finished');
     expect(h.room.stoppageRound ?? 0).toBe(0);
   });
+
+  it('pauses the question clock and restores the remaining time on resume', () => {
+    const h = harness();
+    h.engine.beginMatch([q('q1'), q('q2')]);
+    vi.advanceTimersByTime(1400); // exact kickoff → questionStartedAt aligns with the clock
+    expect(h.room.status).toBe('in_question');
+
+    vi.advanceTimersByTime(3000); // 3s elapsed of 10s → 7s remaining
+    h.engine.pause();
+    expect(h.room.paused).toBe(true);
+
+    // While paused: time passes but the question never resolves...
+    vi.advanceTimersByTime(60000);
+    expect(h.room.status).toBe('in_question');
+    // ...and answers are ignored.
+    h.engine.recordAnswer('h', { selectedAnswer: 'a', clueStage: 0, timeTakenMs: 1 });
+    expect(h.room.answers['q1']?.length ?? 0).toBe(0);
+
+    h.engine.resume(60000); // resume after a 60s pause
+    expect(h.room.paused).toBe(false);
+
+    vi.advanceTimersByTime(6000); // 6s of the 7s that was left
+    expect(h.room.status).toBe('in_question');
+    vi.advanceTimersByTime(1000); // cross the remaining deadline
+    expect(h.room.status).toBe('showing_result');
+  });
+
+  it('ignores pause outside a live question', () => {
+    const h = harness();
+    h.engine.beginMatch([q('q1')]);
+    h.engine.pause(); // still in "starting"
+    expect(h.room.paused ?? false).toBe(false);
+  });
 });

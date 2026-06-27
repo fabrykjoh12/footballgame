@@ -14,8 +14,17 @@ import { CommentaryTicker } from './CommentaryTicker';
 import { MatchTimeline } from './MatchTimeline';
 
 export function GamePage() {
-  const { room, localPlayerId, isHost, opponent, submitAnswer, nextQuestion } =
-    useGame();
+  const {
+    room,
+    localPlayerId,
+    isHost,
+    opponent,
+    submitAnswer,
+    nextQuestion,
+    canPause,
+    pauseMatch,
+    resumeMatch,
+  } = useGame();
 
   const [picked, setPicked] = useState<string | null>(null);
   const [locked, setLocked] = useState(false);
@@ -49,7 +58,7 @@ export function GamePage() {
   const countdown = useCountdown(
     room?.questionStartedAt ?? null,
     room?.settings.questionDurationMs ?? 15000,
-    room?.status === 'in_question',
+    room?.status === 'in_question' && !room?.paused,
   );
 
   if (!room) return null;
@@ -67,8 +76,10 @@ export function GamePage() {
   const selectedAnswer = picked ?? myRoomAnswer?.selectedAnswer ?? null;
   const opponentAnswered = roomAnswers.some((a) => a.playerId !== localPlayerId);
 
+  const paused = Boolean(room.paused);
+
   const handleAnswer = (answer: string) => {
-    if (hasAnswered || status !== 'in_question') return;
+    if (hasAnswered || status !== 'in_question' || paused) return;
     play('click');
     setPicked(answer);
     setLocked(true);
@@ -114,11 +125,23 @@ export function GamePage() {
 
       {status === 'in_question' && question && (
         <div className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <Badge tone="muted">{MATCH_MODES[room.settings.mode].label}</Badge>
-            <span className="text-xs text-white/40">
-              Question {Math.min(room.currentQuestionIndex + 1, total)} of {total}
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-white/40">
+                Question {Math.min(room.currentQuestionIndex + 1, total)} of {total}
+              </span>
+              {canPause && (
+                <button
+                  type="button"
+                  onClick={() => void pauseMatch()}
+                  aria-label="Pause match"
+                  className="rounded-lg border border-white/10 px-2 py-1 text-xs font-semibold text-white/60 transition hover:border-pitch/50 hover:text-pitch focus:outline-none focus-visible:ring-2 focus-visible:ring-pitch"
+                >
+                  ⏸ Pause
+                </button>
+              )}
+            </div>
           </div>
           <TimerBar fraction={countdown.fraction} secondsLeft={countdown.secondsLeft} />
           <QuestionCard
@@ -142,6 +165,31 @@ export function GamePage() {
           isLastQuestion={room.currentQuestionIndex >= total - 1}
           onNext={nextQuestion}
         />
+      )}
+
+      {paused && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Match paused"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-ink-900/90 px-6 text-center backdrop-blur-sm"
+        >
+          <div className="font-display text-xs uppercase tracking-[0.3em] text-pitch">
+            Paused
+          </div>
+          <div className="font-display text-3xl font-bold text-white">Match suspended</div>
+          <p className="max-w-xs text-sm text-white/60">
+            The clock and your opponent are frozen for both sides. Resume when you’re ready.
+          </p>
+          <button
+            type="button"
+            autoFocus
+            onClick={() => void resumeMatch()}
+            className="rounded-xl bg-pitch px-8 py-3.5 font-display text-base font-bold text-ink-900 shadow-glow transition hover:brightness-110"
+          >
+            Resume
+          </button>
+        </div>
       )}
     </div>
   );

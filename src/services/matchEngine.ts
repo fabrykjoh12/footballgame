@@ -71,6 +71,44 @@ export class MatchEngine {
     this.clearTimers();
   }
 
+  /* ------------------------------- pause ------------------------------- */
+
+  /** Freeze the live question: stop every timer and mark the room paused. */
+  pause(): void {
+    if (this.room.status !== 'in_question' || this.room.paused) return;
+    this.clearTimers();
+    this.room = { ...this.room, paused: true };
+    this.emit();
+  }
+
+  /**
+   * Resume after a pause that lasted `pausedDurationMs`. The question clock is
+   * pushed forward by that amount so the countdown continues from where it
+   * stopped, then the deadline (or short all-answered reveal) timer re-arms.
+   */
+  resume(pausedDurationMs: number): void {
+    if (!this.room.paused) return;
+    const startedAt =
+      (this.room.questionStartedAt ?? Date.now()) + Math.max(0, pausedDurationMs);
+    this.room = { ...this.room, paused: false, questionStartedAt: startedAt };
+    this.emit();
+
+    const question = this.currentQuestion();
+    if (!question) return;
+    const everyoneAnswered = this.room.players.every((p) =>
+      (this.room.answers[question.id] ?? []).some((a) => a.playerId === p.id),
+    );
+    if (everyoneAnswered) {
+      this.revealTimer = setTimeout(() => this.resolveQuestion(), ALL_ANSWERED_REVEAL_MS);
+    } else {
+      const remaining = Math.max(
+        0,
+        startedAt + this.room.settings.questionDurationMs - Date.now(),
+      );
+      this.questionTimer = setTimeout(() => this.resolveQuestion(), remaining);
+    }
+  }
+
   /* ----------------------------- lifecycle ----------------------------- */
 
   /**
@@ -150,7 +188,7 @@ export class MatchEngine {
 
   /** Record one player's answer. Resolves early once everyone has answered. */
   recordAnswer(playerId: string, input: SubmitAnswerInput): void {
-    if (this.room.status !== 'in_question') return;
+    if (this.room.status !== 'in_question' || this.room.paused) return;
     const question = this.currentQuestion();
     if (!question) return;
 

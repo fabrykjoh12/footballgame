@@ -51,6 +51,10 @@ interface GameContextValue {
   nextQuestion: () => Promise<void>;
   rematch: () => Promise<void>;
   leaveRoom: () => Promise<void>;
+  /** Whether the active backend supports a shared pause. */
+  canPause: boolean;
+  pauseMatch: () => Promise<void>;
+  resumeMatch: () => Promise<void>;
   clearEvent: (nonce: number) => void;
   clearError: () => void;
 }
@@ -168,6 +172,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const rematch = useCallback(async () => {
     await serviceRef.current?.rematch();
   }, []);
+  const pauseMatch = useCallback(async () => {
+    await serviceRef.current?.pause?.();
+  }, []);
+  const resumeMatch = useCallback(async () => {
+    await serviceRef.current?.resume?.();
+  }, []);
 
   const leaveRoom = useCallback(async () => {
     try {
@@ -198,6 +208,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     [room, localPlayerId],
   );
   const isHost = Boolean(localPlayer?.isHost);
+  const canPause = Boolean(serviceRef.current?.pause);
 
   const value: GameContextValue = {
     room,
@@ -222,6 +233,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     nextQuestion,
     rematch,
     leaveRoom,
+    canPause,
+    pauseMatch,
+    resumeMatch,
     clearEvent,
     clearError,
   };

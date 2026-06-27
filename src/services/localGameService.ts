@@ -64,6 +64,13 @@ export class LocalGameService implements GameService {
   private botAnswerTimer: ReturnType<typeof setTimeout> | null = null;
   private lobbyTimer: ReturnType<typeof setTimeout> | null = null;
   private scheduledBotQuestionId: string | null = null;
+  /** The bot's pending answer, kept so a pause can freeze and re-arm it. */
+  private botPending: {
+    decision: ReturnType<typeof decideBotAnswer>;
+    /** Absolute epoch-ms the bot is due to answer. */
+    answerAt: number;
+  } | null = null;
+  private pausedAt: number | null = null;
 
   getLocalPlayerId(): string {
     return this.localPlayerId;
@@ -128,6 +135,28 @@ export class LocalGameService implements GameService {
 
   async nextQuestion(): Promise<void> {
     this.engine?.nextQuestion();
+  }
+
+  async pause(): Promise<void> {
+    const room = this.engine?.getRoom();
+    if (!this.engine || !room || room.status !== 'in_question' || room.paused) return;
+    this.pausedAt = Date.now();
+    if (this.botAnswerTimer) {
+      clearTimeout(this.botAnswerTimer);
+      this.botAnswerTimer = null;
+    }
+    this.engine.pause();
+  }
+
+  async resume(): Promise<void> {
+    if (!this.engine || this.pausedAt == null) return;
+    const pausedDur = Date.now() - this.pausedAt;
+    this.pausedAt = null;
+    if (this.botPending) this.botPending.answerAt += pausedDur;
+    this.engine.resume(pausedDur);
+    // engine.resume re-emits the room; the bot is already marked scheduled for
+    // this question, so re-arm it here from its shifted answer time.
+    this.armBotTimer();
   }
 
   async rematch(): Promise<void> {
@@ -200,8 +229,18 @@ export class LocalGameService implements GameService {
   private handleRoom(room: Room): void {
     this.emitRoom(room);
 
+    // While paused, hold the bot — resume() re-arms it from its shifted time.
+    if (room.paused) {
+      if (this.botAnswerTimer) {
+        clearTimeout(this.botAnswerTimer);
+        this.botAnswerTimer = null;
+      }
+      return;
+    }
+
     if (room.status !== 'in_question') {
       this.scheduledBotQuestionId = null;
+      this.botPending = null;
       if (this.botAnswerTimer) {
         clearTimeout(this.botAnswerTimer);
         this.botAnswerTimer = null;
@@ -220,14 +259,25 @@ export class LocalGameService implements GameService {
 
     this.scheduledBotQuestionId = question.id;
     const decision = decideBotAnswer(question, room.settings.questionDurationMs);
+    this.botPending = { decision, answerAt: Date.now() + decision.delayMs };
+    this.armBotTimer();
+  }
+
+  /** (Re)arm the bot's answer timer from its pending absolute answer time. */
+  private armBotTimer(): void {
+    if (!this.botPending || !this.botPlayerId) return;
     if (this.botAnswerTimer) clearTimeout(this.botAnswerTimer);
+    const { decision } = this.botPending;
+    const delay = Math.max(0, this.botPending.answerAt - Date.now());
     this.botAnswerTimer = setTimeout(() => {
+      this.botAnswerTimer = null;
+      this.botPending = null;
       this.engine?.recordAnswer(this.botPlayerId, {
         selectedAnswer: decision.selectedAnswer,
         clueStage: decision.clueStage,
         timeTakenMs: decision.timeTakenMs,
       });
-    }, decision.delayMs);
+    }, delay);
   }
 
   private emitRoom(room: Room | null): void {
@@ -243,5 +293,7 @@ export class LocalGameService implements GameService {
     if (this.lobbyTimer) clearTimeout(this.lobbyTimer);
     this.botAnswerTimer = null;
     this.lobbyTimer = null;
+    this.botPending = null;
+    this.pausedAt = null;
   }
 }
