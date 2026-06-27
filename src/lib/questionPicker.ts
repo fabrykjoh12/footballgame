@@ -52,6 +52,22 @@ export function randomizeAnswerOrder(q: Question, rng: Rng = Math.random): Quest
   return { ...q, options: shuffle(q.options, rng) };
 }
 
+/**
+ * Order candidates so freshly-unseen questions come first (each group still
+ * shuffled), so the picker exhausts unseen content before reusing recent ones.
+ * With no `avoid` set this is a plain shuffle, so behaviour is unchanged.
+ */
+function prioritizeUnseen(
+  list: Question[],
+  rng: Rng,
+  avoid?: ReadonlySet<string>,
+): Question[] {
+  if (!avoid || avoid.size === 0) return shuffle(list, rng);
+  const unseen = list.filter((q) => !avoid.has(q.id));
+  const seen = list.filter((q) => avoid.has(q.id));
+  return [...shuffle(unseen, rng), ...shuffle(seen, rng)];
+}
+
 function pickOfType(
   pool: Question[],
   type: QuestionType,
@@ -59,6 +75,7 @@ function pickOfType(
   allowed: Difficulty[],
   rng: Rng,
   categories?: Category[],
+  avoid?: ReadonlySet<string>,
 ): Question[] {
   const byType = pool.filter((q) => q.type === type);
   const tier = byType.filter((q) => allowed.includes(q.difficulty));
@@ -69,18 +86,17 @@ function pickOfType(
       ? tier.filter((q) => categories.includes(q.category))
       : tier;
 
-  const chosen = shuffle(preferred, rng).slice(0, count);
+  const chosen: Question[] = [];
+  const take = (candidates: Question[]) => {
+    if (chosen.length >= count) return;
+    const remaining = candidates.filter((q) => !chosen.includes(q));
+    const ordered = prioritizeUnseen(remaining, rng, avoid);
+    chosen.push(...ordered.slice(0, count - chosen.length));
+  };
 
-  // Top up from the rest of the tier (relax topic, keep the mode's difficulty).
-  if (chosen.length < count) {
-    const more = shuffle(tier.filter((q) => !chosen.includes(q)), rng);
-    chosen.push(...more.slice(0, count - chosen.length));
-  }
-  // Last resort: any difficulty of this type, so a match is always full.
-  if (chosen.length < count) {
-    const more = shuffle(byType.filter((q) => !chosen.includes(q)), rng);
-    chosen.push(...more.slice(0, count - chosen.length));
-  }
+  take(preferred); // preferred topics, mode difficulty, unseen first
+  take(tier); // top up: relax topic, keep difficulty
+  take(byType); // last resort: any difficulty, so a match is always full
   return chosen;
 }
 
@@ -119,24 +135,30 @@ function distributionFor(count: number): Record<QuestionType, number> {
 export function pickMatchQuestions(
   settings: MatchSettings,
   pool: Question[] = QUESTIONS,
+  avoid?: ReadonlySet<string>,
 ): Question[] {
   // A seed makes the whole pick deterministic (Daily Challenge); otherwise random.
-  const rng: Rng = settings.seed != null ? mulberry32(settings.seed) : Math.random;
+  const seeded = settings.seed != null;
+  const rng: Rng = seeded ? mulberry32(settings.seed!) : Math.random;
   const allowed = difficultiesForMode(settings.mode);
   const dist = distributionFor(settings.questionCount);
 
+  // History only steers a random pick — the Daily Challenge must stay identical
+  // for everyone, so never let recent-history skew a seeded selection.
+  const skip = seeded ? undefined : avoid;
+
   const cats = settings.categories;
   const selected: Question[] = [
-    ...pickOfType(pool, 'who_am_i', dist.who_am_i, allowed, rng, cats),
-    ...pickOfType(pool, 'career_path', dist.career_path, allowed, rng, cats),
-    ...pickOfType(pool, 'higher_lower', dist.higher_lower, allowed, rng, cats),
-    ...pickOfType(pool, 'club_country', dist.club_country, allowed, rng, cats),
-    ...pickOfType(pool, 'guess_year', dist.guess_year, allowed, rng, cats),
-    ...pickOfType(pool, 'transfer_fee', dist.transfer_fee, allowed, rng, cats),
-    ...pickOfType(pool, 'pitch_position', dist.pitch_position, allowed, rng, cats),
-    ...pickOfType(pool, 'odd_one_out', dist.odd_one_out, allowed, rng, cats),
-    ...pickOfType(pool, 'spot_the_lie', dist.spot_the_lie, allowed, rng, cats),
-    ...pickOfType(pool, 'guess_the_number', dist.guess_the_number, allowed, rng, cats),
+    ...pickOfType(pool, 'who_am_i', dist.who_am_i, allowed, rng, cats, skip),
+    ...pickOfType(pool, 'career_path', dist.career_path, allowed, rng, cats, skip),
+    ...pickOfType(pool, 'higher_lower', dist.higher_lower, allowed, rng, cats, skip),
+    ...pickOfType(pool, 'club_country', dist.club_country, allowed, rng, cats, skip),
+    ...pickOfType(pool, 'guess_year', dist.guess_year, allowed, rng, cats, skip),
+    ...pickOfType(pool, 'transfer_fee', dist.transfer_fee, allowed, rng, cats, skip),
+    ...pickOfType(pool, 'pitch_position', dist.pitch_position, allowed, rng, cats, skip),
+    ...pickOfType(pool, 'odd_one_out', dist.odd_one_out, allowed, rng, cats, skip),
+    ...pickOfType(pool, 'spot_the_lie', dist.spot_the_lie, allowed, rng, cats, skip),
+    ...pickOfType(pool, 'guess_the_number', dist.guess_the_number, allowed, rng, cats, skip),
   ];
 
   // Shuffle the final order so mini-games are interleaved, then randomize each

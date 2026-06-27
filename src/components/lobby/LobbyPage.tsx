@@ -7,6 +7,7 @@ import { teamName } from '../../lib/teamName';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
+import { InviteFriends } from '../friends/InviteFriends';
 import { IconCopy, IconCheck, IconBack, IconUsers, IconShare } from '../ui/icons';
 
 export function LobbyPage() {
@@ -83,6 +84,9 @@ export function LobbyPage() {
             : 'A CPU opponent will join shortly so you can play right now.'}
         </p>
       </Card>
+
+      {/* Invite a saved friend (live multiplayer only) */}
+      {serviceMode === 'remote' && <InviteFriends roomCode={room.roomCode} />}
 
       {/* Players */}
       <div className="grid grid-cols-2 gap-3">

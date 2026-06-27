@@ -5,6 +5,8 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { setSoundEnabled, play } from '../../lib/sound';
 import { IconSound, IconMute } from '../ui/icons';
 import { AccountButton } from '../auth/AccountButton';
+import { FriendsButton } from '../friends/FriendsButton';
+import { IncomingInviteToast } from '../friends/IncomingInviteToast';
 
 /** App frame: stadium backdrop, brand header, and a centered content column. */
 export function AppShell({ children }: { children: ReactNode }) {
@@ -51,6 +53,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             {soundOn ? <IconSound /> : <IconMute />}
           </button>
+          <FriendsButton />
           <AccountButton />
         </div>
       </header>
@@ -73,6 +76,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-10 sm:px-6">
         {children}
       </main>
+
+      <IncomingInviteToast />
     </div>
   );
 }

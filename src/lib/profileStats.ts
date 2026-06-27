@@ -7,6 +7,8 @@
 import type { Room } from '../types/game';
 import { getPlayerTitle } from './playerTitle';
 import { notifyProgressChanged } from './progress';
+import { recordSeenQuestions } from './questionHistory';
+import { recordHeadToHead } from './headToHead';
 
 const KEY = 'bk_profile_v1';
 
@@ -72,6 +74,11 @@ export function recordMatchResult(room: Room, localPlayerId: string): ProfileSta
 
   const sig = matchSignature(room);
   if (prev.lastMatchSig === sig) return prev; // already counted
+
+  // Remember the questions just played so the picker can keep matches fresh.
+  recordSeenQuestions(room.selectedQuestions.map((q) => q.id));
+  // Track the rivalry record against this opponent.
+  recordHeadToHead(room, localPlayerId);
 
   const opp = room.players.find((p) => p.id !== localPlayerId);
   let outcome: 'win' | 'loss' | 'draw' = 'draw';

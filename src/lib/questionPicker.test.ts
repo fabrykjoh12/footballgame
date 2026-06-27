@@ -154,6 +154,91 @@ describe('pickMatchQuestions topic filter', () => {
   });
 });
 
+describe('pickMatchQuestions question-history avoidance', () => {
+  const TYPES: Question['type'][] = [
+    'who_am_i',
+    'career_path',
+    'higher_lower',
+    'club_country',
+    'guess_year',
+    'transfer_fee',
+    'pitch_position',
+    'odd_one_out',
+    'spot_the_lie',
+    'guess_the_number',
+  ];
+
+  // Two easy questions of every type, suffixed -a (to be avoided) and -b (fresh).
+  const make = (type: Question['type'], suffix: string): Question => {
+    const base = {
+      id: `${type}-${suffix}`,
+      difficulty: 'easy' as const,
+      category: 'players' as const,
+      explanation: '',
+    };
+    switch (type) {
+      case 'higher_lower':
+        return {
+          ...base,
+          type,
+          prompt: 'more?',
+          leftOption: { name: 'L', value: 10 },
+          rightOption: { name: 'R', value: 2 },
+          correctAnswer: 'L',
+        };
+      case 'guess_the_number':
+        return { ...base, type, prompt: 'how many?', correctAnswer: '50', min: 0, max: 100 };
+      case 'guess_year':
+        return {
+          ...base,
+          type,
+          prompt: 'when?',
+          options: ['2010', '2012', '2014', '2016'],
+          correctAnswer: '2010',
+        };
+      default:
+        return {
+          ...base,
+          type,
+          prompt: 'p',
+          path: ['A', 'B'],
+          clues: ['c1', 'c2', 'c3'],
+          options: ['a', 'b', 'c', 'd'],
+          correctAnswer: 'a',
+        } as Question;
+    }
+  };
+
+  const pool: Question[] = TYPES.flatMap((t) => [make(t, 'a'), make(t, 'b')]);
+  const settings: MatchSettings = { mode: 'casual', questionCount: 10, questionDurationMs: 15000 };
+
+  it('prefers unseen questions when fresh alternatives exist', () => {
+    const avoid = new Set(TYPES.map((t) => `${t}-a`));
+    for (let i = 0; i < 30; i++) {
+      const qs = pickMatchQuestions(settings, pool, avoid);
+      expect(qs).toHaveLength(10);
+      // Every type had exactly one unseen option (-b); it must be the one chosen.
+      for (const q of qs) expect(q.id.endsWith('-b')).toBe(true);
+    }
+  });
+
+  it('still fills the match by reusing seen questions when no fresh ones remain', () => {
+    const everything = new Set(pool.map((q) => q.id));
+    const qs = pickMatchQuestions(settings, pool, everything);
+    expect(qs).toHaveLength(10);
+  });
+
+  it('ignores history for a seeded (Daily) pick so it stays deterministic', () => {
+    const seeded: MatchSettings = { ...settings, seed: 7 };
+    const avoidAll = new Set(pool.map((q) => q.id));
+    const ids = (avoid?: Set<string>) =>
+      pickMatchQuestions(seeded, pool, avoid)
+        .map((q) => q.id)
+        .join(',');
+    expect(ids(avoidAll)).toEqual(ids(undefined));
+  });
+});
+
 describe('pickMatchQuestions determinism (Daily Challenge)', () => {
   const layout = (qs: Question[]) =>
     qs.map((q) => {

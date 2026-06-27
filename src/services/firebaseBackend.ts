@@ -25,9 +25,17 @@ import {
   type Auth,
 } from 'firebase/auth';
 import {
+  addDoc,
+  collection,
+  deleteDoc,
   doc,
   getDoc,
+  getDocs,
   getFirestore,
+  limit as fbLimit,
+  onSnapshot,
+  orderBy,
+  query,
   setDoc,
   type Firestore,
 } from 'firebase/firestore';
@@ -178,4 +186,158 @@ export async function pushProgress(
     { ...clean, updatedAt: Date.now() },
     { merge: true },
   );
+}
+
+/* ------------------------------------------------------------------ */
+/* Friends + invites (online layer — only when signed in)              */
+/* ------------------------------------------------------------------ */
+
+export interface PublicProfile {
+  uid: string;
+  name: string;
+  friendCode: string;
+}
+
+export interface FriendDoc {
+  uid: string;
+  name: string;
+  friendCode: string;
+  addedAt: number;
+}
+
+export interface InviteDoc {
+  id: string;
+  fromUid: string;
+  fromName: string;
+  roomCode: string;
+  createdAt: number;
+}
+
+/**
+ * Publish this account's public profile so friends can find it by code.
+ * Writes `users/{uid}` and a `friendCodes/{CODE}` → uid lookup entry.
+ */
+export async function publishProfile(
+  uid: string,
+  name: string,
+  friendCode: string,
+): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) return;
+  const code = friendCode.toUpperCase();
+  await setDoc(
+    doc(ctx.db, 'users', uid),
+    { name, friendCode: code, updatedAt: Date.now() },
+    { merge: true },
+  );
+  await setDoc(doc(ctx.db, 'friendCodes', code), { uid });
+}
+
+/** Resolve a friend code to a public profile, or null if unknown. */
+export async function resolveFriendCode(code: string): Promise<PublicProfile | null> {
+  const ctx = ensure();
+  if (!ctx) return null;
+  const map = await getDoc(doc(ctx.db, 'friendCodes', code.toUpperCase()));
+  if (!map.exists()) return null;
+  const uid = (map.data() as { uid?: string }).uid;
+  if (!uid) return null;
+  const prof = await getDoc(doc(ctx.db, 'users', uid));
+  const data = prof.exists() ? (prof.data() as { name?: string; friendCode?: string }) : {};
+  return { uid, name: data.name ?? 'Player', friendCode: data.friendCode ?? code.toUpperCase() };
+}
+
+/** Save a friend under the signed-in user's friends sub-collection. */
+export async function addFriendOnline(uid: string, friend: PublicProfile): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) return;
+  await setDoc(doc(ctx.db, 'users', uid, 'friends', friend.uid), {
+    uid: friend.uid,
+    name: friend.name,
+    friendCode: friend.friendCode,
+    addedAt: Date.now(),
+  });
+}
+
+export async function removeFriendOnline(uid: string, friendUid: string): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) return;
+  await deleteDoc(doc(ctx.db, 'users', uid, 'friends', friendUid));
+}
+
+export async function listFriendsOnline(uid: string): Promise<FriendDoc[]> {
+  const ctx = ensure();
+  if (!ctx) return [];
+  const snap = await getDocs(collection(ctx.db, 'users', uid, 'friends'));
+  return snap.docs.map((d) => d.data() as FriendDoc);
+}
+
+/** Push an invite into a friend's inbox so they can join your room in one tap. */
+export async function sendInvite(
+  toUid: string,
+  invite: { fromUid: string; fromName: string; roomCode: string },
+): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) return;
+  await addDoc(collection(ctx.db, 'users', toUid, 'invites'), {
+    ...invite,
+    createdAt: Date.now(),
+  });
+}
+
+/** Live-watch the signed-in user's incoming invites. Returns an unsubscribe fn. */
+export function watchInvites(uid: string, cb: (invites: InviteDoc[]) => void): () => void {
+  const ctx = ensure();
+  if (!ctx) return () => {};
+  const q = query(collection(ctx.db, 'users', uid, 'invites'), orderBy('createdAt', 'desc'), fbLimit(10));
+  return onSnapshot(
+    q,
+    (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<InviteDoc, 'id'>) }))),
+    () => cb([]),
+  );
+}
+
+export async function clearInvite(uid: string, inviteId: string): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) return;
+  await deleteDoc(doc(ctx.db, 'users', uid, 'invites', inviteId));
+}
+
+/* ------------------------------------------------------------------ */
+/* Leaderboard (online layer)                                          */
+/* ------------------------------------------------------------------ */
+
+export interface LeaderboardEntry {
+  uid: string;
+  name: string;
+  score: number;
+  updatedAt: number;
+}
+
+/**
+ * Submit a score to a board (e.g. `daily-2026-06-27` or `alltime-best`).
+ * Casual play only — scoring is client-trusted, so do not treat these as
+ * cheat-proof rankings.
+ */
+export async function submitLeaderboardScore(
+  boardId: string,
+  entry: { uid: string; name: string; score: number },
+): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) return;
+  await setDoc(doc(ctx.db, 'leaderboards', boardId, 'entries', entry.uid), {
+    ...entry,
+    updatedAt: Date.now(),
+  });
+}
+
+export async function fetchLeaderboard(boardId: string, topN = 50): Promise<LeaderboardEntry[]> {
+  const ctx = ensure();
+  if (!ctx) return [];
+  const q = query(
+    collection(ctx.db, 'leaderboards', boardId, 'entries'),
+    orderBy('score', 'desc'),
+    fbLimit(topN),
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => d.data() as LeaderboardEntry);
 }

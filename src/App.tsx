@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthProvider';
 import { GameProvider, useGame } from './context/GameProvider';
+import { FriendsProvider } from './context/FriendsProvider';
 import { AppShell } from './components/layout/AppShell';
 import { HomePage } from './components/home/HomePage';
 import { LobbyPage } from './components/lobby/LobbyPage';
@@ -53,9 +54,11 @@ export default function App() {
   return (
     <AuthProvider>
       <GameProvider>
-        <AppShell>
-          <Screens />
-        </AppShell>
+        <FriendsProvider>
+          <AppShell>
+            <Screens />
+          </AppShell>
+        </FriendsProvider>
       </GameProvider>
     </AuthProvider>
   );
