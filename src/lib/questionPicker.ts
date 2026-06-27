@@ -132,6 +132,7 @@ export function pickMatchQuestions(
     ...pickOfType(pool, 'guess_year', dist.guess_year, allowed, rng, cats),
     ...pickOfType(pool, 'transfer_fee', dist.transfer_fee, allowed, rng, cats),
     ...pickOfType(pool, 'pitch_position', dist.pitch_position, allowed, rng, cats),
+    ...pickOfType(pool, 'odd_one_out', dist.odd_one_out, allowed, rng, cats),
   ];
 
   // Shuffle the final order so mini-games are interleaved, then randomize each

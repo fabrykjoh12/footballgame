@@ -27,6 +27,7 @@ export const BASE_POINTS: Record<QuestionType, number> = {
   guess_year: 700,
   transfer_fee: 700,
   pitch_position: 700,
+  odd_one_out: 700,
 };
 
 /**
@@ -44,6 +45,7 @@ export const MAX_SPEED_BONUS: Record<QuestionType, number> = {
   guess_year: 300,
   transfer_fee: 300,
   pitch_position: 300,
+  odd_one_out: 300,
 };
 
 /** Goal conversion: every 2500 points = 1 goal, capped at 5. */

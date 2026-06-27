@@ -15,7 +15,8 @@ export type QuestionType =
   | 'club_country'
   | 'guess_year'
   | 'transfer_fee'
-  | 'pitch_position';
+  | 'pitch_position'
+  | 'odd_one_out';
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'nightmare';
 
@@ -110,6 +111,15 @@ export interface PitchPositionQuestion extends BaseQuestion {
   correctAnswer: string;
 }
 
+/** "ODD ONE OUT" — pick the option that doesn't belong / is the exception. */
+export interface OddOneOutQuestion extends BaseQuestion {
+  type: 'odd_one_out';
+  prompt: string;
+  /** Four options; correctAnswer is the one that does NOT belong. */
+  options: string[];
+  correctAnswer: string;
+}
+
 export type Question =
   | WhoAmIQuestion
   | CareerPathQuestion
@@ -117,7 +127,8 @@ export type Question =
   | ClubCountryQuestion
   | GuessYearQuestion
   | TransferFeeQuestion
-  | PitchPositionQuestion;
+  | PitchPositionQuestion
+  | OddOneOutQuestion;
 
 /* ------------------------------------------------------------------ */
 /* Match settings & difficulty modes                                   */
