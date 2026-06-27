@@ -1,6 +1,7 @@
 import type { Question } from '../types/game';
 import { PITCH_ZONES } from '../lib/positions';
 import { QUESTIONS_B7 } from './questionsB7';
+import { QUESTIONS_B8 } from './questionsB8';
 
 /* ============================================================================
  * Ball Knowledge — seed question database.
@@ -8710,4 +8711,6 @@ export const QUESTIONS: Question[] = [
 
   // Freshness expansion batch (men's football; iconic facts).
   ...QUESTIONS_B7,
+  // Difficult expansion batch (hard / nightmare; deep facts).
+  ...QUESTIONS_B8,
 ];
