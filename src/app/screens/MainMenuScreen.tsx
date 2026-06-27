@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { useSettings } from '../providers/AppSettingsProvider.tsx';
 import { useMatch } from '../providers/MatchProvider.tsx';
+import { RulesModal } from './RulesModal.tsx';
 import { PitchSvg } from '../../ui/pitch/PitchSvg.tsx';
 import {
   onlineAvailable,
@@ -16,6 +18,7 @@ export function MainMenuScreen() {
   const { startCpuMatch } = useMatch();
   const canPlayOnline = onlineAvailable(readRuntimeEnv());
   const online = useOnlineStatus();
+  const [showRules, setShowRules] = useState(false);
 
   const handlePlay = () => {
     // Unlock audio within the user gesture before the match starts.
@@ -124,7 +127,17 @@ export function MainMenuScreen() {
         >
           {canPlayOnline ? 'Play Online' : 'Online — not configured'}
         </button>
+
+        <button
+          type="button"
+          onClick={() => setShowRules(true)}
+          className="text-sm font-medium text-ink-muted underline-offset-4 transition hover:text-neon hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-neon"
+        >
+          How to play
+        </button>
       </div>
+
+      {showRules && <RulesModal onClose={() => setShowRules(false)} />}
     </div>
   );
 }
