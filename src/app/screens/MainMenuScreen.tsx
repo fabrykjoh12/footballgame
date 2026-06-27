@@ -1,16 +1,10 @@
-import { useState } from 'react';
 import { useSettings } from '../providers/AppSettingsProvider.tsx';
 import { useMatch } from '../providers/MatchProvider.tsx';
-import { useStats } from '../providers/StatsProvider.tsx';
-import { RulesModal } from './RulesModal.tsx';
-import { StatsStrip } from '../../ui/stats/StatsStrip.tsx';
 import { PitchSvg } from '../../ui/pitch/PitchSvg.tsx';
 import {
   onlineAvailable,
   readRuntimeEnv,
 } from '../../transport/MatchTransport.ts';
-import { soundEngine } from '../../lib/sound.ts';
-import { useOnlineStatus } from '../../lib/useOnlineStatus.ts';
 import type { Difficulty } from '../../types/match.ts';
 
 const DIFFICULTIES: Difficulty[] = ['casual', 'pro', 'legend'];
@@ -19,15 +13,6 @@ export function MainMenuScreen() {
   const settings = useSettings();
   const { startCpuMatch } = useMatch();
   const canPlayOnline = onlineAvailable(readRuntimeEnv());
-  const online = useOnlineStatus();
-  const { stats } = useStats();
-  const [showRules, setShowRules] = useState(false);
-
-  const handlePlay = () => {
-    // Unlock audio within the user gesture before the match starts.
-    if (settings.soundOn) soundEngine.resume();
-    startCpuMatch(settings.playerName, settings.difficulty);
-  };
 
   return (
     <div className="relative mx-auto flex min-h-dvh max-w-xl flex-col justify-center gap-8 px-5 py-10">
@@ -40,27 +25,7 @@ export function MainMenuScreen() {
         <p className="mt-2 text-sm text-ink-muted">
           A 1v1 football knowledge duel. Turn trivia into a live scoreline.
         </p>
-        <div className="mt-3 flex justify-center">
-          <span
-            className={[
-              'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium',
-              online
-                ? 'bg-white/5 text-ink-muted'
-                : 'bg-amber-400/10 text-amber-200',
-            ].join(' ')}
-          >
-            <span
-              className={[
-                'h-1.5 w-1.5 rounded-full',
-                online ? 'bg-neon' : 'bg-amber-300',
-              ].join(' ')}
-            />
-            {online ? 'Online · CPU ready' : 'Offline · CPU still playable'}
-          </span>
-        </div>
       </header>
-
-      <StatsStrip stats={stats} />
 
       <div className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-pitch-900/60 p-6 backdrop-blur">
         <label className="flex flex-col gap-1.5 text-sm">
@@ -95,30 +60,9 @@ export function MainMenuScreen() {
           </div>
         </div>
 
-        <label className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm">
-          <span className="text-ink-muted">Sound effects</span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={settings.soundOn}
-            onClick={() => settings.update({ soundOn: !settings.soundOn })}
-            className={[
-              'relative h-6 w-11 rounded-full transition',
-              settings.soundOn ? 'bg-neon/70' : 'bg-white/15',
-            ].join(' ')}
-          >
-            <span
-              className={[
-                'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all',
-                settings.soundOn ? 'left-[22px]' : 'left-0.5',
-              ].join(' ')}
-            />
-          </button>
-        </label>
-
         <button
           type="button"
-          onClick={handlePlay}
+          onClick={() => startCpuMatch(settings.playerName, settings.difficulty)}
           className="rounded-xl bg-neon-grad px-4 py-3.5 font-display text-base font-bold text-pitch-950 shadow-neon transition hover:brightness-110 active:scale-[0.99]"
         >
           Play vs CPU
@@ -132,17 +76,7 @@ export function MainMenuScreen() {
         >
           {canPlayOnline ? 'Play Online' : 'Online — not configured'}
         </button>
-
-        <button
-          type="button"
-          onClick={() => setShowRules(true)}
-          className="text-sm font-medium text-ink-muted underline-offset-4 transition hover:text-neon hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-neon"
-        >
-          How to play
-        </button>
       </div>
-
-      {showRules && <RulesModal onClose={() => setShowRules(false)} />}
     </div>
   );
 }
