@@ -12,4 +12,10 @@ describe('App smoke test', () => {
       screen.getByRole('button', { name: /play vs cpu/i }),
     ).toBeInTheDocument();
   });
+
+  it('exposes a live region for screen-reader phase announcements', () => {
+    render(<App />);
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent(/menu/i);
+  });
 });

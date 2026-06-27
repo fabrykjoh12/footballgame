@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { AppSettingsProvider, useSettings } from './providers/AppSettingsProvider.tsx';
 import { MatchProvider, useMatch } from './providers/MatchProvider.tsx';
 import { MatchErrorBoundary } from './MatchErrorBoundary.tsx';
+import { ScreenAnnouncer } from './a11y/ScreenAnnouncer.tsx';
 import { useMatchSound } from '../engine/useMatchSound.ts';
 import { MainMenuScreen } from './screens/MainMenuScreen.tsx';
 import { MatchmakingScreen } from './screens/MatchmakingScreen.tsx';
@@ -79,6 +80,7 @@ function AppShell() {
   useMatchSound(state, soundOn);
   return (
     <MatchErrorBoundary onReset={reset}>
+      <ScreenAnnouncer />
       <Router />
     </MatchErrorBoundary>
   );

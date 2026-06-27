@@ -34,6 +34,7 @@ export function Scoreboard({ player, opponent, scoreline, clock }: ScoreboardPro
       <div className="flex shrink-0 flex-col items-center">
         <div
           key={`${scoreline.home}-${scoreline.away}`}
+          aria-label={`Score: ${homeTeam.name} ${scoreline.home}, ${awayTeam.name} ${scoreline.away}`}
           className="animate-score-pop font-display text-2xl font-bold tabular-nums sm:text-3xl"
         >
           {scoreline.home} <span className="text-ink-muted">–</span> {scoreline.away}

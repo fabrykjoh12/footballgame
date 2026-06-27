@@ -406,9 +406,11 @@ commentary and timeline react correctly to every scoring event; reduced-motion h
       play works fully offline after first load.
 - [~] **Performance budget** — bundles are small and split; a formal Lighthouse CI gate is a
       follow-up.
-- [~] **Accessibility pass** — ARIA live regions on scoreboard/commentary, `role="switch"` on
-      the sound toggle, focusable controls, reduced-motion honored. A full keyboard/focus
-      audit across every FSM transition remains.
+- [x] **Accessibility pass** — a centralized `ScreenAnnouncer` live region announces every
+      phase to assistive tech (pure, unit-tested `describePhase`); ARIA live regions on
+      scoreboard/commentary, `role="switch"` on the sound toggle, accessible names on
+      controls, reduced-motion honored. (A full manual keyboard/screen-reader sweep is still
+      worth doing pre-launch.)
 - [x] **CI/CD** — GitHub Actions runs typecheck → test → build on every PR
       (`.github/workflows/ci.yml`). Static `dist/` deploys to any host.
 - [x] **Env-key wiring in prod** — online lights up only when `VITE_ABLY_KEY` / Supabase vars
