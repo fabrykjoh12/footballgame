@@ -9,11 +9,13 @@ interface MiniGameShellProps {
   title: string;
   /** Absolute epoch-ms deadline, or null when not timed. */
   deadline: number | null;
+  /** When true, the timer is frozen (manual pause). */
+  paused?: boolean;
   children: ReactNode;
 }
 
-export function MiniGameShell({ title, deadline, children }: MiniGameShellProps) {
-  const remaining = useTimeRemaining(deadline);
+export function MiniGameShell({ title, deadline, paused = false, children }: MiniGameShellProps) {
+  const remaining = useTimeRemaining(deadline, paused);
   const pct = deadline ? Math.max(0, Math.min(100, remaining.pct)) : 100;
   const low = pct < 30;
 
@@ -50,13 +52,16 @@ export function MiniGameShell({ title, deadline, children }: MiniGameShellProps)
   );
 }
 
-function useTimeRemaining(deadline: number | null): { ms: number; pct: number } {
+function useTimeRemaining(
+  deadline: number | null,
+  frozen = false,
+): { ms: number; pct: number } {
   const [, force] = useState(0);
   useEffect(() => {
-    if (!deadline) return;
+    if (!deadline || frozen) return;
     const id = setInterval(() => force((n) => n + 1), 200);
     return () => clearInterval(id);
-  }, [deadline]);
+  }, [deadline, frozen]);
 
   if (!deadline) return { ms: 0, pct: 100 };
   const ms = Math.max(0, deadline - Date.now());

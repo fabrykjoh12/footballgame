@@ -250,6 +250,44 @@ describe('match FSM: half-time', () => {
   });
 });
 
+describe('match FSM: pause / resume', () => {
+  function atQuestion(): MatchState {
+    let s = started();
+    return run(s, [
+      { type: 'MATCH/COUNTDOWN_TICK' },
+      { type: 'MATCH/COUNTDOWN_TICK' },
+      { type: 'MATCH/COUNTDOWN_TICK' },
+      { type: 'QUESTION/START', index: 0, miniGame: 'multiple_choice', deadline: 5000 },
+    ]);
+  }
+
+  it('pauses an active question without changing the phase', () => {
+    const s = matchReducer(atQuestion(), { type: 'MATCH/PAUSE' });
+    expect(s.paused).toBe(true);
+    expect(s.phase.kind).toBe('in_question');
+  });
+
+  it('resume restores the shifted deadline and clears paused', () => {
+    let s = matchReducer(atQuestion(), { type: 'MATCH/PAUSE' });
+    s = matchReducer(s, { type: 'MATCH/RESUME', deadline: 12345 });
+    expect(s.paused).toBe(false);
+    if (s.phase.kind !== 'in_question') throw new Error('wrong phase');
+    expect(s.phase.deadline).toBe(12345);
+  });
+
+  it('cannot pause from the menu or countdown', () => {
+    expect(matchReducer(initialState(), { type: 'MATCH/PAUSE' }).paused).toBe(false);
+    expect(matchReducer(started(), { type: 'MATCH/PAUSE' }).paused).toBe(false);
+  });
+
+  it('ignores a double pause and a resume when not paused', () => {
+    const paused = matchReducer(atQuestion(), { type: 'MATCH/PAUSE' });
+    expect(matchReducer(paused, { type: 'MATCH/PAUSE' })).toBe(paused);
+    const running = atQuestion();
+    expect(matchReducer(running, { type: 'MATCH/RESUME' })).toBe(running);
+  });
+});
+
 describe('match FSM: resilience', () => {
   it('captures errors into an error phase', () => {
     const s = matchReducer(started(), {

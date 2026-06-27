@@ -58,6 +58,10 @@ export interface MatchEngine {
   answer: (value: AnswerValue) => void;
   /** Skip the half-time break and kick off the second half immediately. */
   resumeFromHalfTime: () => void;
+  /** Freeze the match (clock + opponent) for both sides. */
+  pauseMatch: () => void;
+  /** Resume after a pause, restoring the remaining time. */
+  resumeMatch: () => void;
   reset: () => void;
 }
 
@@ -207,6 +211,41 @@ export function useMatchEngine(): MatchEngine {
     startQuestion(HALFTIME_AT);
   }, [startQuestion]);
 
+  // Manual pause — freezes the clock and the opponent for both sides.
+  const pausedAtRef = useRef<number | null>(null);
+  const pauseMatch = useCallback(() => {
+    const s = stateRef.current;
+    const k = s.phase.kind;
+    if (
+      s.paused ||
+      (k !== 'in_question' && k !== 'question_reveal' && k !== 'tiebreaker')
+    ) {
+      return;
+    }
+    pausedAtRef.current = Date.now();
+    configRef.current?.transport.pause?.();
+    dispatch({ type: 'MATCH/PAUSE' });
+  }, []);
+
+  const resumeMatch = useCallback(() => {
+    const s = stateRef.current;
+    if (!s.paused) return;
+    const delta =
+      pausedAtRef.current != null ? Date.now() - pausedAtRef.current : 0;
+    pausedAtRef.current = null;
+    configRef.current?.transport.resume?.();
+    // Push the current question's start forward so the pause doesn't count
+    // against the player's answer speed.
+    if (delta > 0) {
+      setQuestion((q) => (q ? { ...q, startedAt: q.startedAt + delta } : q));
+    }
+    if (s.phase.kind === 'in_question') {
+      dispatch({ type: 'MATCH/RESUME', deadline: s.phase.deadline + delta });
+    } else {
+      dispatch({ type: 'MATCH/RESUME' });
+    }
+  }, []);
+
   const reset = useCallback(() => {
     configRef.current?.transport.disconnect();
     configRef.current = null;
@@ -223,6 +262,7 @@ export function useMatchEngine(): MatchEngine {
   // --- timed orchestration effects -----------------------------------------
 
   const phase = state.phase;
+  const paused = state.paused;
 
   // Countdown ticking + kickoff of the first question.
   useEffect(() => {
@@ -237,11 +277,12 @@ export function useMatchEngine(): MatchEngine {
 
   // Auto-reveal once both sides have answered (short dramatic pause).
   useEffect(() => {
-    if (phase.kind !== 'in_question') return;
+    if (paused || phase.kind !== 'in_question') return;
     if (!phase.playerOutcome || !phase.opponentOutcome) return;
     const id = setTimeout(() => dispatch({ type: 'QUESTION/REVEAL' }), BOTH_ANSWERED_PAUSE_MS);
     return () => clearTimeout(id);
   }, [
+    paused,
     phase.kind,
     phase.kind === 'in_question' ? phase.playerOutcome : null,
     phase.kind === 'in_question' ? phase.opponentOutcome : null,
@@ -249,16 +290,16 @@ export function useMatchEngine(): MatchEngine {
 
   // Deadline: force a reveal if the question runs out of time.
   useEffect(() => {
-    if (phase.kind !== 'in_question') return;
+    if (paused || phase.kind !== 'in_question') return;
     const ms = Math.max(0, phase.deadline - Date.now());
     const id = setTimeout(() => dispatch({ type: 'QUESTION/REVEAL' }), ms);
     return () => clearTimeout(id);
-  }, [phase.kind, phase.kind === 'in_question' ? phase.deadline : 0]);
+  }, [paused, phase.kind, phase.kind === 'in_question' ? phase.deadline : 0]);
 
   // After the reveal pause, advance to the next question / half-time /
   // tiebreaker / end.
   useEffect(() => {
-    if (phase.kind !== 'question_reveal') return;
+    if (paused || phase.kind !== 'question_reveal') return;
     const id = setTimeout(() => {
       const played = stateRef.current.results.length;
       if (played >= QUESTIONS_PER_MATCH) {
@@ -270,7 +311,7 @@ export function useMatchEngine(): MatchEngine {
       }
     }, REVEAL_DELAY_MS);
     return () => clearTimeout(id);
-  }, [phase.kind, phase.kind === 'question_reveal' ? phase.index : -1, startQuestion]);
+  }, [paused, phase.kind, phase.kind === 'question_reveal' ? phase.index : -1, startQuestion]);
 
   // Half-time break: auto-resume into the second half after a pause (the
   // player can also skip it manually via resumeFromHalfTime).
@@ -293,6 +334,8 @@ export function useMatchEngine(): MatchEngine {
     selectMode,
     answer,
     resumeFromHalfTime,
+    pauseMatch,
+    resumeMatch,
     reset,
   };
 }

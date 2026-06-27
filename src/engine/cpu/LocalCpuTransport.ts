@@ -26,16 +26,27 @@ const defaultSchedule = (fn: () => void, ms: number): (() => void) => {
   return () => clearTimeout(id);
 };
 
+interface PendingAnswer {
+  questionIndex: number;
+  /** Absolute epoch-ms the answer is due to fire. */
+  fireAt: number;
+  /** Cancels the currently-armed timer. */
+  cancel: () => void;
+  /** Remaining ms captured while paused (null when running). */
+  remaining: number | null;
+}
+
 export class LocalCpuTransport implements MatchTransport {
   readonly mode = 'cpu' as const;
   private readonly rng: Rng;
   private readonly handlers = new Set<(e: OpponentEvent) => void>();
-  private readonly pending = new Set<() => void>();
+  private readonly pending = new Set<PendingAnswer>();
   private readonly answered = new Set<number>();
   private readonly difficulty: Difficulty;
   private readonly opponent: OpponentInfo;
   private readonly schedule: (fn: () => void, ms: number) => () => void;
   private disconnected = false;
+  private paused = false;
 
   constructor(opts: LocalCpuOptions) {
     this.rng = createRng(opts.seed);
@@ -73,9 +84,33 @@ export class LocalCpuTransport implements MatchTransport {
 
   disconnect(): void {
     this.disconnected = true;
-    for (const cancel of this.pending) cancel();
+    for (const entry of this.pending) entry.cancel();
     this.pending.clear();
     this.handlers.clear();
+  }
+
+  /** Freeze the opponent: capture each pending answer's remaining think-time. */
+  pause(): void {
+    if (this.paused || this.disconnected) return;
+    this.paused = true;
+    const now = Date.now();
+    for (const entry of this.pending) {
+      entry.cancel();
+      entry.remaining = Math.max(0, entry.fireAt - now);
+    }
+  }
+
+  /** Re-arm each pending answer with the think-time it had left. */
+  resume(): void {
+    if (!this.paused || this.disconnected) return;
+    this.paused = false;
+    const now = Date.now();
+    for (const entry of [...this.pending]) {
+      const delay = entry.remaining ?? Math.max(0, entry.fireAt - now);
+      entry.fireAt = now + delay;
+      entry.remaining = null;
+      this.arm(entry, delay);
+    }
   }
 
   private scheduleAnswer(questionIndex: number, deadline: number): void {
@@ -90,17 +125,25 @@ export class LocalCpuTransport implements MatchTransport {
       delay = Math.min(delay, budget);
     }
 
-    // `let` (not `const`) so a synchronous scheduler — used in tests — can run
-    // the callback before assignment without hitting the temporal dead zone.
-    let cancel: (() => void) | null = null;
+    const entry: PendingAnswer = {
+      questionIndex,
+      fireAt: Date.now() + delay,
+      cancel: () => {},
+      remaining: this.paused ? delay : null,
+    };
+    this.pending.add(entry);
+    // If we're paused, leave it disarmed — resume() will arm it.
+    if (!this.paused) this.arm(entry, delay);
+  }
+
+  private arm(entry: PendingAnswer, delayMs: number): void {
     const run = () => {
-      if (cancel) this.pending.delete(cancel);
+      this.pending.delete(entry);
       if (this.disconnected) return;
       const outcome = simulateCpuOutcome(this.difficulty, this.rng);
-      this.emit({ t: 'opponent_answer', questionIndex, outcome });
+      this.emit({ t: 'opponent_answer', questionIndex: entry.questionIndex, outcome });
     };
-    cancel = this.schedule(run, delay);
-    this.pending.add(cancel);
+    entry.cancel = this.schedule(run, delayMs);
   }
 
   private emit(event: OpponentEvent): void {

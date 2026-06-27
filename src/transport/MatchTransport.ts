@@ -17,6 +17,13 @@ export interface MatchTransport {
   subscribe(handler: (event: OpponentEvent) => void): () => void;
   /** Tear down channels/timers. Safe to call more than once. */
   disconnect(): void;
+  /**
+   * Optionally freeze the opponent (e.g. a manual pause). The CPU transport
+   * suspends pending answers; an online transport would coordinate with the
+   * peer. No-op transports simply omit these.
+   */
+  pause?(): void;
+  resume?(): void;
 }
 
 /** Runtime environment flags derived from import.meta.env. */

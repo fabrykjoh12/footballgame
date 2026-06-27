@@ -16,8 +16,8 @@ import {
 import { QUESTIONS_PER_MATCH, type AnswerValue } from '../../types/match.ts';
 
 export function GameplayScreen() {
-  const { state, question, answer } = useMatch();
-  const { player, opponent, phase } = state;
+  const { state, question, answer, pauseMatch, resumeMatch } = useMatch();
+  const { player, opponent, phase, paused } = state;
 
   const scoreline = currentScoreline(state);
   const commentary = useCommentary(state);
@@ -29,6 +29,7 @@ export function GameplayScreen() {
   const isTiebreak = phase.kind === 'tiebreaker';
 
   const locked =
+    paused ||
     isReveal ||
     (inQuestion && phase.playerOutcome !== null) ||
     (isTiebreak && phase.playerOutcome !== null);
@@ -42,7 +43,20 @@ export function GameplayScreen() {
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-2xl flex-col gap-4 px-4 py-5">
-      <Scoreboard player={player} opponent={opponent} scoreline={scoreline} clock={clock} />
+      <div className="flex items-center gap-3">
+        <div className="flex-1">
+          <Scoreboard player={player} opponent={opponent} scoreline={scoreline} clock={clock} />
+        </div>
+        <button
+          type="button"
+          onClick={pauseMatch}
+          aria-label="Pause match"
+          className="shrink-0 rounded-xl border border-white/10 bg-black/30 px-3 py-3 text-ink-muted transition hover:border-neon/50 hover:text-neon focus:outline-none focus-visible:ring-2 focus-visible:ring-neon"
+        >
+          {/* pause glyph */}
+          <span aria-hidden="true" className="text-lg leading-none">⏸</span>
+        </button>
+      </div>
       <MomentumBar results={state.results} playerSide={player.side} />
       <MatchTimeline results={state.results} currentIndex={state.results.length} />
 
@@ -53,7 +67,7 @@ export function GameplayScreen() {
           </p>
         )}
         {Body && question ? (
-          <MiniGameShell title={game?.title ?? ''} deadline={deadline}>
+          <MiniGameShell title={game?.title ?? ''} deadline={deadline} paused={paused}>
             <Body
               key={question.wireIndex}
               payload={question.payload as never}
@@ -76,6 +90,33 @@ export function GameplayScreen() {
       </div>
 
       <CommentaryTicker lines={commentary} />
+
+      {paused && <PauseOverlay onResume={resumeMatch} />}
+    </div>
+  );
+}
+
+function PauseOverlay({ onResume }: { onResume: () => void }) {
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Match paused"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-pitch-950/90 px-6 text-center backdrop-blur"
+    >
+      <p className="font-display text-sm uppercase tracking-[0.3em] text-neon">Paused</p>
+      <p className="font-display text-3xl font-bold">Match suspended</p>
+      <p className="max-w-xs text-sm text-ink-muted">
+        The clock and your opponent are frozen for both sides. Resume when you’re ready.
+      </p>
+      <button
+        type="button"
+        autoFocus
+        onClick={onResume}
+        className="rounded-xl bg-neon-grad px-8 py-3.5 font-display text-base font-bold text-pitch-950 shadow-neon transition hover:brightness-110"
+      >
+        Resume
+      </button>
     </div>
   );
 }

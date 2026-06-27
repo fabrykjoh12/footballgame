@@ -64,6 +64,8 @@ export interface MatchState {
   sequence: MiniGameId[];
   results: QuestionResult[];
   wentToTiebreaker: boolean;
+  /** When true, all match timers and the opponent are frozen (manual pause). */
+  paused: boolean;
 }
 
 export function initialState(): MatchState {
@@ -75,6 +77,7 @@ export function initialState(): MatchState {
     sequence: [],
     results: [],
     wentToTiebreaker: false,
+    paused: false,
   };
 }
 
@@ -101,6 +104,8 @@ export type MatchAction =
   | { type: 'TIEBREAKER/PLAYER_OUTCOME'; outcome: AnswerOutcome }
   | { type: 'TIEBREAKER/OPPONENT_OUTCOME'; outcome: AnswerOutcome }
   | { type: 'MATCH/ERROR'; code: MatchError['code']; recoverable?: boolean }
+  | { type: 'MATCH/PAUSE' }
+  | { type: 'MATCH/RESUME'; deadline?: number }
   | { type: 'MATCH/RESET' };
 
 const COUNTDOWN_FROM = 3;
@@ -166,8 +171,32 @@ export function matchReducer(
         sequence: action.sequence,
         results: [],
         wentToTiebreaker: false,
+        paused: false,
         phase: { kind: 'countdown', secondsLeft: COUNTDOWN_FROM },
       };
+    }
+
+    case 'MATCH/PAUSE': {
+      // Only the active, timed phases can be paused.
+      const k = state.phase.kind;
+      const pausable =
+        k === 'in_question' || k === 'question_reveal' || k === 'tiebreaker';
+      if (!pausable || state.paused) return state;
+      return { ...state, paused: true };
+    }
+
+    case 'MATCH/RESUME': {
+      if (!state.paused) return state;
+      // Restore the (shifted) question deadline so the clock continues from
+      // where it stopped rather than jumping.
+      if (state.phase.kind === 'in_question' && action.deadline != null) {
+        return {
+          ...state,
+          paused: false,
+          phase: { ...state.phase, deadline: action.deadline },
+        };
+      }
+      return { ...state, paused: false };
     }
 
     case 'MATCH/COUNTDOWN_TICK': {

@@ -65,4 +65,29 @@ describe('LocalCpuTransport', () => {
     t.send({ t: 'question_open', questionIndex: 1, deadline: 0 });
     expect(events).toHaveLength(0);
   });
+
+  it('does not answer while paused, then answers after resume', () => {
+    // A manual scheduler so we control exactly when timers fire.
+    const tasks: Array<{ fn: () => void; cancelled: boolean }> = [];
+    const schedule = (fn: () => void): (() => void) => {
+      const task = { fn, cancelled: false };
+      tasks.push(task);
+      return () => {
+        task.cancelled = true;
+      };
+    };
+    const events: OpponentEvent[] = [];
+    const t = new LocalCpuTransport({ opponent, difficulty: 'pro', seed: 1, schedule });
+    t.subscribe((e) => events.push(e));
+
+    t.send({ t: 'question_open', questionIndex: 0, deadline: 0 });
+    t.pause();
+    // The originally-armed timer is cancelled while paused.
+    expect(tasks.every((task) => task.cancelled)).toBe(true);
+
+    t.resume();
+    // Fire whatever is live now and confirm the answer lands.
+    tasks.filter((task) => !task.cancelled).forEach((task) => task.fn());
+    expect(events.some((e) => e.t === 'opponent_answer')).toBe(true);
+  });
 });
