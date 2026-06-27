@@ -14,7 +14,7 @@ when keys are present.
 
 Built and working: 10 mini-games, **624 questions**, live Ably 1v1 (verified +
 hardened), a singleplayer **Career Mode** (climb from League Two to the Premier
-League), **optional sign-in with cross-device progress sync** (Supabase Auth),
+League), **optional sign-in with cross-device progress sync** (Firebase Auth),
 Daily Challenge, local profile/stats, sound, share-as-image, live commentary, a
 0–90' match timeline, **sudden-death stoppage time**, a lobby topic filter,
 deterministic per-team kit colours, a premium UI pass, and **111 unit tests**
@@ -139,7 +139,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
 | Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
-| Optional sign-in + cross-device progress sync | `src/context/AuthProvider.tsx`, `src/lib/progress.ts`, `src/services/cloudSync.ts`, `src/components/auth/` |
+| Optional sign-in + cross-device progress sync (Firebase) | `src/context/AuthProvider.tsx`, `src/lib/progress.ts`, `src/lib/firebaseConfig.ts`, `src/services/firebaseBackend.ts`, `src/components/auth/` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |
 | Live commentary text generator (pure) | `src/lib/commentary.ts` |
 | Deterministic per-team kit colours | `src/lib/teamIdentity.ts` |
@@ -165,18 +165,21 @@ streaks/stats; the streak bonus only applies then. The match engine derives
   opponent's club name is forced via `LocalGameService({ botName })` →
   `createGameService(intent, opts)` → `playCareer()`. Screens: `CareerHub`,
   `CareerResult`, `LeagueTable`. **No match-engine changes** — it's a layer on top.
-- **Optional sign-in + cloud sync** — local-first; everything works
-  anonymously. When Supabase is configured, a header **Sign in** button appears
-  (passwordless email **magic link** via Supabase Auth). On sign-in the app
-  pulls the player's `progress` row and reconciles it with local
-  (`reconcileProgress` in `progress.ts` — remote wins per blob, local fills
-  gaps, so a first sign-in never wipes local progress), then debounce-pushes on
-  every save. The three durable blobs (`bk_career_v1`, `bk_profile_v1`,
-  `bk_daily_v1`) are synced as JSON to one row per user. `AuthProvider` gates a
-  brief "Restoring your progress…" splash while hydrating a session. The auth
-  SDK is lazily imported (no main-bundle cost); UI is hidden when unconfigured.
-  Save sites notify via a `bk:progress-changed` window event from each
-  `save()`/`saveCareer()`. Setup + SQL in `SUPABASE_SETUP.md` §3.
+- **Optional sign-in + cloud sync (Firebase)** — local-first; everything works
+  anonymously. When **Firebase** is configured (`isFirebaseConfigured`), a header
+  **Sign in** button appears (passwordless **email link** via Firebase Auth). On
+  sign-in the app pulls the player's Firestore doc (`progress/{uid}`) and
+  reconciles it with local (`reconcileProgress` in `progress.ts` — remote wins
+  per blob, local fills gaps, so a first sign-in never wipes local progress),
+  then debounce-pushes on every save. The three durable blobs (`bk_career_v1`,
+  `bk_profile_v1`, `bk_daily_v1`) are synced as JSON. `AuthProvider` gates a brief
+  "Restoring your progress…" splash while hydrating; on load it runs
+  `completeEmailLinkSignIn()` to finish a returning link. **All Firebase SDK use
+  is in `services/firebaseBackend.ts`, only ever reached via a dynamic import**,
+  so it's code-split out of the main/anonymous bundle and the UI is hidden when
+  unconfigured. This is **independent of multiplayer** (Ably/Supabase). Save
+  sites notify via a `bk:progress-changed` window event from each
+  `save()`/`saveCareer()`. Setup in `FIREBASE_SETUP.md`.
 - **Daily Challenge** — one deterministic puzzle/day (seed from the date via
   `seededRandom`), tracked streak + best score in `dailyChallenge.ts`; home card.
 - **Local profile** — lifetime matches/win-rate/accuracy/best-streak in
@@ -265,12 +268,16 @@ Env vars (build-time, `VITE_` prefixed; see `.env.example`):
 
 - `VITE_ABLY_API_KEY` — enables Ably multiplayer (preferred).
 - `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` — enables Supabase multiplayer.
+- `VITE_FIREBASE_API_KEY` + `VITE_FIREBASE_AUTH_DOMAIN` +
+  `VITE_FIREBASE_PROJECT_ID` + `VITE_FIREBASE_APP_ID` — enables **optional
+  sign-in + progress sync** (Firebase; independent of multiplayer).
 
-No keys → demo mode (vs CPU) everywhere. Setup guides: `ABLY_SETUP.md`,
-`SUPABASE_SETUP.md`. **Status:** demo + local loop verified; **live Ably 1v1
-verified** across two devices, with disconnect/reconnect handling, lobby-slot
-release on leave, and guest-side countdown rebasing to neutralise clock skew
-(see `ablyGameService.ts`). The Supabase path is built but **not yet
+No keys → demo mode (vs CPU) everywhere, no sign-in button. Setup guides:
+`ABLY_SETUP.md`, `SUPABASE_SETUP.md`, `FIREBASE_SETUP.md`. **Status:** demo +
+local loop verified; **live Ably 1v1 verified** across two devices, with
+disconnect/reconnect handling, lobby-slot release on leave, and guest-side
+countdown rebasing to neutralise clock skew (see `ablyGameService.ts`). The
+Supabase multiplayer path and the Firebase sign-in path are built but **not yet
 device-tested**.
 
 ## Deployment — auto-deploy via GitHub Actions
@@ -295,14 +302,15 @@ Gotchas:
 
 - ✅ Done: 10 mini-games, 624 Qs, live Ably 1v1 + hardening, **Career Mode**
   (singleplayer league climb), **optional sign-in + cross-device progress sync**
-  (Supabase Auth magic link), Daily Challenge, profile/stats, sound, share
+  (Firebase Auth email link), Daily Challenge, profile/stats, sound, share
   (image+text), commentary, timeline, sudden death, topic filter, kit colours,
   premium UI across all screens, 111 tests + CI.
-- ⏳ Open: **online leaderboard** (the sign-in + `progress` table now provide the
-  auth/backend foundation; a public ranked board still needs its own table +
-  server-trusted scoring). **Supabase multiplayer path** built but not
-  device-tested; the **sign-in flow** is built but not yet device-tested against
-  a live Supabase project. A full **two-device playtest** is still owed.
+- ⏳ Open: **online leaderboard** (the Firebase sign-in + Firestore now provide
+  the auth/backend foundation; a public ranked board still needs its own
+  collection + server-trusted scoring). **Supabase multiplayer path** built but
+  not device-tested; the **Firebase sign-in flow** is built but not yet
+  device-tested against a live Firebase project. A full **two-device playtest**
+  is still owed.
 
 ## Gotchas
 

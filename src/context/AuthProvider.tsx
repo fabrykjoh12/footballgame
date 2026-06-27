@@ -8,8 +8,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { isSupabaseConfigured } from '../lib/realtimeConfig';
+import { isFirebaseConfigured } from '../lib/firebaseConfig';
 import {
   PROGRESS_EVENT,
   readLocalProgress,
@@ -23,12 +22,12 @@ export interface AuthUser {
 }
 
 interface AuthContextValue {
-  /** Whether sign-in is available in this build (Supabase keys present). */
+  /** Whether sign-in is available in this build (Firebase config present). */
   configured: boolean;
   user: AuthUser | null;
   /** True while restoring a signed-in session's progress on load. */
   hydrating: boolean;
-  /** Send a passwordless magic-link to this email. */
+  /** Send a passwordless sign-in (email) link. */
   signInWithEmail: (email: string) => Promise<{ ok: boolean; error?: string }>;
   signOut: () => Promise<void>;
 }
@@ -37,13 +36,14 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 const PUSH_DEBOUNCE_MS = 1500;
 
+type Backend = typeof import('../services/firebaseBackend');
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const configured = isSupabaseConfigured;
+  const configured = isFirebaseConfigured;
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hydrating, setHydrating] = useState<boolean>(configured);
 
-  const clientRef = useRef<SupabaseClient | null>(null);
-  const cloudRef = useRef<typeof import('../services/cloudSync') | null>(null);
+  const backendRef = useRef<Backend | null>(null);
   const userRef = useRef<AuthUser | null>(null);
   const hydratedForRef = useRef<string | null>(null);
 
@@ -52,19 +52,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   /** Pull remote progress, merge with local, and reconcile (once per user). */
-  const applySession = useCallback(async (id: string, email: string | null) => {
-    setUser({ id, email });
-    if (hydratedForRef.current === id) return;
-    hydratedForRef.current = id;
+  const applySession = useCallback(async (u: AuthUser) => {
+    setUser(u);
+    if (hydratedForRef.current === u.id) return;
+    hydratedForRef.current = u.id;
     setHydrating(true);
     try {
-      const client = clientRef.current;
-      const cloud = cloudRef.current;
-      if (client && cloud) {
-        const remote = await cloud.pullRemoteProgress(client, id);
+      const backend = backendRef.current;
+      if (backend) {
+        const remote = await backend.pullProgress(u.id);
         const { result, shouldPush } = reconcileProgress(readLocalProgress(), remote);
         writeLocalProgress(result);
-        if (shouldPush) await cloud.pushRemoteProgress(client, id, result);
+        if (shouldPush) await backend.pushProgress(u.id, result);
       }
     } catch {
       /* offline / transient — local play is unaffected */
@@ -73,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Boot the auth client + restore any existing session.
+  // Boot the auth backend, complete any returning email-link, and watch session.
   useEffect(() => {
     if (!configured) {
       setHydrating(false);
@@ -83,42 +82,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let unsubscribe = () => {};
 
     (async () => {
-      let client: SupabaseClient | null = null;
+      let backend: Backend | null = null;
       try {
-        const mod = await import('../lib/supabaseClient');
-        client = mod.getSupabaseClient();
-        cloudRef.current = await import('../services/cloudSync');
+        backend = await import('../services/firebaseBackend');
       } catch {
-        client = null;
+        backend = null;
       }
       if (!active) return;
-      if (!client) {
+      if (!backend) {
         setHydrating(false);
         return;
       }
-      clientRef.current = client;
+      backendRef.current = backend;
 
-      const {
-        data: { session },
-      } = await client.auth.getSession();
-      if (!active) return;
-      if (session?.user) {
-        await applySession(session.user.id, session.user.email ?? null);
-      } else {
-        setHydrating(false);
+      // Finish a sign-in if the user just clicked their email link.
+      try {
+        await backend.completeEmailLinkSignIn();
+      } catch {
+        /* ignore */
       }
+      if (!active) return;
 
-      const { data: sub } = client.auth.onAuthStateChange((_event, sess) => {
-        const u = sess?.user;
+      let sawInitial = false;
+      unsubscribe = backend.subscribe((u) => {
         if (u) {
-          void applySession(u.id, u.email ?? null);
+          void applySession(u);
         } else {
           hydratedForRef.current = null;
           setUser(null);
           setHydrating(false);
         }
+        sawInitial = true;
       });
-      unsubscribe = () => sub.subscription.unsubscribe();
+
+      // If the listener hasn't reported yet, don't hang the splash forever.
+      setTimeout(() => {
+        if (active && !sawInitial) setHydrating(false);
+      }, 4000);
     })();
 
     return () => {
@@ -133,12 +133,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let timer: ReturnType<typeof setTimeout> | undefined;
     const onChange = () => {
       const u = userRef.current;
-      const client = clientRef.current;
-      const cloud = cloudRef.current;
-      if (!u || !client || !cloud) return;
+      const backend = backendRef.current;
+      if (!u || !backend) return;
       clearTimeout(timer);
       timer = setTimeout(() => {
-        cloud.pushRemoteProgress(client, u.id, readLocalProgress()).catch(() => {});
+        backend.pushProgress(u.id, readLocalProgress()).catch(() => {});
       }, PUSH_DEBOUNCE_MS);
     };
     window.addEventListener(PROGRESS_EVENT, onChange);
@@ -149,23 +148,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [configured]);
 
   const signInWithEmail = useCallback(async (email: string) => {
-    const client = clientRef.current;
-    if (!client) return { ok: false, error: 'Sign-in is not available right now.' };
+    const backend = backendRef.current;
+    if (!backend) return { ok: false, error: 'Sign-in is not available right now.' };
     const redirect =
       typeof window !== 'undefined'
         ? window.location.origin + window.location.pathname
-        : undefined;
-    const { error } = await client.auth.signInWithOtp({
-      email: email.trim(),
-      options: { emailRedirectTo: redirect },
-    });
-    return error ? { ok: false, error: error.message } : { ok: true };
+        : '';
+    try {
+      await backend.sendLink(email.trim(), redirect);
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: e instanceof Error ? e.message : 'Could not send the link.' };
+    }
   }, []);
 
   const signOut = useCallback(async () => {
     hydratedForRef.current = null;
     try {
-      await clientRef.current?.auth.signOut();
+      await backendRef.current?.signOutUser();
     } catch {
       /* ignore */
     }
