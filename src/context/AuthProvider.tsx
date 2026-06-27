@@ -28,8 +28,48 @@ interface AuthContextValue {
   /** True while restoring a signed-in session's progress on load. */
   hydrating: boolean;
   /** Send a passwordless sign-in (email) link. */
-  signInWithEmail: (email: string) => Promise<{ ok: boolean; error?: string }>;
+  signInWithEmail: (email: string) => Promise<AuthResult>;
+  /** Email + password sign-in for an existing account. */
+  signInWithPassword: (email: string, password: string) => Promise<AuthResult>;
+  /** Create a new email + password account. */
+  registerWithPassword: (email: string, password: string) => Promise<AuthResult>;
+  /** One-tap Google sign-in. */
+  signInWithGoogle: () => Promise<AuthResult>;
   signOut: () => Promise<void>;
+}
+
+export interface AuthResult {
+  ok: boolean;
+  error?: string;
+}
+
+/** Map raw Firebase auth errors to short, friendly copy. */
+function authErrorMessage(e: unknown): string {
+  const code =
+    e && typeof e === 'object' && 'code' in e ? String((e as { code: unknown }).code) : '';
+  switch (code) {
+    case 'auth/operation-not-allowed':
+      return 'This sign-in method isn’t enabled yet — turn it on in Firebase → Authentication → Sign-in method.';
+    case 'auth/invalid-email':
+      return 'That doesn’t look like a valid email.';
+    case 'auth/invalid-credential':
+    case 'auth/wrong-password':
+    case 'auth/user-not-found':
+      return 'Wrong email or password.';
+    case 'auth/email-already-in-use':
+      return 'That email already has an account — sign in instead.';
+    case 'auth/weak-password':
+      return 'Password should be at least 6 characters.';
+    case 'auth/popup-closed-by-user':
+    case 'auth/cancelled-popup-request':
+      return 'Sign-in was cancelled.';
+    case 'auth/popup-blocked':
+      return 'Your browser blocked the popup — allow popups and try again.';
+    case 'auth/too-many-requests':
+      return 'Too many attempts. Wait a moment and try again.';
+    default:
+      return e instanceof Error ? e.message : 'Something went wrong.';
+  }
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -147,7 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [configured]);
 
-  const signInWithEmail = useCallback(async (email: string) => {
+  const signInWithEmail = useCallback(async (email: string): Promise<AuthResult> => {
     const backend = backendRef.current;
     if (!backend) return { ok: false, error: 'Sign-in is not available right now.' };
     const redirect =
@@ -158,7 +198,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await backend.sendLink(email.trim(), redirect);
       return { ok: true };
     } catch (e) {
-      return { ok: false, error: e instanceof Error ? e.message : 'Could not send the link.' };
+      return { ok: false, error: authErrorMessage(e) };
+    }
+  }, []);
+
+  const signInWithPassword = useCallback(
+    async (email: string, password: string): Promise<AuthResult> => {
+      const backend = backendRef.current;
+      if (!backend) return { ok: false, error: 'Sign-in is not available right now.' };
+      try {
+        await backend.signInWithPassword(email.trim(), password);
+        return { ok: true };
+      } catch (e) {
+        return { ok: false, error: authErrorMessage(e) };
+      }
+    },
+    [],
+  );
+
+  const registerWithPassword = useCallback(
+    async (email: string, password: string): Promise<AuthResult> => {
+      const backend = backendRef.current;
+      if (!backend) return { ok: false, error: 'Sign-in is not available right now.' };
+      try {
+        await backend.registerWithPassword(email.trim(), password);
+        return { ok: true };
+      } catch (e) {
+        return { ok: false, error: authErrorMessage(e) };
+      }
+    },
+    [],
+  );
+
+  const signInWithGoogle = useCallback(async (): Promise<AuthResult> => {
+    const backend = backendRef.current;
+    if (!backend) return { ok: false, error: 'Sign-in is not available right now.' };
+    try {
+      await backend.signInWithGoogle();
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, error: authErrorMessage(e) };
     }
   }, []);
 
@@ -173,8 +252,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ configured, user, hydrating, signInWithEmail, signOut }),
-    [configured, user, hydrating, signInWithEmail, signOut],
+    () => ({
+      configured,
+      user,
+      hydrating,
+      signInWithEmail,
+      signInWithPassword,
+      registerWithPassword,
+      signInWithGoogle,
+      signOut,
+    }),
+    [
+      configured,
+      user,
+      hydrating,
+      signInWithEmail,
+      signInWithPassword,
+      registerWithPassword,
+      signInWithGoogle,
+      signOut,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

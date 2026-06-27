@@ -167,7 +167,8 @@ streaks/stats; the streak bonus only applies then. The match engine derives
   `CareerResult`, `LeagueTable`. **No match-engine changes** — it's a layer on top.
 - **Optional sign-in + cloud sync (Firebase)** — local-first; everything works
   anonymously. When **Firebase** is configured (`isFirebaseConfigured`), a header
-  **Sign in** button appears (passwordless **email link** via Firebase Auth). On
+  **Sign in** button appears with three methods (Firebase Auth): **email +
+  password**, **Google** (popup), and passwordless **email link**. On
   sign-in the app pulls the player's Firestore doc (`progress/{uid}`) and
   reconciles it with local (`reconcileProgress` in `progress.ts` — remote wins
   per blob, local fills gaps, so a first sign-in never wipes local progress),

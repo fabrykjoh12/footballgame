@@ -46,10 +46,20 @@ export function AccountButton() {
 }
 
 function AuthModal({ onClose }: { onClose: () => void }) {
-  const { user, signInWithEmail, signOut } = useAuth();
+  const {
+    user,
+    signInWithEmail,
+    signInWithPassword,
+    registerWithPassword,
+    signInWithGoogle,
+    signOut,
+  } = useAuth();
   const [email, setEmail] = useState(user?.email ?? '');
-  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
-  const [message, setMessage] = useState('');
+  const [password, setPassword] = useState('');
+  const [tab, setTab] = useState<'signin' | 'signup'>('signin');
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Close on Escape.
   useEffect(() => {
@@ -58,18 +68,33 @@ function AuthModal({ onClose }: { onClose: () => void }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  const valid = EMAIL_RE.test(email.trim());
+  const emailValid = EMAIL_RE.test(email.trim());
+  const passwordValid = password.length >= 6;
 
-  const send = async () => {
-    if (!valid) return;
-    setState('sending');
-    const res = await signInWithEmail(email);
-    if (res.ok) {
-      setState('sent');
-    } else {
-      setState('error');
-      setMessage(res.error ?? 'Something went wrong. Try again.');
+  /** Run an auth action; close on success, or surface the error. */
+  const run = async (
+    action: () => Promise<{ ok: boolean; error?: string }>,
+    opts?: { magic?: boolean },
+  ) => {
+    setBusy(true);
+    setError(null);
+    const res = await action();
+    setBusy(false);
+    if (!res.ok) {
+      setError(res.error ?? 'Something went wrong.');
+      return;
     }
+    if (opts?.magic) setSent(true);
+    else onClose();
+  };
+
+  const submitPassword = () => {
+    if (!emailValid || !passwordValid || busy) return;
+    run(() =>
+      tab === 'signin'
+        ? signInWithPassword(email, password)
+        : registerWithPassword(email, password),
+    );
   };
 
   return createPortal(
@@ -113,7 +138,7 @@ function AuthModal({ onClose }: { onClose: () => void }) {
               Signing out keeps your progress on this device.
             </p>
           </div>
-        ) : state === 'sent' ? (
+        ) : sent ? (
           <div className="text-center">
             <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-pitch/15 text-pitch ring-1 ring-pitch/30">
               <IconCheck className="h-6 w-6" />
@@ -136,15 +161,34 @@ function AuthModal({ onClose }: { onClose: () => void }) {
               <IconUser className="h-6 w-6" />
             </div>
             <h2 className="text-center font-display text-xl font-bold">
-              Sign in to save progress
+              {tab === 'signin' ? 'Sign in to save progress' : 'Create your account'}
             </h2>
             <p className="mx-auto mt-1 max-w-xs text-center text-sm text-white/55">
-              Sync your Career, stats and daily streak across devices. No
-              password — we’ll email you a one-tap sign-in link.
+              Sync your Career, stats and daily streak across devices.
             </p>
+
+            {/* Google */}
+            <div className="mt-5">
+              <Button
+                variant="secondary"
+                fullWidth
+                disabled={busy}
+                onClick={() => run(() => signInWithGoogle())}
+              >
+                <GoogleIcon className="h-4 w-4" /> Continue with Google
+              </Button>
+            </div>
+
+            <div className="my-4 flex items-center gap-3 text-[11px] uppercase tracking-widest text-white/30">
+              <span className="h-px flex-1 bg-white/10" />
+              or
+              <span className="h-px flex-1 bg-white/10" />
+            </div>
+
+            {/* Email + password */}
             <label
               htmlFor="auth-email"
-              className="mb-1.5 mt-5 block text-xs font-semibold uppercase tracking-wider text-white/50"
+              className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/50"
             >
               Email
             </label>
@@ -156,34 +200,104 @@ function AuthModal({ onClose }: { onClose: () => void }) {
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
-                if (state === 'error') setState('idle');
+                if (error) setError(null);
               }}
-              onKeyDown={(e) => e.key === 'Enter' && send()}
               placeholder="you@example.com"
               className="input-field text-base"
             />
-            {state === 'error' && (
+            <label
+              htmlFor="auth-password"
+              className="mb-1.5 mt-3 block text-xs font-semibold uppercase tracking-wider text-white/50"
+            >
+              Password
+            </label>
+            <input
+              id="auth-password"
+              type="password"
+              autoComplete={tab === 'signin' ? 'current-password' : 'new-password'}
+              value={password}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (error) setError(null);
+              }}
+              onKeyDown={(e) => e.key === 'Enter' && submitPassword()}
+              placeholder={tab === 'signin' ? 'Your password' : 'At least 6 characters'}
+              className="input-field text-base"
+            />
+
+            {error && (
               <p role="alert" className="mt-2 text-sm text-danger">
-                {message}
+                {error}
               </p>
             )}
+
             <div className="mt-4">
               <Button
                 fullWidth
                 size="lg"
-                disabled={!valid || state === 'sending'}
-                onClick={send}
+                disabled={!emailValid || !passwordValid || busy}
+                onClick={submitPassword}
               >
-                {state === 'sending' ? 'Sending…' : 'Send magic link'}
+                {busy
+                  ? 'Working…'
+                  : tab === 'signin'
+                    ? 'Sign in'
+                    : 'Create account'}
               </Button>
             </div>
-            <p className="mt-3 text-center text-[11px] text-white/35">
-              Progress already on this device stays — signing in just backs it up.
-            </p>
+
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => {
+                setError(null);
+                setTab((t) => (t === 'signin' ? 'signup' : 'signin'));
+              }}
+              className="mt-3 w-full text-center text-xs text-white/55 hover:text-white"
+            >
+              {tab === 'signin'
+                ? 'New here? Create an account'
+                : 'Already have an account? Sign in'}
+            </button>
+
+            <div className="my-3 h-px bg-white/[0.06]" />
+
+            <button
+              type="button"
+              disabled={!emailValid || busy}
+              onClick={() => run(() => signInWithEmail(email), { magic: true })}
+              className="w-full text-center text-xs text-white/45 hover:text-pitch disabled:opacity-40"
+            >
+              Or email me a one-tap sign-in link instead
+            </button>
           </div>
         )}
       </div>
     </div>,
     document.body,
+  );
+}
+
+/** Google "G" mark (brand colours). */
+function GoogleIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 48 48" className={className} aria-hidden>
+      <path
+        fill="#FFC107"
+        d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8a12 12 0 1 1 0-24c3 0 5.8 1.1 7.9 3l5.7-5.7A20 20 0 1 0 24 44c11 0 20-9 20-20 0-1.3-.1-2.3-.4-3.5z"
+      />
+      <path
+        fill="#FF3D00"
+        d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3 0 5.8 1.1 7.9 3l5.7-5.7A20 20 0 0 0 6.3 14.7z"
+      />
+      <path
+        fill="#4CAF50"
+        d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2A12 12 0 0 1 12.7 28l-6.5 5C9.5 39.6 16.2 44 24 44z"
+      />
+      <path
+        fill="#1976D2"
+        d="M43.6 20.5H42V20H24v8h11.3a12 12 0 0 1-4.1 5.6l6.2 5.2C39 35.7 44 30.5 44 24c0-1.3-.1-2.3-.4-3.5z"
+      />
+    </svg>
   );
 }

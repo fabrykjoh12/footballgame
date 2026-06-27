@@ -12,11 +12,15 @@
 
 import { initializeApp, type FirebaseApp } from 'firebase/app';
 import {
+  createUserWithEmailAndPassword,
   getAuth,
+  GoogleAuthProvider,
   isSignInWithEmailLink,
   onAuthStateChanged,
   sendSignInLinkToEmail,
+  signInWithEmailAndPassword,
   signInWithEmailLink,
+  signInWithPopup,
   signOut,
   type Auth,
 } from 'firebase/auth';
@@ -112,6 +116,33 @@ export async function completeEmailLinkSignIn(): Promise<void> {
       window.location.origin + window.location.pathname,
     );
   }
+}
+
+/** Email + password sign-in for an existing account. */
+export async function signInWithPassword(
+  email: string,
+  password: string,
+): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) throw new Error('Sign-in is not available.');
+  await signInWithEmailAndPassword(ctx.auth, email, password);
+}
+
+/** Create a new email + password account. */
+export async function registerWithPassword(
+  email: string,
+  password: string,
+): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) throw new Error('Sign-in is not available.');
+  await createUserWithEmailAndPassword(ctx.auth, email, password);
+}
+
+/** One-tap Google sign-in (popup). */
+export async function signInWithGoogle(): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) throw new Error('Sign-in is not available.');
+  await signInWithPopup(ctx.auth, new GoogleAuthProvider());
 }
 
 export async function signOutUser(): Promise<void> {

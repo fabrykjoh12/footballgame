@@ -41,18 +41,28 @@ into the build in `.github/workflows/deploy.yml` (next to `VITE_ABLY_API_KEY`).
 
 Restart the dev server — a **Sign in** button now appears in the header.
 
-## 3. Enable Email-link auth
+## 3. Enable the sign-in methods
+
+The app offers three ways to sign in: **email + password**, **Google**, and a
+passwordless **email link**. You only need to enable the ones you want — but if
+a player picks a method you haven't enabled, Firebase returns
+`auth/operation-not-allowed`. **Email/Password is the simplest and most reliable
+to start with.**
 
 1. In the console: **Build → Authentication → Get started**.
-2. **Sign-in method → Email/Password → Enable**, and tick **Email link
-   (passwordless sign-in)**. Save.
+2. **Sign-in method** tab → enable what you want:
+   - **Email/Password → Enable.** This one toggle covers both password sign-in
+     *and* the magic link (also tick **Email link (passwordless sign-in)** if you
+     want the link option). Save.
+   - **Google → Enable** → pick a support email → Save. (Needed only for the
+     "Continue with Google" button.)
 3. **Authentication → Settings → Authorized domains**: add the domains the app
    runs on, e.g.:
    - `localhost` (already there for dev)
    - `YOUR-USER.github.io` (GitHub Pages)
 
-   The sign-in link returns the player to the app URL, so its domain must be
-   authorized.
+   Both the email link and Google sign-in return the player to the app URL, so
+   its domain must be authorized.
 
 ## 4. Create Firestore + lock it down
 
