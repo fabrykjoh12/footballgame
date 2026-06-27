@@ -3664,4 +3664,194 @@ export const QUESTIONS: Question[] = [
     explanation: 'Thierry Henry was a forward, Arsenal\'s record goalscorer.',
   },
 
+  /* ====================================================================== */
+  /* BATCH 601 — more variety (content only, no UI changes)                 */
+  /* ====================================================================== */
+
+  // --- who_am_i (2) ---
+  {
+    id: 'who-kaka-601',
+    type: 'who_am_i',
+    difficulty: 'hard',
+    category: 'players',
+    clues: [
+      'I am a Brazilian attacking midfielder of the 2000s, known for surging runs from deep.',
+      'I starred for AC Milan before a then-record move to Real Madrid.',
+      'I won the 2007 Ballon d\'Or and the 2002 World Cup with Brazil.',
+    ],
+    options: ['Kaká', 'Ronaldinho', 'Rivaldo', 'Robinho'],
+    correctAnswer: 'Kaká',
+    explanation: 'Kaká won the 2007 Ballon d\'Or during his AC Milan peak.',
+  },
+  {
+    id: 'who-buffon-601',
+    type: 'who_am_i',
+    difficulty: 'medium',
+    category: 'players',
+    clues: [
+      'I am an Italian goalkeeper with a career spanning more than two decades.',
+      'I spent the bulk of my career at Juventus and captained Italy.',
+      'I won the 2006 World Cup as a goalkeeper.',
+    ],
+    options: ['Gianluigi Buffon', 'Dino Zoff', 'Walter Zenga', 'Gianluca Pagliuca'],
+    correctAnswer: 'Gianluigi Buffon',
+    explanation: 'Gianluigi Buffon won the 2006 World Cup and is a Juventus icon.',
+  },
+
+  // --- career_path (2) ---
+  {
+    id: 'career-ibrahimovic-601',
+    type: 'career_path',
+    difficulty: 'hard',
+    category: 'transfers',
+    path: ['Ajax', 'Juventus', 'Inter', 'Barcelona', 'AC Milan', 'PSG'],
+    options: ['Zlatan Ibrahimović', 'Edinson Cavani', 'Carlos Tévez', 'Samuel Eto\'o'],
+    correctAnswer: 'Zlatan Ibrahimović',
+    explanation: 'Zlatan Ibrahimović played for Ajax, Juventus, Inter, Barcelona, AC Milan and PSG.',
+  },
+  {
+    id: 'career-bale-601',
+    type: 'career_path',
+    difficulty: 'medium',
+    category: 'transfers',
+    path: ['Southampton', 'Tottenham', 'Real Madrid'],
+    options: ['Gareth Bale', 'Aaron Ramsey', 'Theo Walcott', 'Kieran Trippier'],
+    correctAnswer: 'Gareth Bale',
+    explanation: 'Gareth Bale moved Southampton → Tottenham → Real Madrid.',
+  },
+
+  // --- club_country (2) ---
+  {
+    id: 'country-anfield-601',
+    type: 'club_country',
+    difficulty: 'easy',
+    category: 'clubs',
+    prompt: 'Which club plays its home games at Anfield?',
+    options: ['Liverpool', 'Everton', 'Manchester City', 'Leeds United'],
+    correctAnswer: 'Liverpool',
+    explanation: 'Anfield is Liverpool\'s historic home stadium.',
+  },
+  {
+    id: 'country-selecao-601',
+    type: 'club_country',
+    difficulty: 'medium',
+    category: 'countries',
+    prompt: 'Which national team is known as the "Seleção"?',
+    options: ['Brazil', 'Portugal', 'Spain', 'Argentina'],
+    correctAnswer: 'Brazil',
+    explanation: '"Seleção" refers to the Brazil national team.',
+  },
+
+  // --- higher_lower (2) ---
+  {
+    id: 'hol-leagues-prem-spain-601',
+    type: 'higher_lower',
+    difficulty: 'medium',
+    category: 'leagues',
+    prompt: 'Which top division contains MORE clubs in a season?',
+    leftOption: { name: 'Premier League', value: 20 },
+    rightOption: { name: 'Bundesliga', value: 18 },
+    correctAnswer: 'Premier League',
+    unit: 'clubs',
+    explanation: 'The Premier League has 20 clubs; the Bundesliga has 18.',
+  },
+  {
+    id: 'hol-goals-ronaldo-raul-601',
+    type: 'higher_lower',
+    difficulty: 'hard',
+    category: 'champions_league',
+    prompt: 'Who has scored MORE Champions League goals?',
+    leftOption: { name: 'Cristiano Ronaldo', value: 140 },
+    rightOption: { name: 'Raúl', value: 71 },
+    correctAnswer: 'Cristiano Ronaldo',
+    unit: 'CL goals',
+    explanation: 'Cristiano Ronaldo is the competition\'s all-time top scorer, well ahead of Raúl.',
+  },
+
+  // --- transfer_fee (2) ---
+  {
+    id: 'fee-hazard-madrid-601',
+    type: 'transfer_fee',
+    difficulty: 'hard',
+    category: 'transfers',
+    prompt: 'Roughly how much did Real Madrid pay Chelsea for Eden Hazard in 2019?',
+    options: ['€60m', '€80m', '€100m', '€140m'],
+    correctAnswer: '€100m',
+    explanation: 'Eden Hazard joined Real Madrid for an initial fee of around €100m in 2019.',
+  },
+  {
+    id: 'fee-lukaku-inter-601',
+    type: 'transfer_fee',
+    difficulty: 'medium',
+    category: 'transfers',
+    prompt: 'Roughly how much did Chelsea pay Inter to re-sign Romelu Lukaku in 2021?',
+    options: ['£68m', '£85m', '£98m', '£115m'],
+    correctAnswer: '£98m',
+    explanation: 'Lukaku returned to Chelsea for a club-record fee of around £98m in 2021.',
+  },
+
+  // --- guess_year (3) ---
+  {
+    id: 'year-italy-wc-601',
+    type: 'guess_year',
+    difficulty: 'medium',
+    category: 'world_cup',
+    prompt: 'In which year did Italy win the FIFA World Cup in Germany?',
+    options: ['2006', '2010', '2014', '2018'],
+    correctAnswer: '2006',
+    explanation: 'Italy won the 2006 World Cup, beating France in the final.',
+  },
+  {
+    id: 'year-spain-euro-601',
+    type: 'guess_year',
+    difficulty: 'hard',
+    category: 'history',
+    prompt: 'In which year did Spain begin their run of three straight major tournament wins?',
+    options: ['2004', '2008', '2012', '2016'],
+    correctAnswer: '2008',
+    explanation: 'Spain won Euro 2008, the 2010 World Cup and Euro 2012 in a row.',
+  },
+  {
+    id: 'year-aguero-601',
+    type: 'guess_year',
+    difficulty: 'nightmare',
+    category: 'leagues',
+    prompt: 'In which year did Sergio Agüero score his famous title-winning goal for Manchester City?',
+    options: ['2009', '2010', '2011', '2012'],
+    correctAnswer: '2012',
+    explanation: '"Aguerooo" — his stoppage-time goal won City the title in 2012.',
+  },
+
+  // --- pitch_position (3) ---
+  {
+    id: 'pos-cannavaro-601',
+    type: 'pitch_position',
+    difficulty: 'medium',
+    category: 'players',
+    prompt: 'What was Fabio Cannavaro\'s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Defender',
+    explanation: 'Fabio Cannavaro was a centre-back and 2006 Ballon d\'Or winner.',
+  },
+  {
+    id: 'pos-xavi-601',
+    type: 'pitch_position',
+    difficulty: 'medium',
+    category: 'players',
+    prompt: 'What was Xavi\'s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Midfielder',
+    explanation: 'Xavi was a central midfielder, the metronome of Barcelona and Spain.',
+  },
+  {
+    id: 'pos-shearer-601',
+    type: 'pitch_position',
+    difficulty: 'easy',
+    category: 'players',
+    prompt: 'What was Alan Shearer\'s position?',
+    options: [...PITCH_ZONES],
+    correctAnswer: 'Forward',
+    explanation: 'Alan Shearer was a striker and the Premier League\'s record scorer.',
+  },
+
 ];
