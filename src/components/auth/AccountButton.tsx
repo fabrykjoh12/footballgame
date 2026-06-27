@@ -76,11 +76,11 @@ function AuthModal({ onClose }: { onClose: () => void }) {
       role="dialog"
       aria-modal="true"
       aria-label={user ? 'Account' : 'Sign in'}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/85 px-5 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/90 px-5 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="glass-strong relative w-full max-w-sm rounded-2xl p-6 animate-scale-in"
+        className="relative w-full max-w-sm rounded-2xl border border-white/12 bg-ink-800 p-6 shadow-elev-2 animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         <button
