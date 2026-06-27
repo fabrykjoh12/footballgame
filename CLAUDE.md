@@ -12,7 +12,7 @@ score ("Sara FC 3–2 Jonas United"). React + TypeScript + Vite + Tailwind.
 Fully playable offline vs a CPU; real-time multiplayer via Ably (or Supabase)
 when keys are present.
 
-Built and working: 8 mini-games, **473 questions**, live Ably 1v1 (verified +
+Built and working: 8 mini-games, **509 questions**, live Ably 1v1 (verified +
 hardened), Daily Challenge, local profile/stats, sound, share-as-image,
 live commentary, a 0–90' match timeline, **sudden-death stoppage time**, a
 lobby topic filter, deterministic per-team kit colours, a premium UI pass, and
@@ -123,7 +123,7 @@ club_country ×1, guess_year ×1, transfer_fee ×1, pitch_position ×1, odd_one_
 | Scoring, goals, events, sudden-death helpers (pure) | `src/lib/scoring.ts` |
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize, tiebreakers) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
-| Question database (473 Qs, 8 types) | `src/data/questions.ts` |
+| Question database (509 Qs, 8 types) | `src/data/questions.ts` |
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
 | Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |
