@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useSettings } from '../providers/AppSettingsProvider.tsx';
 import { useMatch } from '../providers/MatchProvider.tsx';
+import { useStats } from '../providers/StatsProvider.tsx';
 import { RulesModal } from './RulesModal.tsx';
+import { StatsStrip } from '../../ui/stats/StatsStrip.tsx';
 import { PitchSvg } from '../../ui/pitch/PitchSvg.tsx';
 import {
   onlineAvailable,
@@ -18,6 +20,7 @@ export function MainMenuScreen() {
   const { startCpuMatch } = useMatch();
   const canPlayOnline = onlineAvailable(readRuntimeEnv());
   const online = useOnlineStatus();
+  const { stats } = useStats();
   const [showRules, setShowRules] = useState(false);
 
   const handlePlay = () => {
@@ -56,6 +59,8 @@ export function MainMenuScreen() {
           </span>
         </div>
       </header>
+
+      <StatsStrip stats={stats} />
 
       <div className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-pitch-900/60 p-6 backdrop-blur">
         <label className="flex flex-col gap-1.5 text-sm">

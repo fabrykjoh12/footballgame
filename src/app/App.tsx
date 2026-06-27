@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { AppSettingsProvider, useSettings } from './providers/AppSettingsProvider.tsx';
 import { MatchProvider, useMatch } from './providers/MatchProvider.tsx';
+import { StatsProvider, useStats } from './providers/StatsProvider.tsx';
 import { MatchErrorBoundary } from './MatchErrorBoundary.tsx';
 import { ScreenAnnouncer } from './a11y/ScreenAnnouncer.tsx';
 import { useMatchSound } from '../engine/useMatchSound.ts';
@@ -67,9 +68,11 @@ function Router() {
 export function App() {
   return (
     <AppSettingsProvider>
-      <MatchProvider>
-        <AppShell />
-      </MatchProvider>
+      <StatsProvider>
+        <MatchProvider>
+          <AppShell />
+        </MatchProvider>
+      </StatsProvider>
     </AppSettingsProvider>
   );
 }
@@ -77,7 +80,14 @@ export function App() {
 function AppShell() {
   const { state, reset } = useMatch();
   const { soundOn } = useSettings();
+  const { record } = useStats();
   useMatchSound(state, soundOn);
+
+  // Record a finished match into career stats exactly once.
+  useEffect(() => {
+    if (state.phase.kind === 'post_match') record(state.phase.summary);
+  }, [state.phase, record]);
+
   return (
     <MatchErrorBoundary onReset={reset}>
       <ScreenAnnouncer />
