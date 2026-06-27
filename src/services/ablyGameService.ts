@@ -41,6 +41,8 @@ type ChannelEvent =
 
 const JOIN_TIMEOUT_MS = 6000;
 const MAX_PLAYERS = 2;
+/** How long a guest waits for the host to return before declaring the match lost. */
+const HOST_AWAY_GRACE_MS = 12000;
 
 function makePlayer(name: string, isHost: boolean): Player {
   return {
@@ -79,6 +81,10 @@ export class AblyGameService implements GameService {
   /** Guest-side: pin a question's countdown to local receipt time (anti-skew). */
   private rebasedQuestionKey: string | null = null;
   private rebasedStartedAt: number | null = null;
+
+  /** Guest-side: the host's presence has dropped and we're awaiting its return. */
+  private hostAway = false;
+  private hostAwayTimer: ReturnType<typeof setTimeout> | null = null;
 
   getLocalPlayerId(): string {
     return this.localPlayerId;
@@ -160,6 +166,10 @@ export class AblyGameService implements GameService {
       await this.channel?.presence.leave();
     } catch {
       /* best effort */
+    }
+    if (this.hostAwayTimer) {
+      clearTimeout(this.hostAwayTimer);
+      this.hostAwayTimer = null;
     }
     this.realtime?.close();
     this.realtime = null;
@@ -268,6 +278,20 @@ export class AblyGameService implements GameService {
       }
     });
 
+    // Guest-side: notice if the HOST (the authoritative engine) drops, so the
+    // match doesn't silently freeze. A brief blip resolves itself when the host
+    // re-enters or the next snapshot arrives; a real drop surfaces as 'failed'.
+    channel.presence.subscribe('leave', (member) => {
+      if (!this.isHost && member.clientId && member.clientId === this.snapshot?.hostId) {
+        this.onHostAway();
+      }
+    });
+    channel.presence.subscribe('enter', (member) => {
+      if (!this.isHost && member.clientId && member.clientId === this.snapshot?.hostId) {
+        this.clearHostAway();
+      }
+    });
+
     await channel.attach();
     // Presence is only used to detect disconnects; if the key lacks the
     // presence capability, multiplayer should still work.
@@ -354,8 +378,42 @@ export class AblyGameService implements GameService {
   /* ----------------------------- guest logic ----------------------------- */
 
   private applySnapshot(room: Room): void {
+    // A fresh snapshot proves the host is alive — clear any host-away state.
+    this.clearHostAway();
     this.snapshot = this.rebaseQuestionClock(room);
     this.emitRoom(this.snapshot);
+  }
+
+  /** Guest: the host dropped. Show "reconnecting", ask for state, then give up. */
+  private onHostAway(): void {
+    if (this.hostAway) return;
+    this.hostAway = true;
+    if (this.connectionState === 'connected') {
+      this.connectionState = 'reconnecting';
+      this.emitConnectionState('reconnecting');
+    }
+    void this.send('request_state', { playerId: this.localPlayerId });
+    if (this.hostAwayTimer) clearTimeout(this.hostAwayTimer);
+    this.hostAwayTimer = setTimeout(() => {
+      if (this.hostAway) {
+        this.connectionState = 'failed';
+        this.emitConnectionState('failed');
+      }
+    }, HOST_AWAY_GRACE_MS);
+  }
+
+  /** Guest: the host is back (re-entered presence or a snapshot arrived). */
+  private clearHostAway(): void {
+    if (this.hostAwayTimer) {
+      clearTimeout(this.hostAwayTimer);
+      this.hostAwayTimer = null;
+    }
+    if (!this.hostAway) return;
+    this.hostAway = false;
+    if (this.connectionState !== 'connected') {
+      this.connectionState = 'connected';
+      this.emitConnectionState('connected');
+    }
   }
 
   /**

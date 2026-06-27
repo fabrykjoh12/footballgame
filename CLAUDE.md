@@ -14,11 +14,13 @@ when keys are present.
 
 Built and working: 10 mini-games, **624 questions**, live Ably 1v1 (verified +
 hardened), a singleplayer **Career Mode** (climb from League Two to the Premier
-League), **optional sign-in with cross-device progress sync** (Firebase Auth),
-Daily Challenge, local profile/stats, sound, share-as-image, live commentary, a
-0–90' match timeline, **sudden-death stoppage time**, a lobby topic filter,
-deterministic per-team kit colours, a premium UI pass, and **111 unit tests**
-gating an auto-deploy pipeline.
+League), **optional sign-in with cross-device progress sync** (Firebase Auth), a
+**friends list with friend codes + invite-to-room** (no dictating codes), an
+**online daily/all-time leaderboard**, **achievements**, **head-to-head records**,
+per-device **question-freshness**, Daily Challenge, local profile/stats, sound,
+share-as-image, live commentary, a 0–90' match timeline, **sudden-death stoppage
+time**, a lobby topic filter, deterministic per-team kit colours, a premium UI
+pass, and **154 unit tests** gating an auto-deploy pipeline.
 
 > "Football" always means **European football / soccer**. Never use real club
 > badges or player photos — visuals are gradients, pitch patterns, icons, type.
@@ -34,7 +36,7 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (111 tests across lib/, data/, services/)
+npm test         # vitest run (154 tests across lib/, data/, services/)
 ```
 
 Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). **CI runs the
@@ -147,6 +149,11 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
 | Optional sign-in + cross-device progress sync (Firebase) | `src/context/AuthProvider.tsx`, `src/lib/progress.ts`, `src/lib/firebaseConfig.ts`, `src/services/firebaseBackend.ts`, `src/components/auth/` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |
+| Per-device question-history (recent-repeat avoidance, local) | `src/lib/questionHistory.ts` |
+| Achievements / badges (derived from stats, pure unlock rules) | `src/lib/achievements.ts`, `src/components/home/TrophyCabinet.tsx` |
+| Head-to-head record vs each opponent (local) | `src/lib/headToHead.ts` |
+| Friends list + friend codes + invite-to-room (local-first; Firestore online layer) | `src/lib/friends.ts`, `src/context/FriendsProvider.tsx`, `src/components/friends/` |
+| Online leaderboard (daily + all-time, Firestore; SDK-free wrappers) | `src/lib/leaderboard.ts`, `src/components/home/TrophyCabinet.tsx` |
 | Live commentary text generator (pure) | `src/lib/commentary.ts` |
 | Deterministic per-team kit colours | `src/lib/teamIdentity.ts` |
 | Pitch zones constant | `src/lib/positions.ts` |
@@ -259,15 +266,19 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-13 test files (`npm test`, 111 tests): `scoring` (incl. **`guessAccuracy` +
+18 test files (`npm test`, 154 tests): `scoring` (incl. **`guessAccuracy` +
 closeness-scaled points** for Guess the Number), `questionPicker` (distribution,
-difficulty, anti-bias shuffle, determinism, topic filter), `questions` (data
-integrity invariants above, incl. numeric-in-range for `guess_the_number`),
-`matchEngine` (lifecycle, scoring, **sudden death**, timeout) with fake timers,
-`career` (round-robin schedule, standings, fixtures, deterministic AI sim,
-promotion/relegation), `progress` (sign-in reconcile rules), `commentary`,
-`teamIdentity`, `connectionMapping`, `dailyChallenge`, `seededRandom`,
-`shareResult`, `profileStats`. Add a test when you add an invariant or a rule.
+difficulty, anti-bias shuffle, determinism, topic filter, **history-avoidance**
+that exhausts unseen questions first but stays deterministic when seeded),
+`questionHistory` (recent-ring push/cap), `questions` (data integrity invariants
+above, incl. numeric-in-range for `guess_the_number`), `matchEngine` (lifecycle,
+scoring, **sudden death**, timeout) with fake timers, `career` (round-robin
+schedule, standings, fixtures, deterministic AI sim, promotion/relegation),
+`achievements` (unlock thresholds), `headToHead` (W/D/L tally, idempotency),
+`friends` (codes, invite link/text, list de-dupe), `leaderboard` (board ids),
+`progress` (sign-in reconcile rules), `commentary`, `teamIdentity`,
+`connectionMapping`, `dailyChallenge`, `seededRandom`, `shareResult`,
+`profileStats`. Add a test when you add an invariant or a rule.
 
 ## Realtime / env
 
@@ -310,15 +321,22 @@ Gotchas:
 
 ## Status & open items
 
-- ✅ Done: 10 mini-games, 624 Qs, live Ably 1v1 + hardening, **Career Mode**
-  (singleplayer league climb), **optional sign-in + cross-device progress sync**
-  (Firebase Auth email link), Daily Challenge, profile/stats, sound, share
-  (image+text), commentary, timeline, sudden death, topic filter, kit colours,
-  premium UI across all screens, 111 tests + CI.
-- ⏳ Open: **online leaderboard** (the Firebase sign-in + Firestore now provide
-  the auth/backend foundation; a public ranked board still needs its own
-  collection + server-trusted scoring). **Supabase multiplayer path** built but
-  not device-tested.
+- ✅ Done: 10 mini-games, 624 Qs, live Ably 1v1 + hardening (incl. **guest-side
+  host-drop detection** → reconnecting/failed instead of a frozen match),
+  **Career Mode** (singleplayer league climb), **optional sign-in + cross-device
+  progress sync** (Firebase Auth email link), Daily Challenge, profile/stats,
+  **per-device question-freshness (recent-repeat avoidance)**, **achievements /
+  badges**, **head-to-head records**, **friends list + friend codes +
+  invite-to-room** (local-first share link, plus online live push invites when
+  signed in), **online daily + all-time leaderboard** (Firestore), sound, share
+  (image+text), commentary (now an `aria-live` region), timeline, sudden death,
+  topic filter, kit colours, premium UI across all screens, 154 tests + CI.
+- ⏳ Open: **friends/leaderboard online layer** is built + code-split + gated on
+  Firebase sign-in, but **not device-tested** (needs two signed-in accounts);
+  the local-first friends + share-link invite path works anonymously today.
+  Leaderboard scoring is **client-trusted** (host runs the engine) — fine for
+  casual boards, not safe for ranked without server-side validation. **Supabase
+  multiplayer path** built but not device-tested.
 - 🔧 Firebase sign-in — current operational state (as of last session): the
   `VITE_FIREBASE_*` repo secrets are **added** and the live site shows the **Sign
   in** button (modal verified on device). **Still pending on the owner's side**
@@ -327,8 +345,11 @@ Gotchas:
   email-link optional) — until then sign-in returns `auth/operation-not-allowed`;
   (2) add `fabrykjoh12.github.io` to Authentication → Settings → Authorized
   domains (for Google + email-link redirects); (3) create Firestore + publish the
-  `progress/{uid}` security rules so cross-device **sync** turns on (sign-in works
-  without it — sync just no-ops). Steps in `FIREBASE_SETUP.md`. The owner is doing
+  **expanded** security rules so cross-device **sync** AND the friends/leaderboard
+  features turn on — the rules now cover `progress/{uid}` (private sync),
+  `users/{uid}` (+ `friends`/`invites` sub-collections), `friendCodes/{code}`, and
+  `leaderboards/{board}/entries/{uid}` (sign-in works without them — those
+  features just no-op). Steps + the full ruleset in `FIREBASE_SETUP.md`. The owner is doing
   all setup **web-only** (no terminal); the Firestore *Rules* editor is the
   Firestore one (`service cloud.firestore`), NOT Realtime Database (JSON).
 

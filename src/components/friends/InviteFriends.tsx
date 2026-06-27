@@ -23,12 +23,14 @@ export function InviteFriends({ roomCode }: { roomCode: string }) {
       return;
     }
     // No live channel — share or copy the pre-filled message.
-    const shareData = { title: 'Ball Knowledge', text: payload.text, url: payload.link };
+    const nav = navigator as Navigator & {
+      share?: (data: { title?: string; text?: string; url?: string }) => Promise<void>;
+    };
     try {
-      if (typeof navigator !== 'undefined' && 'share' in navigator) {
-        await navigator.share(shareData);
+      if (typeof nav.share === 'function') {
+        await nav.share({ title: 'Ball Knowledge', text: payload.text, url: payload.link });
       } else {
-        await navigator.clipboard.writeText(payload.text);
+        await nav.clipboard.writeText(payload.text);
       }
       setDone((d) => ({ ...d, [friend.id]: 'shared' }));
     } catch {

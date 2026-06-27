@@ -3,6 +3,7 @@ import { useGame } from '../../context/GameProvider';
 import { play } from '../../lib/sound';
 import { teamName } from '../../lib/teamName';
 import { recordMatchResult } from '../../lib/profileStats';
+import { refreshAchievements } from '../../lib/achievements';
 import {
   getCareer,
   saveCareer,
@@ -36,6 +37,7 @@ export function CareerResult() {
   useEffect(() => {
     if (!room || room.status !== 'finished' || !me || !opp) return;
     recordMatchResult(room, localPlayerId);
+    refreshAchievements();
     const sig = `${room.createdAt}:${room.selectedQuestions.map((q) => q.id).join(',')}`;
     const current = getCareer();
     if (!current) return;

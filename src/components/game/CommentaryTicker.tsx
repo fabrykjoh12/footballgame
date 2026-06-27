@@ -62,8 +62,17 @@ export function CommentaryTicker() {
   if (!line) return null;
 
   return (
-    <div className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2">
-      <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-pitch/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-pitch">
+    <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      aria-label="Live commentary"
+      className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2"
+    >
+      <span
+        aria-hidden
+        className="inline-flex shrink-0 items-center gap-1 rounded-md bg-pitch/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-pitch"
+      >
         <span className="h-1.5 w-1.5 rounded-full bg-pitch motion-safe:animate-pulse" />
         Live
       </span>

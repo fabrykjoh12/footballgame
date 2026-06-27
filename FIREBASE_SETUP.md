@@ -74,15 +74,53 @@ to start with.**
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+
+    // Private progress sync — only the owner.
     match /progress/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Public profile (name + friend code). Any signed-in user can read it so
+    // friends resolve; only the owner can write their own.
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == uid;
+
+      // Your friends list + your invite inbox live under your own doc.
+      match /friends/{friendUid} {
+        allow read, write: if signedIn() && request.auth.uid == uid;
+      }
+      match /invites/{inviteId} {
+        // The owner reads/deletes; anyone signed-in may send you an invite.
+        allow read, delete: if signedIn() && request.auth.uid == uid;
+        allow create: if signedIn();
+      }
+    }
+
+    // Friend-code → uid lookup. Readable by signed-in users; you may only
+    // claim a code that points at your own uid.
+    match /friendCodes/{code} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.resource.data.uid == request.auth.uid;
+    }
+
+    // Leaderboards — readable by signed-in users; you may only write your row.
+    // NOTE: scoring is client-trusted (the host runs the engine), so treat
+    // these as casual bragging rights, not cheat-proof rankings.
+    match /leaderboards/{board}/entries/{uid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == uid;
     }
   }
 }
 ```
 
-That's it. One document per user lives at `progress/{uid}` holding the three
-progress blobs (`career`, `profile`, `daily`) as JSON.
+This covers everything: `progress/{uid}` (private sync), `users/{uid}` (public
+profile + your `friends`/`invites` sub-collections), `friendCodes/{code}` (the
+add-by-code lookup), and `leaderboards/{board}/entries/{uid}` (daily + all-time
+boards). The friends/leaderboard features stay hidden until sign-in is enabled,
+and the app still works fully anonymously without any of this.
 
 ---
 

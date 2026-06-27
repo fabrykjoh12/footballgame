@@ -12,6 +12,7 @@ import { getDailyState, hasPlayedToday } from '../../lib/dailyChallenge';
 import { getCareer, divisionByTier } from '../../lib/career';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
+import { TrophyCabinet } from './TrophyCabinet';
 import {
   IconUsers,
   IconRoute,
@@ -327,6 +328,9 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
           )}
         </Card>
       )}
+
+      {/* Achievements + leaderboard */}
+      <TrophyCabinet />
 
       {/* Feature cards */}
       <div className="mx-auto grid w-full max-w-2xl grid-cols-2 gap-3 animate-fade-in [animation-delay:200ms]">

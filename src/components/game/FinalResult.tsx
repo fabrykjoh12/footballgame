@@ -10,6 +10,11 @@ import { buildShareText } from '../../lib/shareResult';
 import { shareResultImage } from '../../lib/shareImage';
 import { recordMatchResult } from '../../lib/profileStats';
 import { recordDailyResult } from '../../lib/dailyChallenge';
+import { refreshAchievements } from '../../lib/achievements';
+import type { AchievementDef } from '../../lib/achievements';
+import { getOpponentRecord, h2hSummary } from '../../lib/headToHead';
+import { dailyBoardId, submitScore, submitPersonalBest } from '../../lib/leaderboard';
+import { useAuth } from '../../context/AuthProvider';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -17,6 +22,8 @@ import { IconTrophy, IconShare, IconCheck, IconBack } from '../ui/icons';
 
 export function FinalResult() {
   const { room, localPlayerId, isHost, serviceMode, rematch, leaveRoom } = useGame();
+  const { user } = useAuth();
+  const [unlocked, setUnlocked] = useState<AchievementDef[]>([]);
   const [shared, setShared] = useState(false);
   const [imgState, setImgState] = useState<'idle' | 'working' | 'shared' | 'saved'>(
     'idle',
@@ -37,12 +44,22 @@ export function FinalResult() {
     play(winner?.id === localPlayerId ? 'win' : 'whistle');
   }, [room?.status, winner?.id, localPlayerId]);
 
-  // Record the match into the local lifetime profile (and Daily, if applicable).
+  // Record the match into the local lifetime profile (and Daily, if applicable),
+  // surface any newly-unlocked achievements, and submit online scores if signed in.
   useEffect(() => {
     if (room?.status !== 'finished') return;
     recordMatchResult(room, localPlayerId);
     if (room.settings.isDaily) recordDailyResult(room, localPlayerId);
-  }, [room?.status, localPlayerId]);
+    setUnlocked(refreshAchievements());
+
+    const me = room.players.find((p) => p.id === localPlayerId);
+    if (user && me) {
+      void submitPersonalBest({ uid: user.id, name: me.name, score: me.score });
+      if (room.settings.isDaily) {
+        void submitScore(dailyBoardId(), { uid: user.id, name: me.name, score: me.score });
+      }
+    }
+  }, [room?.status, localPlayerId, user]);
 
   if (!room) return null;
   const [a, b] = room.players;
@@ -137,6 +154,40 @@ export function FinalResult() {
         <Badge tone="muted">Mode: {MATCH_MODES[room.settings.mode].label}</Badge>
         <Badge tone="muted">{total} questions</Badge>
       </div>
+
+      {/* Head-to-head record vs this opponent */}
+      {(() => {
+        const opp = a.id === localPlayerId ? b : a;
+        const rec = getOpponentRecord(opp.name);
+        if (!rec || rec.played < 2) return null;
+        return (
+          <p className="text-center text-xs text-white/50">
+            Your record vs {teamName(opp.name)}:{' '}
+            <span className="font-semibold text-white/75">{h2hSummary(rec)}</span> over{' '}
+            {rec.played} games
+          </p>
+        );
+      })()}
+
+      {/* Newly-unlocked achievements */}
+      {unlocked.length > 0 && (
+        <Card className="border-gold/30 p-4 text-center animate-rise-in">
+          <div className="text-xs font-bold uppercase tracking-[0.2em] text-gold">
+            Achievement{unlocked.length > 1 ? 's' : ''} unlocked
+          </div>
+          <div className="mt-2 flex flex-wrap justify-center gap-2">
+            {unlocked.map((a2) => (
+              <span
+                key={a2.id}
+                className="inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm"
+              >
+                <span aria-hidden>{a2.icon}</span>
+                <span className="font-semibold">{a2.title}</span>
+              </span>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {/* Actions */}
       <div className="mt-1 flex flex-col gap-2">
