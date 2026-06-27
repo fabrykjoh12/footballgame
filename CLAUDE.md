@@ -14,10 +14,11 @@ when keys are present.
 
 Built and working: 10 mini-games, **624 questions**, live Ably 1v1 (verified +
 hardened), a singleplayer **Career Mode** (climb from League Two to the Premier
-League), Daily Challenge, local profile/stats, sound, share-as-image, live
-commentary, a 0–90' match timeline, **sudden-death stoppage time**, a lobby
-topic filter, deterministic per-team kit colours, a premium UI pass, and
-**106 unit tests** gating an auto-deploy pipeline.
+League), **optional sign-in with cross-device progress sync** (Supabase Auth),
+Daily Challenge, local profile/stats, sound, share-as-image, live commentary, a
+0–90' match timeline, **sudden-death stoppage time**, a lobby topic filter,
+deterministic per-team kit colours, a premium UI pass, and **111 unit tests**
+gating an auto-deploy pipeline.
 
 > "Football" always means **European football / soccer**. Never use real club
 > badges or player photos — visuals are gradients, pitch patterns, icons, type.
@@ -138,6 +139,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
 | Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
+| Optional sign-in + cross-device progress sync | `src/context/AuthProvider.tsx`, `src/lib/progress.ts`, `src/services/cloudSync.ts`, `src/components/auth/` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |
 | Live commentary text generator (pure) | `src/lib/commentary.ts` |
 | Deterministic per-team kit colours | `src/lib/teamIdentity.ts` |
@@ -163,6 +165,18 @@ streaks/stats; the streak bonus only applies then. The match engine derives
   opponent's club name is forced via `LocalGameService({ botName })` →
   `createGameService(intent, opts)` → `playCareer()`. Screens: `CareerHub`,
   `CareerResult`, `LeagueTable`. **No match-engine changes** — it's a layer on top.
+- **Optional sign-in + cloud sync** — local-first; everything works
+  anonymously. When Supabase is configured, a header **Sign in** button appears
+  (passwordless email **magic link** via Supabase Auth). On sign-in the app
+  pulls the player's `progress` row and reconciles it with local
+  (`reconcileProgress` in `progress.ts` — remote wins per blob, local fills
+  gaps, so a first sign-in never wipes local progress), then debounce-pushes on
+  every save. The three durable blobs (`bk_career_v1`, `bk_profile_v1`,
+  `bk_daily_v1`) are synced as JSON to one row per user. `AuthProvider` gates a
+  brief "Restoring your progress…" splash while hydrating a session. The auth
+  SDK is lazily imported (no main-bundle cost); UI is hidden when unconfigured.
+  Save sites notify via a `bk:progress-changed` window event from each
+  `save()`/`saveCareer()`. Setup + SQL in `SUPABASE_SETUP.md` §3.
 - **Daily Challenge** — one deterministic puzzle/day (seed from the date via
   `seededRandom`), tracked streak + best score in `dailyChallenge.ts`; home card.
 - **Local profile** — lifetime matches/win-rate/accuracy/best-streak in
@@ -235,15 +249,15 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-12 test files (`npm test`, 106 tests): `scoring` (incl. **`guessAccuracy` +
+13 test files (`npm test`, 111 tests): `scoring` (incl. **`guessAccuracy` +
 closeness-scaled points** for Guess the Number), `questionPicker` (distribution,
 difficulty, anti-bias shuffle, determinism, topic filter), `questions` (data
 integrity invariants above, incl. numeric-in-range for `guess_the_number`),
 `matchEngine` (lifecycle, scoring, **sudden death**, timeout) with fake timers,
 `career` (round-robin schedule, standings, fixtures, deterministic AI sim,
-promotion/relegation), `commentary`, `teamIdentity`, `connectionMapping`,
-`dailyChallenge`, `seededRandom`, `shareResult`, `profileStats`. Add a test when
-you add an invariant or a rule.
+promotion/relegation), `progress` (sign-in reconcile rules), `commentary`,
+`teamIdentity`, `connectionMapping`, `dailyChallenge`, `seededRandom`,
+`shareResult`, `profileStats`. Add a test when you add an invariant or a rule.
 
 ## Realtime / env
 
@@ -280,12 +294,15 @@ Gotchas:
 ## Status & open items
 
 - ✅ Done: 10 mini-games, 624 Qs, live Ably 1v1 + hardening, **Career Mode**
-  (singleplayer league climb), Daily Challenge, profile/stats, sound, share
+  (singleplayer league climb), **optional sign-in + cross-device progress sync**
+  (Supabase Auth magic link), Daily Challenge, profile/stats, sound, share
   (image+text), commentary, timeline, sudden death, topic filter, kit colours,
-  premium UI across all screens, 106 tests + CI.
-- ⏳ Open: **online leaderboard** (needs a backend — Supabase; daily/stats are
-  local only). **Supabase multiplayer path** built but not device-tested. A
-  full **two-device multiplayer playtest** of the newer features is still owed.
+  premium UI across all screens, 111 tests + CI.
+- ⏳ Open: **online leaderboard** (the sign-in + `progress` table now provide the
+  auth/backend foundation; a public ranked board still needs its own table +
+  server-trusted scoring). **Supabase multiplayer path** built but not
+  device-tested; the **sign-in flow** is built but not yet device-tested against
+  a live Supabase project. A full **two-device playtest** is still owed.
 
 ## Gotchas
 

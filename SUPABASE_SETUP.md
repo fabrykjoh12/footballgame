@@ -121,7 +121,67 @@ alter publication supabase_realtime add table rooms, room_players, room_answers;
 
 ---
 
-## 3. How the service layer is wired
+## 3. (Optional) Sign-in & cross-device progress sync
+
+Career Mode, lifetime stats and the Daily Challenge streak are saved **locally**
+(in `localStorage`) and work with no account. If you connect Supabase, players
+can **optionally sign in** to back that progress up and carry it across devices.
+
+The same two env vars from step 1 enable it — when they're present, a **Sign in**
+button appears in the header. Sign-in is **passwordless** (magic link): the
+player enters their email, clicks the link, and lands back signed in.
+
+### a) Enable Email auth + allow the redirect URL
+
+1. In **Authentication → Providers**, make sure **Email** is enabled (it is by
+   default). No password is needed — the app uses one-time magic links.
+2. In **Authentication → URL Configuration**, add your app URL(s) to
+   **Redirect URLs**, e.g.:
+   - `http://localhost:5173` (local dev)
+   - `https://YOUR-USER.github.io/footballgame/` (GitHub Pages)
+
+   The magic link returns the player to exactly this URL, so it must be listed.
+
+### b) Create the progress table
+
+Run this in the **SQL Editor**. One row per user holds the three progress blobs
+as JSON, locked down so a player can only read/write their own row.
+
+```sql
+create table if not exists progress (
+  user_id uuid primary key references auth.users on delete cascade,
+  career jsonb,
+  profile jsonb,
+  daily jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table progress enable row level security;
+
+create policy "own progress (select)" on progress
+  for select using (auth.uid() = user_id);
+create policy "own progress (modify)" on progress
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+```
+
+### How sync behaves
+
+- **Local-first.** Everything works signed-out; sign-in only mirrors what's
+  already on the device.
+- **On sign-in**, the app pulls your cloud row and reconciles it with local
+  progress (`reconcileProgress` in `src/lib/progress.ts`): your account is the
+  source of truth per blob, but local fills any gap the cloud doesn't have — so
+  a first sign-in never wipes existing local progress.
+- **On every save** (a finished match, an advanced season, a daily result) the
+  snapshot is debounced and pushed back up.
+- **Sign-out** keeps your progress on the device.
+
+The Supabase auth SDK is loaded lazily (same code-split chunk as multiplayer),
+so unconfigured / anonymous builds never download it.
+
+---
+
+## 4. How the service layer is wired
 
 | File | Role |
 | --- | --- |
@@ -130,6 +190,9 @@ alter publication supabase_realtime add table rooms, room_players, room_answers;
 | `src/services/supabaseGameService.ts` | Host-authoritative broadcast sync + best-effort persistence. |
 | `src/services/localGameService.ts` | Offline play vs a bot (demo + no-backend fallback). |
 | `src/services/matchEngine.ts` | Shared authoritative state machine + scoring. |
+| `src/context/AuthProvider.tsx` | Optional sign-in (magic link) + progress hydration/push. |
+| `src/services/cloudSync.ts` | Pull/push the `progress` row for the signed-in user. |
+| `src/lib/progress.ts` | Local progress snapshot + pure reconcile rules (tested). |
 
 Both services implement the same `GameService` interface, so the UI is
 completely unaware of which backend is active.

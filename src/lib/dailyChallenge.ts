@@ -6,6 +6,7 @@
 
 import type { MatchSettings, Room } from '../types/game';
 import { dailySeed, previousDay, todayString } from './seededRandom';
+import { notifyProgressChanged } from './progress';
 
 const KEY = 'bk_daily_v1';
 
@@ -39,6 +40,7 @@ export function getDailyState(): DailyState {
 function save(state: DailyState): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(state));
+    notifyProgressChanged();
   } catch {
     /* storage unavailable */
   }

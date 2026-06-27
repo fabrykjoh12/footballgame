@@ -15,6 +15,7 @@
 
 import type { MatchMode, MatchSettings } from '../types/game';
 import { mulberry32, hashString, type Rng } from './seededRandom';
+import { notifyProgressChanged } from './progress';
 
 const KEY = 'bk_career_v1';
 const VERSION = 1;
@@ -507,6 +508,7 @@ export function getCareer(): CareerState | null {
 export function saveCareer(state: CareerState): CareerState {
   try {
     localStorage.setItem(KEY, JSON.stringify(state));
+    notifyProgressChanged();
   } catch {
     /* storage unavailable */
   }

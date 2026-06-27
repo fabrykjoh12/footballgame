@@ -6,6 +6,7 @@
 
 import type { Room } from '../types/game';
 import { getPlayerTitle } from './playerTitle';
+import { notifyProgressChanged } from './progress';
 
 const KEY = 'bk_profile_v1';
 
@@ -48,6 +49,7 @@ export function getProfileStats(): ProfileStats {
 function save(stats: ProfileStats): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(stats));
+    notifyProgressChanged();
   } catch {
     /* storage unavailable / full */
   }

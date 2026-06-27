@@ -4,6 +4,7 @@ import { useGame } from '../../context/GameProvider';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { setSoundEnabled, play } from '../../lib/sound';
 import { IconSound, IconMute } from '../ui/icons';
+import { AccountButton } from '../auth/AccountButton';
 
 /** App frame: stadium backdrop, brand header, and a centered content column. */
 export function AppShell({ children }: { children: ReactNode }) {
@@ -32,23 +33,26 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setSoundOn((s) => {
-              const next = !s;
-              setSoundEnabled(next);
-              if (next) play('click'); // audible confirmation when enabling
-              return next;
-            });
-          }}
-          aria-pressed={soundOn}
-          aria-label={soundOn ? 'Mute sound' : 'Unmute sound'}
-          title={soundOn ? 'Sound on' : 'Sound off'}
-          className="answer-press rounded-full border border-white/10 bg-white/5 p-2.5 text-white/70 hover:text-white hover:bg-white/10"
-        >
-          {soundOn ? <IconSound /> : <IconMute />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setSoundOn((s) => {
+                const next = !s;
+                setSoundEnabled(next);
+                if (next) play('click'); // audible confirmation when enabling
+                return next;
+              });
+            }}
+            aria-pressed={soundOn}
+            aria-label={soundOn ? 'Mute sound' : 'Unmute sound'}
+            title={soundOn ? 'Sound on' : 'Sound off'}
+            className="answer-press rounded-full border border-white/10 bg-white/5 p-2.5 text-white/70 hover:text-white hover:bg-white/10"
+          >
+            {soundOn ? <IconSound /> : <IconMute />}
+          </button>
+          <AccountButton />
+        </div>
       </header>
 
       {connectionState !== 'connected' && (
