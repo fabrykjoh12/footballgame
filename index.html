@@ -65,6 +65,16 @@
         true,
       );
     </script>
+    <script>
+      // Evict any stale service worker from a previous version of the site.
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          regs.forEach(function (r) {
+            r.unregister();
+          });
+        });
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
