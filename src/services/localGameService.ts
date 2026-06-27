@@ -51,12 +51,20 @@ function randomBotName(): string {
   return BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
 }
 
+
+
 export class LocalGameService implements GameService {
   readonly mode: ServiceMode = 'local';
 
   private engine: MatchEngine | null = null;
   private localPlayerId = '';
   private botPlayerId = '';
+  /** When set (Career Mode), the CPU opponent uses this name instead of random. */
+  private readonly forcedBotName?: string;
+
+  constructor(opts?: { botName?: string }) {
+    this.forcedBotName = opts?.botName?.trim() || undefined;
+  }
 
   private roomListeners = new Set<(room: Room | null) => void>();
   private eventListeners = new Set<(event: GameEvent) => void>();
@@ -92,7 +100,7 @@ export class LocalGameService implements GameService {
   async joinRoom(_roomCode: string, playerName: string): Promise<Room> {
     // In local mode there is no real host to find, so we simulate one: a bot
     // hosts and the human is the guest. This demos the join / waiting flow.
-    const botHost = makePlayer(randomBotName(), true, true);
+    const botHost = makePlayer(this.forcedBotName ?? randomBotName(), true, true);
     const guest = makePlayer(playerName, false, false);
     this.localPlayerId = guest.id;
     this.botPlayerId = botHost.id;
@@ -206,7 +214,7 @@ export class LocalGameService implements GameService {
   private botJoin(): void {
     const room = this.engine?.getRoom();
     if (!room || room.status !== 'lobby') return;
-    const bot = makePlayer(randomBotName(), false, true);
+    const bot = makePlayer(this.forcedBotName ?? randomBotName(), false, true);
     this.botPlayerId = bot.id;
     this.engine?.setRoom({
       ...room,

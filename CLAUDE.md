@@ -13,10 +13,11 @@ Fully playable offline vs a CPU; real-time multiplayer via Ably (or Supabase)
 when keys are present.
 
 Built and working: 10 mini-games, **624 questions**, live Ably 1v1 (verified +
-hardened), Daily Challenge, local profile/stats, sound, share-as-image,
-live commentary, a 0–90' match timeline, **sudden-death stoppage time**, a
-lobby topic filter, deterministic per-team kit colours, a premium UI pass, and
-**95 unit tests** gating an auto-deploy pipeline.
+hardened), a singleplayer **Career Mode** (climb from League Two to the Premier
+League), Daily Challenge, local profile/stats, sound, share-as-image, live
+commentary, a 0–90' match timeline, **sudden-death stoppage time**, a lobby
+topic filter, deterministic per-team kit colours, a premium UI pass, and
+**106 unit tests** gating an auto-deploy pipeline.
 
 > "Football" always means **European football / soccer**. Never use real club
 > badges or player photos — visuals are gradients, pitch patterns, icons, type.
@@ -136,6 +137,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Question database (610 Qs, 9 types) | `src/data/questions.ts` |
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
 | Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
+| Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |
 | Live commentary text generator (pure) | `src/lib/commentary.ts` |
 | Deterministic per-team kit colours | `src/lib/teamIdentity.ts` |
@@ -144,11 +146,23 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Share: canvas matchday card / copy-paste text | `src/lib/shareImage.ts`, `src/lib/shareResult.ts` |
 | Realtime connection-state mapping (pure) | `src/services/connectionMapping.ts` |
 | Realtime env detection (SDK-free) | `src/lib/realtimeConfig.ts` |
-| Components | `src/components/{layout,home,lobby,game,ui}` |
+| Components | `src/components/{layout,home,lobby,game,career,ui}` |
 | Styling tokens / animations | `tailwind.config.js`, `src/styles/globals.css` |
 
 ## Features built this far
 
+- **Career Mode** (singleplayer) — climb from League Two to the Premier League.
+  Pure engine in `career.ts`: 4 divisions (each maps to a harder match `mode` +
+  tighter clock), a 6-team single round-robin season (you play 5 fixtures for
+  real; rival AI-vs-AI results are deterministically simulated per round off the
+  season seed), a derived league table, promotion/relegation (top 2 / bottom 2),
+  trophies, and win-the-top-flight as the goal. Persisted in localStorage
+  (`bk_career_v1`). Career fixtures are normal local matches flagged
+  `settings.careerMatch`; `App.tsx` routes the finished room to `CareerResult`
+  (records the scoreline + advances the season) instead of `FinalResult`. The CPU
+  opponent's club name is forced via `LocalGameService({ botName })` →
+  `createGameService(intent, opts)` → `playCareer()`. Screens: `CareerHub`,
+  `CareerResult`, `LeagueTable`. **No match-engine changes** — it's a layer on top.
 - **Daily Challenge** — one deterministic puzzle/day (seed from the date via
   `seededRandom`), tracked streak + best score in `dailyChallenge.ts`; home card.
 - **Local profile** — lifetime matches/win-rate/accuracy/best-streak in
@@ -221,14 +235,15 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-11 test files (`npm test`, 95 tests): `scoring` (incl. **`guessAccuracy` +
+12 test files (`npm test`, 106 tests): `scoring` (incl. **`guessAccuracy` +
 closeness-scaled points** for Guess the Number), `questionPicker` (distribution,
 difficulty, anti-bias shuffle, determinism, topic filter), `questions` (data
 integrity invariants above, incl. numeric-in-range for `guess_the_number`),
 `matchEngine` (lifecycle, scoring, **sudden death**, timeout) with fake timers,
-`commentary`, `teamIdentity`, `connectionMapping`, `dailyChallenge`,
-`seededRandom`, `shareResult`, `profileStats`. Add a test when you add an
-invariant or a rule.
+`career` (round-robin schedule, standings, fixtures, deterministic AI sim,
+promotion/relegation), `commentary`, `teamIdentity`, `connectionMapping`,
+`dailyChallenge`, `seededRandom`, `shareResult`, `profileStats`. Add a test when
+you add an invariant or a rule.
 
 ## Realtime / env
 
@@ -264,9 +279,10 @@ Gotchas:
 
 ## Status & open items
 
-- ✅ Done: 10 mini-games, 624 Qs, live Ably 1v1 + hardening, Daily Challenge,
-  profile/stats, sound, share (image+text), commentary, timeline, sudden death,
-  topic filter, kit colours, premium UI across all screens, 95 tests + CI.
+- ✅ Done: 10 mini-games, 624 Qs, live Ably 1v1 + hardening, **Career Mode**
+  (singleplayer league climb), Daily Challenge, profile/stats, sound, share
+  (image+text), commentary, timeline, sudden death, topic filter, kit colours,
+  premium UI across all screens, 106 tests + CI.
 - ⏳ Open: **online leaderboard** (needs a backend — Supabase; daily/stats are
   local only). **Supabase multiplayer path** built but not device-tested. A
   full **two-device multiplayer playtest** of the newer features is still owed.

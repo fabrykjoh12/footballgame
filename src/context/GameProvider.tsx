@@ -22,6 +22,7 @@ import {
   multiplayerProvider,
   type GameIntent,
   type GameService,
+  type GameServiceOptions,
   type MultiplayerProvider,
 } from '../services/gameService';
 import { dailySettings } from '../lib/dailyChallenge';
@@ -45,6 +46,12 @@ interface GameContextValue {
   joinRoom: (code: string, name: string) => Promise<void>;
   playDemo: (name: string) => Promise<void>;
   playDaily: (name: string) => Promise<void>;
+  /** Start a Career Mode fixture vs a named CPU club with fixed settings. */
+  playCareer: (
+    name: string,
+    opponentName: string,
+    settings: Partial<MatchSettings>,
+  ) => Promise<void>;
   updateSettings: (settings: Partial<MatchSettings>) => Promise<void>;
   startMatch: () => Promise<void>;
   submitAnswer: (input: SubmitAnswerInput) => Promise<void>;
@@ -80,7 +87,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const startSession = useCallback(
-    async (intent: GameIntent, name: string, code?: string) => {
+    async (
+      intent: GameIntent,
+      name: string,
+      code?: string,
+      opts?: GameServiceOptions,
+    ) => {
       // Clean up any previous session first.
       if (serviceRef.current) {
         try {
@@ -97,7 +109,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setConnectionState('connected');
       setConnecting(true);
 
-      const service = await createGameService(intent);
+      const service = await createGameService(intent, opts);
       serviceRef.current = service;
       setServiceMode(service.mode);
 
@@ -152,6 +164,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
       await startSession('demo', name);
       // Fixed mode + today's seed → the same match for everyone, then kick off.
       await serviceRef.current?.updateSettings(dailySettings());
+      await serviceRef.current?.startMatch();
+    },
+    [startSession],
+  );
+  const playCareer = useCallback(
+    async (name: string, opponentName: string, settings: Partial<MatchSettings>) => {
+      await startSession('demo', name, undefined, { botName: opponentName });
+      await serviceRef.current?.updateSettings(settings);
       await serviceRef.current?.startMatch();
     },
     [startSession],
@@ -227,6 +247,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     joinRoom,
     playDemo,
     playDaily,
+    playCareer,
     updateSettings,
     startMatch,
     submitAnswer,

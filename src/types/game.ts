@@ -182,6 +182,8 @@ export interface MatchSettings {
   seed?: number;
   /** Marks a Daily Challenge match so its result is recorded against the day. */
   isDaily?: boolean;
+  /** Marks a Career Mode fixture so its result feeds the league table. */
+  careerMatch?: boolean;
   /** Preferred question topics (soft filter; tops up if a topic is short). */
   categories?: Category[];
 }

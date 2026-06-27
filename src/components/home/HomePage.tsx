@@ -9,6 +9,7 @@ import {
   winRate,
 } from '../../lib/profileStats';
 import { getDailyState, hasPlayedToday } from '../../lib/dailyChallenge';
+import { getCareer, divisionByTier } from '../../lib/career';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import {
@@ -18,6 +19,7 @@ import {
   IconTrophy,
   IconBolt,
   IconClock,
+  IconArrowRight,
 } from '../ui/icons';
 
 const FEATURES = [
@@ -43,7 +45,7 @@ const FEATURES = [
   },
 ];
 
-export function HomePage() {
+export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
   const {
     createRoom,
     joinRoom,
@@ -59,6 +61,7 @@ export function HomePage() {
   const [code, setCode] = useState('');
   const [stats, setStats] = useState(() => getProfileStats());
   const [daily] = useState(() => getDailyState());
+  const [career] = useState(() => getCareer());
   const playedDailyToday = hasPlayedToday(daily);
 
   // Prefill the join code from a shared link (?room=BK7Q2).
@@ -260,6 +263,39 @@ export function HomePage() {
             </div>
           </>
         )}
+      </Card>
+
+      {/* Career Mode */}
+      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+        <div className="mb-2 flex items-center gap-2">
+          <IconTrophy className="h-5 w-5 text-pitch" />
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
+            Career Mode
+          </h2>
+          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
+            Singleplayer
+          </span>
+        </div>
+        {career ? (
+          <p className="text-xs leading-relaxed text-white/55">
+            Season {career.season} in{' '}
+            <span className="font-semibold text-pitch">
+              {divisionByTier(career.tier).name}
+            </span>
+            . Continue your climb to the Premier League.
+          </p>
+        ) : (
+          <p className="text-xs leading-relaxed text-white/55">
+            Start in League Two and manage your club up the pyramid vs the CPU.
+            Difficulty rises as you’re promoted.
+          </p>
+        )}
+        <div className="mt-3">
+          <Button fullWidth onClick={onOpenCareer}>
+            {career ? 'Continue career' : 'Start a career'}{' '}
+            <IconArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
       </Card>
 
       {/* Lifetime record (local) */}

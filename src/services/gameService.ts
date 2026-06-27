@@ -38,10 +38,16 @@ async function createRemoteService(): Promise<GameService> {
   return new SupabaseGameService();
 }
 
+export interface GameServiceOptions {
+  /** Career Mode: force the CPU opponent's name (local service only). */
+  botName?: string;
+}
+
 export async function createGameService(
   intent: GameIntent,
+  opts?: GameServiceOptions,
 ): Promise<GameService> {
-  if (intent === 'demo') return new LocalGameService();
+  if (intent === 'demo') return new LocalGameService(opts);
   if (multiplayerAvailable) {
     try {
       return await createRemoteService();
