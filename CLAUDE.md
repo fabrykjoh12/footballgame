@@ -12,11 +12,11 @@ score ("Sara FC 3–2 Jonas United"). React + TypeScript + Vite + Tailwind.
 Fully playable offline vs a CPU; real-time multiplayer via Ably (or Supabase)
 when keys are present.
 
-Built and working: 8 mini-games, **341 questions**, live Ably 1v1 (verified +
+Built and working: 8 mini-games, **407 questions**, live Ably 1v1 (verified +
 hardened), Daily Challenge, local profile/stats, sound, share-as-image,
 live commentary, a 0–90' match timeline, **sudden-death stoppage time**, a
 lobby topic filter, deterministic per-team kit colours, a premium UI pass, and
-**83 unit tests** gating an auto-deploy pipeline.
+**85 unit tests** gating an auto-deploy pipeline.
 
 > "Football" always means **European football / soccer**. Never use real club
 > badges or player photos — visuals are gradients, pitch patterns, icons, type.
@@ -30,7 +30,7 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (83 tests across lib/, data/, services/)
+npm test         # vitest run (85 tests across lib/, data/, services/)
 ```
 
 Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). **CI runs the
@@ -121,7 +121,7 @@ club_country ×1, guess_year ×1, transfer_fee ×1, pitch_position ×1, odd_one_
 | Scoring, goals, events, sudden-death helpers (pure) | `src/lib/scoring.ts` |
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize, tiebreakers) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
-| Question database (272 Qs, 7 types) | `src/data/questions.ts` |
+| Question database (407 Qs, 8 types) | `src/data/questions.ts` |
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
 | Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |
