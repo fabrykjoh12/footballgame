@@ -50,6 +50,24 @@ npm run build      # → dist/
 npm run preview    # serve the built app locally to sanity-check the SW/PWA
 ```
 
+### GitHub Pages (this project's deploy target)
+
+The live site is served from the **`gh-pages`** branch at
+`https://fabrykjoh12.github.io/footballgame/`. Because that's a project subpath,
+the production build sets Vite's `base` to `/footballgame/` (see `vite.config.ts`);
+deploying to a custom domain or user page instead just needs `VITE_BASE=/ npm run build`.
+
+`.github/workflows/deploy.yml` rebuilds and publishes `dist/` to `gh-pages`
+automatically on every push to `main`. In the repo's **Settings → Pages**, set
+the source to **Deploy from a branch → `gh-pages` / root**.
+
+To publish manually:
+
+```bash
+npm run build
+npx gh-pages -d dist   # or push the dist/ contents to the gh-pages branch
+```
+
 Configure online play in production by setting the env vars below in your host's
 dashboard; with none set, the "Play Online" entry stays hidden and CPU play is
 unaffected:
