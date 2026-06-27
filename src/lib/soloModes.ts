@@ -104,15 +104,20 @@ const GAUNTLET_RAMP: Difficulty[] = [
 function pickOne(
   candidates: Question[],
   used: Set<string>,
-  avoid: ReadonlySet<string> | undefined,
+  recent: readonly string[] | undefined,
   rng: () => number,
 ): Question | null {
   const fresh = candidates.filter((q) => !used.has(q.id));
   if (fresh.length === 0) return null;
-  // Prefer questions the player hasn't seen recently, then fall back.
-  const unseen = avoid ? fresh.filter((q) => !avoid.has(q.id)) : fresh;
-  const pool = unseen.length ? unseen : fresh;
-  return shuffle(pool, rng)[0];
+  // Prefer questions the player hasn't seen recently; when all are recent,
+  // fall back to the stalest one (oldest in `recent`) rather than at random.
+  if (recent && recent.length) {
+    const rank = new Map(recent.map((id, i) => [id, i] as const));
+    const unseen = fresh.filter((q) => !rank.has(q.id));
+    if (unseen.length) return shuffle(unseen, rng)[0];
+    return [...fresh].sort((a, b) => rank.get(a.id)! - rank.get(b.id)!)[0];
+  }
+  return shuffle(fresh, rng)[0];
 }
 
 /**
@@ -125,7 +130,7 @@ function pickOne(
 export function pickSoloQuestions(
   mode: SoloMode,
   pool: Question[] = QUESTIONS,
-  avoid?: ReadonlySet<string>,
+  recent?: readonly string[],
   rng: () => number = Math.random,
 ): Question[] {
   const used = new Set<string>();
@@ -140,7 +145,7 @@ export function pickSoloQuestions(
       const target = GAUNTLET_RAMP[i];
       const byTypeDiff = pool.filter((q) => q.type === type && q.difficulty === target);
       const byType = pool.filter((q) => q.type === type);
-      const q = take(pickOne(byTypeDiff, used, avoid, rng)) ?? take(pickOne(byType, used, avoid, rng));
+      const q = take(pickOne(byTypeDiff, used, recent, rng)) ?? take(pickOne(byType, used, recent, rng));
       if (q) out.push(q);
     });
     return out;

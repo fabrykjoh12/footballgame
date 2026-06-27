@@ -213,9 +213,9 @@ describe('pickMatchQuestions question-history avoidance', () => {
   const settings: MatchSettings = { mode: 'casual', questionCount: 10, questionDurationMs: 15000 };
 
   it('prefers unseen questions when fresh alternatives exist', () => {
-    const avoid = new Set(TYPES.map((t) => `${t}-a`));
+    const recent = TYPES.map((t) => `${t}-a`); // every "-a" seen
     for (let i = 0; i < 30; i++) {
-      const qs = pickMatchQuestions(settings, pool, avoid);
+      const qs = pickMatchQuestions(settings, pool, recent);
       expect(qs).toHaveLength(10);
       // Every type had exactly one unseen option (-b); it must be the one chosen.
       for (const q of qs) expect(q.id.endsWith('-b')).toBe(true);
@@ -223,19 +223,32 @@ describe('pickMatchQuestions question-history avoidance', () => {
   });
 
   it('still fills the match by reusing seen questions when no fresh ones remain', () => {
-    const everything = new Set(pool.map((q) => q.id));
+    const everything = pool.map((q) => q.id);
     const qs = pickMatchQuestions(settings, pool, everything);
     expect(qs).toHaveLength(10);
   });
 
+  it('reuses the stalest question first when every option has been seen', () => {
+    // For each type, "-a" was seen long ago and "-b" most recently. With both
+    // seen, the oldest ("-a") must be the one served back.
+    const recent = [
+      ...TYPES.map((t) => `${t}-a`), // older
+      ...TYPES.map((t) => `${t}-b`), // newer
+    ];
+    for (let i = 0; i < 20; i++) {
+      const qs = pickMatchQuestions(settings, pool, recent);
+      for (const q of qs) expect(q.id.endsWith('-a')).toBe(true);
+    }
+  });
+
   it('ignores history for a seeded (Daily) pick so it stays deterministic', () => {
     const seeded: MatchSettings = { ...settings, seed: 7 };
-    const avoidAll = new Set(pool.map((q) => q.id));
-    const ids = (avoid?: Set<string>) =>
-      pickMatchQuestions(seeded, pool, avoid)
+    const recentAll = pool.map((q) => q.id);
+    const ids = (recent?: readonly string[]) =>
+      pickMatchQuestions(seeded, pool, recent)
         .map((q) => q.id)
         .join(',');
-    expect(ids(avoidAll)).toEqual(ids(undefined));
+    expect(ids(recentAll)).toEqual(ids(undefined));
   });
 });
 

@@ -53,19 +53,26 @@ export function randomizeAnswerOrder(q: Question, rng: Rng = Math.random): Quest
 }
 
 /**
- * Order candidates so freshly-unseen questions come first (each group still
- * shuffled), so the picker exhausts unseen content before reusing recent ones.
- * With no `avoid` set this is a plain shuffle, so behaviour is unchanged.
+ * Order candidates so freshly-unseen questions come first (shuffled), so the
+ * picker exhausts unseen content before reusing anything. When every candidate
+ * has been seen (a shallow pool), the already-seen ones are ordered *oldest
+ * first* — using their recency rank in `recent` (oldest-first) — so a forced
+ * reuse always lands on the stalest question, never the one just played. With
+ * no `recent` list this is a plain shuffle, so behaviour is unchanged.
  */
 function prioritizeUnseen(
   list: Question[],
   rng: Rng,
-  avoid?: ReadonlySet<string>,
+  recent?: readonly string[],
 ): Question[] {
-  if (!avoid || avoid.size === 0) return shuffle(list, rng);
-  const unseen = list.filter((q) => !avoid.has(q.id));
-  const seen = list.filter((q) => avoid.has(q.id));
-  return [...shuffle(unseen, rng), ...shuffle(seen, rng)];
+  if (!recent || recent.length === 0) return shuffle(list, rng);
+  const rank = new Map<string, number>();
+  recent.forEach((id, i) => rank.set(id, i)); // lower rank = seen longer ago
+  const unseen = list.filter((q) => !rank.has(q.id));
+  const seen = list
+    .filter((q) => rank.has(q.id))
+    .sort((a, b) => rank.get(a.id)! - rank.get(b.id)!); // stalest first
+  return [...shuffle(unseen, rng), ...seen];
 }
 
 function pickOfType(
@@ -75,7 +82,7 @@ function pickOfType(
   allowed: Difficulty[],
   rng: Rng,
   categories?: Category[],
-  avoid?: ReadonlySet<string>,
+  recent?: readonly string[],
 ): Question[] {
   const byType = pool.filter((q) => q.type === type);
   const tier = byType.filter((q) => allowed.includes(q.difficulty));
@@ -90,7 +97,7 @@ function pickOfType(
   const take = (candidates: Question[]) => {
     if (chosen.length >= count) return;
     const remaining = candidates.filter((q) => !chosen.includes(q));
-    const ordered = prioritizeUnseen(remaining, rng, avoid);
+    const ordered = prioritizeUnseen(remaining, rng, recent);
     chosen.push(...ordered.slice(0, count - chosen.length));
   };
 
@@ -135,7 +142,7 @@ function distributionFor(count: number): Record<QuestionType, number> {
 export function pickMatchQuestions(
   settings: MatchSettings,
   pool: Question[] = QUESTIONS,
-  avoid?: ReadonlySet<string>,
+  recent?: readonly string[],
 ): Question[] {
   // A seed makes the whole pick deterministic (Daily Challenge); otherwise random.
   const seeded = settings.seed != null;
@@ -145,7 +152,7 @@ export function pickMatchQuestions(
 
   // History only steers a random pick — the Daily Challenge must stay identical
   // for everyone, so never let recent-history skew a seeded selection.
-  const skip = seeded ? undefined : avoid;
+  const skip = seeded ? undefined : recent;
 
   const cats = settings.categories;
   const selected: Question[] = [

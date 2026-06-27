@@ -10,7 +10,7 @@ import {
   type SoloGrade,
 } from '../../lib/soloModes';
 import { recordSoloResult } from '../../lib/soloProgress';
-import { recentlySeenSet, recordSeenQuestions } from '../../lib/questionHistory';
+import { recentlySeenIds, recordSeenQuestions } from '../../lib/questionHistory';
 import { refreshAchievements } from '../../lib/achievements';
 import { useCountdown } from '../../hooks/useCountdown';
 import { play } from '../../lib/sound';
@@ -41,7 +41,7 @@ interface FinishedRun {
  */
 export function SoloGame({ mode, onExit }: { mode: SoloMode; onExit: () => void }) {
   const cfg = SOLO_MODES[mode];
-  const questions = useMemo(() => pickSoloQuestions(mode, undefined, recentlySeenSet()), [mode]);
+  const questions = useMemo(() => pickSoloQuestions(mode, undefined, recentlySeenIds()), [mode]);
 
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<'question' | 'reveal' | 'finished'>('question');

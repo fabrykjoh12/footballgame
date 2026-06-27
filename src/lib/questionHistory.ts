@@ -11,11 +11,14 @@
 const KEY = 'bk_history_v1';
 
 /**
- * How many recent IDs to remember. Tuned to span several matches (≈12) without
- * approaching any single type's pool size — so we avoid recent repeats but never
- * starve a mini-game of fresh content.
+ * How many recent IDs to remember. Sized to span roughly a full type pool
+ * (≈60 of each of the 10 mini-games ≈ the last 60 matches), so the picker can
+ * walk through most of a type's questions before any repeat. When a shallow
+ * pool is fully covered the picker degrades to an oldest-first round-robin
+ * (see `prioritizeUnseen`), so a wide window never starves a mini-game — it
+ * just makes reuse fall on the stalest question.
  */
-export const HISTORY_LIMIT = 120;
+export const HISTORY_LIMIT = 600;
 
 /**
  * Append newly-seen IDs to a ring, most-recent last, de-duplicated (a repeat is
@@ -50,9 +53,13 @@ export function getSeenIds(): string[] {
   return read();
 }
 
-/** A set of recently-seen IDs for the picker to deprioritise. */
-export function recentlySeenSet(): ReadonlySet<string> {
-  return new Set(getSeenIds());
+/**
+ * Recently-seen IDs in recency order (oldest first), for the picker to
+ * deprioritise — and to reuse the *stalest* question first when fresh content
+ * runs out.
+ */
+export function recentlySeenIds(): readonly string[] {
+  return getSeenIds();
 }
 
 /** Record that a set of questions was just played. */

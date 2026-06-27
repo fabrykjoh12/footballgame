@@ -26,7 +26,7 @@ import type {
 import { defaultSettings } from '../lib/matchModes';
 import { generateRoomCode, normalizeRoomCode } from '../lib/roomCode';
 import { pickMatchQuestions, pickTiebreakers } from '../lib/questionPicker';
-import { recentlySeenSet } from '../lib/questionHistory';
+import { recentlySeenIds } from '../lib/questionHistory';
 import { uid } from '../lib/id';
 import { getSupabaseClient } from '../lib/supabaseClient';
 import { MatchEngine } from './matchEngine';
@@ -180,7 +180,7 @@ export class SupabaseGameService implements GameService {
   async startMatch(): Promise<void> {
     if (!this.isHost || !this.engine) return;
     const settings = this.engine.getRoom().settings;
-    const questions = pickMatchQuestions(settings, undefined, recentlySeenSet());
+    const questions = pickMatchQuestions(settings, undefined, recentlySeenIds());
     this.engine.beginMatch(questions, pickTiebreakers(settings, questions));
   }
 
