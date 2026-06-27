@@ -23,6 +23,16 @@ export const GUESS_THE_YEAR_BANK: readonly YearEvent[] = [
   { prompt: 'Manchester United completed the historic treble.', year: 1999 },
   { prompt: 'Portugal won their first UEFA European Championship.', year: 2016 },
   { prompt: 'Liverpool won the Champions League final in Istanbul.', year: 2005 },
+  { prompt: 'Argentina won the men’s World Cup in Mexico, led by Maradona.', year: 1986 },
+  { prompt: 'France won their first men’s World Cup on home soil.', year: 1998 },
+  { prompt: 'Brazil won the men’s World Cup in South Korea & Japan.', year: 2002 },
+  { prompt: 'Spain won the men’s World Cup in South Africa.', year: 2010 },
+  { prompt: 'Chelsea won their first Champions League in Munich.', year: 2012 },
+  { prompt: 'Liverpool won the Champions League final in Madrid.', year: 2019 },
+  { prompt: 'Italy won the UEFA European Championship at Wembley.', year: 2021 },
+  { prompt: 'Spain won the UEFA European Championship in Germany.', year: 2024 },
+  { prompt: 'Denmark won the UEFA European Championship as surprise entrants.', year: 1992 },
+  { prompt: 'France won the UEFA European Championship at the Stade de France.', year: 2000 },
 ];
 
 /** Inclusive year range the slider/stepper allows. */

@@ -61,4 +61,34 @@ export const ODD_ONE_OUT_BANK: readonly OddOneOutGroup[] = [
     odd: 'Copa Libertadores',
     reason: 'The Copa Libertadores is a South American competition.',
   },
+  {
+    theme: 'French (Ligue 1) clubs',
+    members: ['Paris Saint-Germain', 'Marseille', 'Lyon'],
+    odd: 'Anderlecht',
+    reason: 'Anderlecht are a Belgian club.',
+  },
+  {
+    theme: 'Portuguese clubs',
+    members: ['Benfica', 'Porto', 'Sporting CP'],
+    odd: 'Ajax',
+    reason: 'Ajax are a Dutch club.',
+  },
+  {
+    theme: 'Premier League clubs',
+    members: ['Liverpool', 'Chelsea', 'Tottenham'],
+    odd: 'Rangers',
+    reason: 'Rangers are a Scottish club.',
+  },
+  {
+    theme: 'Nations that have won the World Cup',
+    members: ['Brazil', 'Germany', 'Spain'],
+    odd: 'Portugal',
+    reason: 'Portugal have never won the World Cup.',
+  },
+  {
+    theme: 'Defensive positions',
+    members: ['Centre-back', 'Full-back', 'Wing-back'],
+    odd: 'Winger',
+    reason: 'A winger is an attacking position.',
+  },
 ];

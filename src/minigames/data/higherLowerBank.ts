@@ -62,6 +62,9 @@ export const HIGHER_LOWER_BANK: readonly HigherLowerCategory[] = [
       { label: 'Allianz Arena (Bayern)', value: 75000 },
       { label: 'Anfield (Liverpool)', value: 61000 },
       { label: 'Emirates (Arsenal)', value: 60000 },
+      { label: 'Wembley (England NT)', value: 90000 },
+      { label: 'Celtic Park (Celtic)', value: 60000 },
+      { label: 'Stade de France', value: 80000 },
     ],
   },
   {
@@ -76,6 +79,22 @@ export const HIGHER_LOWER_BANK: readonly HigherLowerCategory[] = [
       { label: 'Netherlands', value: 1 },
       { label: 'Denmark', value: 1 },
       { label: 'Greece', value: 1 },
+    ],
+  },
+  {
+    metric: 'Year the club was founded',
+    unit: '',
+    items: [
+      { label: 'Manchester United', value: 1878 },
+      { label: 'Liverpool', value: 1892 },
+      { label: 'Barcelona', value: 1899 },
+      { label: 'AC Milan', value: 1899 },
+      { label: 'Real Madrid', value: 1902 },
+      { label: 'Bayern Munich', value: 1900 },
+      { label: 'Ajax', value: 1900 },
+      { label: 'Juventus', value: 1897 },
+      { label: 'Arsenal', value: 1886 },
+      { label: 'Borussia Dortmund', value: 1909 },
     ],
   },
 ];
