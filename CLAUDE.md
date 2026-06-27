@@ -7,12 +7,12 @@ Guidance for Claude Code (and humans) working in this repo. This reflects the
 
 **Ball Knowledge** — a real-time 1v1 football (soccer) knowledge duel.
 Two players join a room with a short code and play a **10-question match** built
-from **eight mini-games**. Points convert into **goals** for a football-style
+from **nine mini-games**. Points convert into **goals** for a football-style
 score ("Sara FC 3–2 Jonas United"). React + TypeScript + Vite + Tailwind.
 Fully playable offline vs a CPU; real-time multiplayer via Ably (or Supabase)
 when keys are present.
 
-Built and working: 8 mini-games, **549 questions**, live Ably 1v1 (verified +
+Built and working: 9 mini-games, **590 questions**, live Ably 1v1 (verified +
 hardened), Daily Challenge, local profile/stats, sound, share-as-image,
 live commentary, a 0–90' match timeline, **sudden-death stoppage time**, a
 lobby topic filter, deterministic per-team kit colours, a premium UI pass, and
@@ -74,7 +74,7 @@ HomePage → LobbyPage → GamePage (MatchTimeline / Scoreboard / CommentaryTick
            QuestionCard / ResultReveal / GoalAnimation) → FinalResult
 ```
 
-## The eight mini-games
+## The nine mini-games
 
 All are variants of the `Question` discriminated union (`types/game.ts`). Each
 has a `QuestionCard` render branch, a `scoring.ts` `BASE_POINTS`/`MAX_SPEED_BONUS`
@@ -92,9 +92,11 @@ and a `pickOfType` line in `questionPicker.ts`. The bot (`botPlayer.ts`) and
 | `transfer_fee` | 4 money chips | `options` (4 `€`/`£` fees, one currency), `correctAnswer` |
 | `pitch_position` | vertical 4-line pitch grid | `options` = `PITCH_ZONES`, `correctAnswer` |
 | `odd_one_out` | prompt + 4 options | `options`, `correctAnswer` = the exception (the one that doesn't belong) |
+| `spot_the_lie` | prompt + 4 statements | `options` (4 statements), `correctAnswer` = the FALSE one |
 
-Per-match mix (10 Qs): `who_am_i ×2, career_path ×2, higher_lower ×1,
-club_country ×1, guess_year ×1, transfer_fee ×1, pitch_position ×1, odd_one_out ×1`
+Per-match mix (10 Qs): `who_am_i ×2, career_path ×1, higher_lower ×1,
+club_country ×1, guess_year ×1, transfer_fee ×1, pitch_position ×1, odd_one_out ×1,
+spot_the_lie ×1`
 (`MATCH_TYPE_DISTRIBUTION` in `matchModes.ts`).
 
 ## Scoring & match flow (`src/lib/scoring.ts`, pure)
@@ -123,7 +125,7 @@ club_country ×1, guess_year ×1, transfer_fee ×1, pitch_position ×1, odd_one_
 | Scoring, goals, events, sudden-death helpers (pure) | `src/lib/scoring.ts` |
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize, tiebreakers) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
-| Question database (549 Qs, 8 types) | `src/data/questions.ts` |
+| Question database (590 Qs, 9 types) | `src/data/questions.ts` |
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
 | Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |

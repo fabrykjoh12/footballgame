@@ -24,6 +24,7 @@ const TYPE_META = {
   transfer_fee: { label: 'Transfer Fee', Icon: IconCoins },
   pitch_position: { label: 'On the Pitch', Icon: IconPitch },
   odd_one_out: { label: 'Odd One Out', Icon: IconScale },
+  spot_the_lie: { label: 'Spot the Lie', Icon: IconTrophy },
 } as const;
 
 interface QuestionCardProps {
@@ -100,6 +101,16 @@ export function QuestionCard({
         <div className="mb-4">
           <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
             Odd one out
+          </h2>
+          <p className="text-lg font-semibold leading-snug sm:text-xl">
+            {question.prompt}
+          </p>
+        </div>
+      )}
+      {question.type === 'spot_the_lie' && (
+        <div className="mb-4">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
+            Spot the lie
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
             {question.prompt}

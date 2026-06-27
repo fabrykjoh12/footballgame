@@ -16,7 +16,8 @@ export type QuestionType =
   | 'guess_year'
   | 'transfer_fee'
   | 'pitch_position'
-  | 'odd_one_out';
+  | 'odd_one_out'
+  | 'spot_the_lie';
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'nightmare';
 
@@ -120,6 +121,15 @@ export interface OddOneOutQuestion extends BaseQuestion {
   correctAnswer: string;
 }
 
+/** "SPOT THE LIE" — four statements, pick the one that is FALSE. */
+export interface SpotTheLieQuestion extends BaseQuestion {
+  type: 'spot_the_lie';
+  prompt: string;
+  /** Four statements; correctAnswer is the FALSE one. */
+  options: string[];
+  correctAnswer: string;
+}
+
 export type Question =
   | WhoAmIQuestion
   | CareerPathQuestion
@@ -128,7 +138,8 @@ export type Question =
   | GuessYearQuestion
   | TransferFeeQuestion
   | PitchPositionQuestion
-  | OddOneOutQuestion;
+  | OddOneOutQuestion
+  | SpotTheLieQuestion;
 
 /* ------------------------------------------------------------------ */
 /* Match settings & difficulty modes                                   */
