@@ -47,6 +47,8 @@ export function randomizeAnswerOrder(q: Question, rng: Rng = Math.random): Quest
   }
   // Pitch zones are spatial (GK→Forward) — keep their fixed order.
   if (q.type === 'pitch_position') return q;
+  // Guess the Number has no options to shuffle.
+  if (q.type === 'guess_the_number') return q;
   return { ...q, options: shuffle(q.options, rng) };
 }
 
@@ -134,6 +136,7 @@ export function pickMatchQuestions(
     ...pickOfType(pool, 'pitch_position', dist.pitch_position, allowed, rng, cats),
     ...pickOfType(pool, 'odd_one_out', dist.odd_one_out, allowed, rng, cats),
     ...pickOfType(pool, 'spot_the_lie', dist.spot_the_lie, allowed, rng, cats),
+    ...pickOfType(pool, 'guess_the_number', dist.guess_the_number, allowed, rng, cats),
   ];
 
   // Shuffle the final order so mini-games are interleaved, then randomize each

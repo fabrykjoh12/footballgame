@@ -96,7 +96,7 @@ describe('pickMatchQuestions', () => {
         const counts: Record<string, number> = {};
         for (const q of qs) counts[q.type] = (counts[q.type] ?? 0) + 1;
         expect(counts).toEqual({
-          who_am_i: 2,
+          who_am_i: 1,
           career_path: 1,
           higher_lower: 1,
           club_country: 1,
@@ -105,6 +105,7 @@ describe('pickMatchQuestions', () => {
           pitch_position: 1,
           odd_one_out: 1,
           spot_the_lie: 1,
+          guess_the_number: 1,
         });
 
         for (const q of qs) expect(allowed).toContain(q.difficulty);
@@ -155,11 +156,15 @@ describe('pickMatchQuestions topic filter', () => {
 
 describe('pickMatchQuestions determinism (Daily Challenge)', () => {
   const layout = (qs: Question[]) =>
-    qs.map((q) =>
-      q.type === 'higher_lower'
-        ? `${q.id}:${q.leftOption.name}|${q.rightOption.name}`
-        : `${q.id}:${q.options.join('|')}`,
-    );
+    qs.map((q) => {
+      if (q.type === 'higher_lower') {
+        return `${q.id}:${q.leftOption.name}|${q.rightOption.name}`;
+      }
+      if (q.type === 'guess_the_number') {
+        return `${q.id}:${q.min}-${q.max}`;
+      }
+      return `${q.id}:${q.options.join('|')}`;
+    });
 
   it('produces an identical match for the same seed', () => {
     const settings: MatchSettings = {

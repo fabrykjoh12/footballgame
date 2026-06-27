@@ -29,6 +29,7 @@ export const BASE_POINTS: Record<QuestionType, number> = {
   pitch_position: 700,
   odd_one_out: 700,
   spot_the_lie: 700,
+  guess_the_number: 800,
 };
 
 /**
@@ -48,6 +49,7 @@ export const MAX_SPEED_BONUS: Record<QuestionType, number> = {
   pitch_position: 300,
   odd_one_out: 300,
   spot_the_lie: 300,
+  guess_the_number: 300,
 };
 
 /** Goal conversion: every 2500 points = 1 goal, capped at 5. */
@@ -56,6 +58,24 @@ export const MAX_GOALS = 5;
 
 /** A correct answer under this many ms triggers a "Counterattack!". */
 export const COUNTERATTACK_MS = 3000;
+
+/**
+ * For "Guess the Number", a guess within this fraction of the true value
+ * counts as "correct" for streaks / stats (points themselves scale smoothly).
+ */
+export const GUESS_NUMBER_CORRECT_WITHIN = 0.2;
+
+/**
+ * Closeness for a numeric guess vs the true value, on a 0–1 scale:
+ * exact → 1, 10% off → 0.9, 90% off → 0.1, ≥100% off → 0. Linear in the
+ * relative error. Drives scaled (partial-credit) points for Guess the Number.
+ */
+export function guessAccuracy(guess: number, actual: number): number {
+  if (!Number.isFinite(guess) || !Number.isFinite(actual)) return 0;
+  if (actual === 0) return guess === 0 ? 1 : 0;
+  const error = Math.abs(guess - actual) / Math.abs(actual);
+  return Math.max(0, Math.min(1, 1 - error));
+}
 
 /* ------------------------------------------------------------------ */
 /* Pure scoring functions                                              */
@@ -112,15 +132,42 @@ export interface QuestionPointsInput {
   totalTimeMs: number;
   /** Streak value AFTER applying this answer (i.e. correct → prev+1). */
   newStreak: number;
+  /**
+   * Partial-credit factor (0–1) for closeness-scored types like Guess the
+   * Number. When provided, base + speed scale by it so a near-miss still earns
+   * a share of the pot. Omit for normal all-or-nothing questions.
+   */
+  accuracy?: number;
 }
 
 /**
- * Full breakdown for one answer. Wrong answers earn nothing (no negatives
- * in the MVP), but we still return a zeroed breakdown for transparency.
+ * Full breakdown for one answer. Normal questions are all-or-nothing; when an
+ * `accuracy` factor is supplied (Guess the Number) the base and speed bonus
+ * scale smoothly with closeness, so being 10% off still pays ~90% of the pot.
  */
 export function calculateQuestionPoints(
   input: QuestionPointsInput,
 ): PointsBreakdown {
+  // Closeness-scored path (partial credit).
+  if (input.accuracy !== undefined) {
+    const factor = Math.max(0, Math.min(1, input.accuracy));
+    if (factor <= 0) {
+      return { base: 0, speedBonus: 0, streakBonus: 0, total: 0 };
+    }
+    const base = Math.round(
+      calculateBasePoints(input.type, input.clueStage) * factor,
+    );
+    const speedBonus = Math.round(
+      calculateSpeedBonus(input.type, input.timeTakenMs, input.totalTimeMs) *
+        factor,
+    );
+    // Streak/streak-bonus only when the guess was close enough to count.
+    const streakBonus = input.isCorrect
+      ? calculateStreakBonus(input.newStreak)
+      : 0;
+    return { base, speedBonus, streakBonus, total: base + speedBonus + streakBonus };
+  }
+
   if (!input.isCorrect) {
     return { base: 0, speedBonus: 0, streakBonus: 0, total: 0 };
   }

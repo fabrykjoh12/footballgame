@@ -7,16 +7,16 @@ Guidance for Claude Code (and humans) working in this repo. This reflects the
 
 **Ball Knowledge** — a real-time 1v1 football (soccer) knowledge duel.
 Two players join a room with a short code and play a **10-question match** built
-from **nine mini-games**. Points convert into **goals** for a football-style
+from **ten mini-games**. Points convert into **goals** for a football-style
 score ("Sara FC 3–2 Jonas United"). React + TypeScript + Vite + Tailwind.
 Fully playable offline vs a CPU; real-time multiplayer via Ably (or Supabase)
 when keys are present.
 
-Built and working: 9 mini-games, **610 questions**, live Ably 1v1 (verified +
+Built and working: 10 mini-games, **624 questions**, live Ably 1v1 (verified +
 hardened), Daily Challenge, local profile/stats, sound, share-as-image,
 live commentary, a 0–90' match timeline, **sudden-death stoppage time**, a
 lobby topic filter, deterministic per-team kit colours, a premium UI pass, and
-**86 unit tests** gating an auto-deploy pipeline.
+**95 unit tests** gating an auto-deploy pipeline.
 
 > "Football" always means **European football / soccer**. Never use real club
 > badges or player photos — visuals are gradients, pitch patterns, icons, type.
@@ -93,11 +93,19 @@ and a `pickOfType` line in `questionPicker.ts`. The bot (`botPlayer.ts`) and
 | `pitch_position` | vertical 4-line pitch grid | `options` = `PITCH_ZONES`, `correctAnswer` |
 | `odd_one_out` | prompt + 4 options | `options`, `correctAnswer` = the exception (the one that doesn't belong) |
 | `spot_the_lie` | prompt + 4 statements | `options` (4 statements), `correctAnswer` = the FALSE one |
+| `guess_the_number` | numeric slider (`min`–`max`) | `correctAnswer` (numeric string), `min`, `max`, `step?`, `unit?` — **scaled closeness scoring** (no options) |
 
-Per-match mix (10 Qs): `who_am_i ×2, career_path ×1, higher_lower ×1,
-club_country ×1, guess_year ×1, transfer_fee ×1, pitch_position ×1, odd_one_out ×1,
-spot_the_lie ×1`
-(`MATCH_TYPE_DISTRIBUTION` in `matchModes.ts`).
+Per-match mix (10 Qs): every type ×1 — `who_am_i, career_path, higher_lower,
+club_country, guess_year, transfer_fee, pitch_position, odd_one_out, spot_the_lie,
+guess_the_number` (`MATCH_TYPE_DISTRIBUTION` in `matchModes.ts`).
+
+**Guess the Number** is the one non-all-or-nothing type: the answer is a value on
+a slider, and points scale linearly with closeness (`guessAccuracy` in
+`scoring.ts`) — 10% off pays ~90% of the pot, 90% off pays ~10%, ≥100% off pays 0.
+A guess within `GUESS_NUMBER_CORRECT_WITHIN` (20%) counts as "correct" for
+streaks/stats; the streak bonus only applies then. The match engine derives
+`isCorrect`/`accuracy` for this type and feeds `accuracy` into
+`calculateQuestionPoints`.
 
 ## Scoring & match flow (`src/lib/scoring.ts`, pure)
 
@@ -213,12 +221,14 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-11 test files (`npm test`, 83 tests): `scoring`, `questionPicker` (distribution,
+11 test files (`npm test`, 95 tests): `scoring` (incl. **`guessAccuracy` +
+closeness-scaled points** for Guess the Number), `questionPicker` (distribution,
 difficulty, anti-bias shuffle, determinism, topic filter), `questions` (data
-integrity invariants above), `matchEngine` (lifecycle, scoring, **sudden death**,
-timeout) with fake timers, `commentary`, `teamIdentity`, `connectionMapping`,
-`dailyChallenge`, `seededRandom`, `shareResult`, `profileStats`. Add a test when
-you add an invariant or a rule.
+integrity invariants above, incl. numeric-in-range for `guess_the_number`),
+`matchEngine` (lifecycle, scoring, **sudden death**, timeout) with fake timers,
+`commentary`, `teamIdentity`, `connectionMapping`, `dailyChallenge`,
+`seededRandom`, `shareResult`, `profileStats`. Add a test when you add an
+invariant or a rule.
 
 ## Realtime / env
 
@@ -254,9 +264,9 @@ Gotchas:
 
 ## Status & open items
 
-- ✅ Done: 7 mini-games, 272 Qs, live Ably 1v1 + hardening, Daily Challenge,
+- ✅ Done: 10 mini-games, 624 Qs, live Ably 1v1 + hardening, Daily Challenge,
   profile/stats, sound, share (image+text), commentary, timeline, sudden death,
-  topic filter, kit colours, premium UI across all screens, 83 tests + CI.
+  topic filter, kit colours, premium UI across all screens, 95 tests + CI.
 - ⏳ Open: **online leaderboard** (needs a backend — Supabase; daily/stats are
   local only). **Supabase multiplayer path** built but not device-tested. A
   full **two-device multiplayer playtest** of the newer features is still owed.

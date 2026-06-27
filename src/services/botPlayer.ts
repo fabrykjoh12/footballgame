@@ -29,6 +29,8 @@ function wrongOption(question: Question): string | null {
       ? question.rightOption.name
       : question.leftOption.name;
   }
+  // Guess the Number has no option list; numeric guesses are handled inline.
+  if (question.type === 'guess_the_number') return null;
   const wrong = question.options.filter((o) => o !== question.correctAnswer);
   if (wrong.length === 0) return null;
   return wrong[Math.floor(Math.random() * wrong.length)];
@@ -53,6 +55,21 @@ export function decideBotAnswer(
     question.type === 'who_am_i'
       ? Math.min(Math.floor(delayMs / 5000), question.clues.length - 1)
       : 0;
+
+  // Guess the Number: the bot picks a value — close when "correct", anywhere
+  // in range otherwise (closeness scoring rewards near misses).
+  if (question.type === 'guess_the_number') {
+    const actual = Number(question.correctAnswer);
+    let guess: number;
+    if (willBeCorrect && Number.isFinite(actual)) {
+      const span = Math.max(1, Math.abs(actual) * 0.1);
+      guess = Math.round(actual + (Math.random() * 2 - 1) * span);
+    } else {
+      guess = randBetween(question.min, question.max + 1);
+    }
+    guess = Math.max(question.min, Math.min(question.max, guess));
+    return { selectedAnswer: String(guess), clueStage, timeTakenMs: delayMs, delayMs };
+  }
 
   const selectedAnswer = willBeCorrect
     ? question.correctAnswer

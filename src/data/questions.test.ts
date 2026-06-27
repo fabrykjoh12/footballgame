@@ -9,7 +9,8 @@ describe('question database integrity', () => {
 
   it('gives every multiple-choice question exactly 4 unique options incl. the answer', () => {
     for (const q of QUESTIONS) {
-      if (q.type === 'higher_lower') continue;
+      // higher_lower and guess_the_number have no 4-option list.
+      if (q.type === 'higher_lower' || q.type === 'guess_the_number') continue;
       expect(q.options, q.id).toHaveLength(4);
       expect(new Set(q.options).size, q.id).toBe(4);
       expect(q.options, q.id).toContain(q.correctAnswer);
@@ -90,13 +91,25 @@ describe('question database integrity', () => {
     expect(counts.pitch_position).toBeGreaterThanOrEqual(8);
     expect(counts.odd_one_out).toBeGreaterThanOrEqual(8);
     expect(counts.spot_the_lie).toBeGreaterThanOrEqual(8);
+    expect(counts.guess_the_number).toBeGreaterThanOrEqual(8);
+  });
+
+  it('keeps Guess the Number answers numeric and inside the slider range', () => {
+    for (const q of QUESTIONS) {
+      if (q.type !== 'guess_the_number') continue;
+      const v = Number(q.correctAnswer);
+      expect(Number.isFinite(v), q.id).toBe(true);
+      expect(q.min, q.id).toBeLessThan(q.max);
+      expect(v, q.id).toBeGreaterThanOrEqual(q.min);
+      expect(v, q.id).toBeLessThanOrEqual(q.max);
+    }
   });
 
   it('gives every type at least one question in each difficulty tier it needs', () => {
-    // spot_the_lie and odd_one_out are drawn once per match across all modes,
-    // so each must have a question available in every difficulty tier.
+    // These types are drawn once per match across all modes, so each must have
+    // a question available in every difficulty tier.
     const tiers = ['easy', 'medium', 'hard', 'nightmare'] as const;
-    for (const type of ['odd_one_out', 'spot_the_lie'] as const) {
+    for (const type of ['odd_one_out', 'spot_the_lie', 'guess_the_number'] as const) {
       for (const tier of tiers) {
         const n = QUESTIONS.filter(
           (q) => q.type === type && q.difficulty === tier,

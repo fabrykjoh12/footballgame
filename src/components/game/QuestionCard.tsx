@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import type { Question } from '../../types/game';
 import { calculateBasePoints } from '../../lib/scoring';
 import { Card } from '../ui/Card';
+import { Button } from '../ui/Button';
 import { Badge, DifficultyBadge } from '../ui/Badge';
 import { AnswerOption, type AnswerState } from './AnswerOption';
 import { PITCH_ZONES } from '../../lib/positions';
@@ -25,6 +27,7 @@ const TYPE_META = {
   pitch_position: { label: 'On the Pitch', Icon: IconPitch },
   odd_one_out: { label: 'Odd One Out', Icon: IconScale },
   spot_the_lie: { label: 'Spot the Lie', Icon: IconTrophy },
+  guess_the_number: { label: 'Guess the Number', Icon: IconCoins },
 } as const;
 
 interface QuestionCardProps {
@@ -117,6 +120,16 @@ export function QuestionCard({
           </p>
         </div>
       )}
+      {question.type === 'guess_the_number' && (
+        <div className="mb-4">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
+            Guess the number — closest wins
+          </h2>
+          <p className="text-lg font-semibold leading-snug sm:text-xl">
+            {question.prompt}
+          </p>
+        </div>
+      )}
 
       {/* Answers */}
       {question.type === 'higher_lower' ? (
@@ -142,6 +155,13 @@ export function QuestionCard({
         />
       ) : question.type === 'pitch_position' ? (
         <PitchGrid
+          selectedAnswer={selectedAnswer}
+          disabled={hasAnswered}
+          onAnswer={onAnswer}
+        />
+      ) : question.type === 'guess_the_number' ? (
+        <GuessNumberSlider
+          question={question}
           selectedAnswer={selectedAnswer}
           disabled={hasAnswered}
           onAnswer={onAnswer}
@@ -322,6 +342,56 @@ function HigherLowerPicker({
         <div className="flex items-center text-sm font-bold text-white/40">VS</div>
         {renderOption(question.rightOption.name)}
       </div>
+    </div>
+  );
+}
+
+function GuessNumberSlider({
+  question,
+  selectedAnswer,
+  disabled,
+  onAnswer,
+}: {
+  question: Extract<Question, { type: 'guess_the_number' }>;
+  selectedAnswer: string | null;
+  disabled: boolean;
+  onAnswer: (answer: string) => void;
+}) {
+  const mid = Math.round((question.min + question.max) / 2);
+  const [value, setValue] = useState(mid);
+  const locked = selectedAnswer != null;
+  const shown = locked ? Number(selectedAnswer) : value;
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="text-center">
+        <span className="font-display text-4xl font-bold text-pitch tabular-nums">
+          {shown}
+        </span>
+        {question.unit && (
+          <span className="ml-1.5 text-sm text-white/50">{question.unit}</span>
+        )}
+      </div>
+      <input
+        type="range"
+        min={question.min}
+        max={question.max}
+        step={question.step ?? 1}
+        value={shown}
+        disabled={disabled || locked}
+        onChange={(e) => setValue(Number(e.target.value))}
+        aria-label="Your guess"
+        className="w-full accent-pitch"
+      />
+      <div className="flex justify-between text-xs text-white/40">
+        <span>{question.min}</span>
+        <span>{question.max}</span>
+      </div>
+      {!locked && !disabled && (
+        <Button fullWidth onClick={() => onAnswer(String(value))}>
+          Lock it in
+        </Button>
+      )}
     </div>
   );
 }

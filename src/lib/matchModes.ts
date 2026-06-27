@@ -10,7 +10,7 @@ export const DEFAULT_QUESTION_DURATION_MS = 15_000;
 
 /** Question-type distribution for a 10-question match. */
 export const MATCH_TYPE_DISTRIBUTION = {
-  who_am_i: 2,
+  who_am_i: 1,
   career_path: 1,
   higher_lower: 1,
   club_country: 1,
@@ -19,6 +19,7 @@ export const MATCH_TYPE_DISTRIBUTION = {
   pitch_position: 1,
   odd_one_out: 1,
   spot_the_lie: 1,
+  guess_the_number: 1,
 } as const;
 
 export const MATCH_MODES: Record<MatchMode, MatchModeConfig> = {

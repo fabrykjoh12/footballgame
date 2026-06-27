@@ -17,7 +17,8 @@ export type QuestionType =
   | 'transfer_fee'
   | 'pitch_position'
   | 'odd_one_out'
-  | 'spot_the_lie';
+  | 'spot_the_lie'
+  | 'guess_the_number';
 
 export type Difficulty = 'easy' | 'medium' | 'hard' | 'nightmare';
 
@@ -130,6 +131,23 @@ export interface SpotTheLieQuestion extends BaseQuestion {
   correctAnswer: string;
 }
 
+/**
+ * "GUESS THE NUMBER" — a slider in [min, max]; points scale with closeness to
+ * the true value. No options; `correctAnswer` is the true value as a string.
+ */
+export interface GuessTheNumberQuestion extends BaseQuestion {
+  type: 'guess_the_number';
+  prompt: string;
+  /** True value as a string (e.g. "140"); points scale by how close you are. */
+  correctAnswer: string;
+  min: number;
+  max: number;
+  /** Slider step (default 1). */
+  step?: number;
+  /** Unit label shown by the value, e.g. "goals", "caps". */
+  unit?: string;
+}
+
 export type Question =
   | WhoAmIQuestion
   | CareerPathQuestion
@@ -139,7 +157,8 @@ export type Question =
   | TransferFeeQuestion
   | PitchPositionQuestion
   | OddOneOutQuestion
-  | SpotTheLieQuestion;
+  | SpotTheLieQuestion
+  | GuessTheNumberQuestion;
 
 /* ------------------------------------------------------------------ */
 /* Match settings & difficulty modes                                   */

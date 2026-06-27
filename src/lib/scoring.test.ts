@@ -8,6 +8,7 @@ import {
   getFootballEventLabel,
   getSoloPlayerEvents,
   accuracyPercent,
+  guessAccuracy,
 } from './scoring';
 
 describe('calculateBasePoints', () => {
@@ -94,6 +95,94 @@ describe('calculateQuestionPoints', () => {
     expect(r.speedBonus).toBe(300);
     expect(r.streakBonus).toBe(50);
     expect(r.total).toBe(1050);
+  });
+});
+
+describe('guessAccuracy (closeness for Guess the Number)', () => {
+  it('is 1 for an exact guess', () => {
+    expect(guessAccuracy(100, 100)).toBe(1);
+  });
+
+  it('scales linearly with the relative error', () => {
+    // 10% off → 0.9 of the pot, 90% off → 0.1 (the user spec).
+    expect(guessAccuracy(110, 100)).toBeCloseTo(0.9, 5);
+    expect(guessAccuracy(90, 100)).toBeCloseTo(0.9, 5);
+    expect(guessAccuracy(190, 100)).toBeCloseTo(0.1, 5);
+    expect(guessAccuracy(50, 100)).toBeCloseTo(0.5, 5);
+  });
+
+  it('floors at 0 once the guess is 100%+ off', () => {
+    expect(guessAccuracy(200, 100)).toBe(0);
+    expect(guessAccuracy(1000, 100)).toBe(0);
+    expect(guessAccuracy(0, 100)).toBe(0);
+  });
+
+  it('handles the zero-target and non-finite edge cases', () => {
+    expect(guessAccuracy(0, 0)).toBe(1);
+    expect(guessAccuracy(5, 0)).toBe(0);
+    expect(guessAccuracy(NaN, 100)).toBe(0);
+    expect(guessAccuracy(100, NaN)).toBe(0);
+  });
+});
+
+describe('calculateQuestionPoints with closeness (Guess the Number)', () => {
+  it('pays a scaled share of the pot for a near miss', () => {
+    // 10% off at the buzzer (no speed bonus): ~90% of base.
+    const r = calculateQuestionPoints({
+      type: 'guess_the_number',
+      isCorrect: true,
+      clueStage: 0,
+      timeTakenMs: 15000,
+      totalTimeMs: 15000,
+      newStreak: 1,
+      accuracy: 0.9,
+    });
+    expect(r.base).toBe(Math.round(800 * 0.9));
+    expect(r.speedBonus).toBe(0);
+    expect(r.total).toBe(r.base + r.speedBonus + r.streakBonus);
+  });
+
+  it('scales the speed bonus by closeness too', () => {
+    // Instant, 50% accuracy: half of base AND half of the speed bonus.
+    const r = calculateQuestionPoints({
+      type: 'guess_the_number',
+      isCorrect: false,
+      clueStage: 0,
+      timeTakenMs: 0,
+      totalTimeMs: 15000,
+      newStreak: 0,
+      accuracy: 0.5,
+    });
+    expect(r.base).toBe(Math.round(800 * 0.5));
+    expect(r.speedBonus).toBe(Math.round(300 * 0.5));
+    // Not close enough to count → no streak bonus.
+    expect(r.streakBonus).toBe(0);
+  });
+
+  it('awards the streak bonus only when the guess counts as correct', () => {
+    const close = calculateQuestionPoints({
+      type: 'guess_the_number',
+      isCorrect: true,
+      clueStage: 0,
+      timeTakenMs: 0,
+      totalTimeMs: 15000,
+      newStreak: 2,
+      accuracy: 0.95,
+    });
+    expect(close.streakBonus).toBe(50);
+  });
+
+  it('pays nothing when the guess is 100%+ off', () => {
+    const r = calculateQuestionPoints({
+      type: 'guess_the_number',
+      isCorrect: false,
+      clueStage: 0,
+      timeTakenMs: 0,
+      totalTimeMs: 15000,
+      newStreak: 0,
+      accuracy: 0,
+    });
+    expect(r).toEqual({ base: 0, speedBonus: 0, streakBonus: 0, total: 0 });
   });
 });
 

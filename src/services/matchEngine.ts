@@ -29,6 +29,8 @@ import {
   calculateQuestionPoints,
   getFootballEventLabel,
   getSoloPlayerEvents,
+  guessAccuracy,
+  GUESS_NUMBER_CORRECT_WITHIN,
 } from '../lib/scoring';
 
 /** Delay before the first question after the host hits start. */
@@ -195,7 +197,11 @@ export class MatchEngine {
     const existing = this.room.answers[question.id] ?? [];
     if (existing.some((a) => a.playerId === playerId)) return; // one answer per player
 
-    const isCorrect = input.selectedAnswer === question.correctAnswer;
+    const isCorrect =
+      question.type === 'guess_the_number'
+        ? guessAccuracy(Number(input.selectedAnswer), Number(question.correctAnswer)) >=
+          1 - GUESS_NUMBER_CORRECT_WITHIN
+        : input.selectedAnswer === question.correctAnswer;
     const answers = { ...this.room.answers };
     answers[question.id] = [
       ...existing,
@@ -252,6 +258,11 @@ export class MatchEngine {
       const clueStage = ans?.clueStage ?? this.maxClueStage(question);
 
       const newStreak = isCorrect ? player.streak + 1 : 0;
+      // Guess the Number pays partial credit by closeness to the true value.
+      const accuracy =
+        question.type === 'guess_the_number' && selectedAnswer != null
+          ? guessAccuracy(Number(selectedAnswer), Number(question.correctAnswer))
+          : undefined;
       const breakdown = calculateQuestionPoints({
         type: question.type,
         isCorrect,
@@ -259,6 +270,7 @@ export class MatchEngine {
         timeTakenMs,
         totalTimeMs: totalTime,
         newStreak,
+        accuracy,
       });
 
       const newScore = player.score + breakdown.total;
