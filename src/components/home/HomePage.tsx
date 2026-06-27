@@ -47,7 +47,13 @@ const FEATURES = [
   },
 ];
 
-export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
+export function HomePage({
+  onOpenCareer,
+  onOpenModes,
+}: {
+  onOpenCareer: () => void;
+  onOpenModes: () => void;
+}) {
   const {
     createRoom,
     joinRoom,
@@ -329,6 +335,30 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
           )}
         </Card>
       )}
+
+      {/* Game Modes (solo arcade) */}
+      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+        <div className="mb-2 flex items-center gap-2">
+          <IconBolt className="h-5 w-5 text-pitch" />
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
+            Game Modes
+          </h2>
+          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
+            Singleplayer
+          </span>
+        </div>
+        <p className="text-xs leading-relaxed text-white/55">
+          Solo challenges: <span className="font-semibold text-white/75">Survival</span> (one life,
+          rising difficulty), <span className="font-semibold text-white/75">Time Attack</span> (60s
+          sprint) and <span className="font-semibold text-white/75">The Gauntlet</span> (one of every
+          mini-game).
+        </p>
+        <div className="mt-3">
+          <Button fullWidth onClick={onOpenModes}>
+            Browse modes <IconArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </Card>
 
       {/* Achievements + leaderboard */}
       <TrophyCabinet />

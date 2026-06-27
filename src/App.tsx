@@ -10,9 +10,10 @@ import { GamePage } from './components/game/GamePage';
 import { FinalResult } from './components/game/FinalResult';
 import { CareerHub } from './components/career/CareerHub';
 import { CareerResult } from './components/career/CareerResult';
+import { GameModesHub } from './components/solo/GameModesHub';
 
 /** Top-level singleplayer view when no match is in progress. */
-type View = 'home' | 'career';
+type View = 'home' | 'career' | 'modes';
 
 /** Brief gate while a signed-in session's progress is restored. */
 function SyncSplash() {
@@ -48,7 +49,10 @@ function Screens() {
   }
 
   if (view === 'career') return <CareerHub onExit={() => setView('home')} />;
-  return <HomePage onOpenCareer={() => setView('career')} />;
+  if (view === 'modes') return <GameModesHub onExit={() => setView('home')} />;
+  return (
+    <HomePage onOpenCareer={() => setView('career')} onOpenModes={() => setView('modes')} />
+  );
 }
 
 export default function App() {
