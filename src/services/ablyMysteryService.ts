@@ -220,7 +220,12 @@ export class AblyMysteryService {
       if (this.host && this.state) void this.send('snapshot', redactSecrets(this.state));
     });
     channel.subscribe('action', (msg) => {
-      if (this.host) this.applyAction(msg.data as MysteryAction);
+      if (!this.host) return;
+      const action = msg.data as MysteryAction;
+      // Anti-spoof: a guest may only act as itself (Ably stamps the publisher's
+      // clientId == player id). Prevents impersonating the host's turn/answer.
+      if (msg.clientId && !this.senderAllowed(action, msg.clientId)) return;
+      this.applyAction(action);
     });
 
     await channel.attach();
@@ -251,6 +256,28 @@ export class AblyMysteryService {
     const host: DuelPlayer = { id: this.localId, name: this.localName, isCpu: false };
     this.state = createMysteryGame({ settings: this.settings, players: [host, guest] });
     this.broadcast();
+  }
+
+  /** Whether `clientId` is permitted to perform `action` (anti-impersonation). */
+  private senderAllowed(action: MysteryAction, clientId: string): boolean {
+    const s = this.state;
+    if (!s) return false;
+    switch (action.kind) {
+      case 'lock':
+      case 'askVerified':
+      case 'askFree':
+      case 'guess':
+      case 'skip':
+        return action.playerId === clientId;
+      case 'answer': {
+        // Only the player being asked may answer the pending question.
+        const askerId = s.pendingFree?.askerId ?? s.pendingVerified?.askerId;
+        if (askerId == null) return false;
+        return s.players.some((p) => p.id !== askerId && p.id === clientId);
+      }
+      case 'nextRound':
+        return s.players.some((p) => p.id === clientId);
+    }
   }
 
   private applyAction(action: MysteryAction): void {

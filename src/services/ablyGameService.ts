@@ -252,6 +252,10 @@ export class AblyGameService implements GameService {
     channel.subscribe('answer', (msg) => {
       if (this.isHost) {
         const p = msg.data as { playerId: string; input: SubmitAnswerInput };
+        // Anti-spoof: a guest may only submit answers as itself. Ably stamps
+        // each message with the publisher's clientId (== the player's id), so
+        // reject any answer that claims a different player.
+        if (msg.clientId && msg.clientId !== p.playerId) return;
         this.engine?.recordAnswer(p.playerId, p.input);
       }
     });
