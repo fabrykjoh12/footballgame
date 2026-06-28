@@ -9,6 +9,7 @@ import { getPlayerTitle } from './playerTitle';
 import { notifyProgressChanged } from './progress';
 import { recordSeenQuestions } from './questionHistory';
 import { recordHeadToHead } from './headToHead';
+import { recordOpponent } from './recentOpponents';
 
 const KEY = 'bk_profile_v1';
 
@@ -81,6 +82,8 @@ export function recordMatchResult(room: Room, localPlayerId: string): ProfileSta
   recordHeadToHead(room, localPlayerId);
 
   const opp = room.players.find((p) => p.id !== localPlayerId);
+  // Remember real (non-bot) opponents so they can be added / rematched.
+  if (opp && !opp.isBot && opp.name.trim()) recordOpponent(opp.name);
   let outcome: 'win' | 'loss' | 'draw' = 'draw';
   if (opp) {
     if (me.goals !== opp.goals) outcome = me.goals > opp.goals ? 'win' : 'loss';

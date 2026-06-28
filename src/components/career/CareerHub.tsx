@@ -15,6 +15,14 @@ import {
   ROUNDS_PER_SEASON,
   type CareerState,
 } from '../../lib/career';
+import {
+  seasonObjectives,
+  boardConfidence,
+  managerReputation,
+  seasonRival,
+  rivalProfile,
+  type Objective,
+} from '../../lib/careerProgression';
 import { teamName } from '../../lib/teamName';
 import { teamIdentity } from '../../lib/teamIdentity';
 import { LeagueTable } from './LeagueTable';
@@ -109,6 +117,9 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
         )}
       </Card>
 
+      {/* Board: manager reputation, confidence + season objectives */}
+      <BoardCard career={career} />
+
       {/* Season-over / champion panel, or the next fixture */}
       {seasonOver ? (
         <SeasonSummary career={career} onStartNext={startNext} disabled={connecting} />
@@ -125,6 +136,24 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
             <span className="font-display text-lg font-bold text-white/40">vs</span>
             <ClubChip name={fixture.opponent.name} />
           </div>
+          {(() => {
+            const rival = seasonRival(career);
+            const isDerby = rival?.id === fixture.opponent.id;
+            const profile = rivalProfile(fixture.opponent, career.seed);
+            return (
+              <div className="mb-3 rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2 text-center">
+                {isDerby && (
+                  <Badge tone="danger" className="mb-1.5">
+                    🔥 Rivalry match
+                  </Badge>
+                )}
+                <div className="text-xs font-semibold text-white/70">
+                  {profile.playStyle}
+                </div>
+                <div className="mt-0.5 text-[11px] text-white/45">{profile.personality}</div>
+              </div>
+            );
+          })()}
           <p className="mb-3 text-center text-xs text-white/45">
             {division.mode === 'nightmare'
               ? 'Top-flight football — nightmare questions, fast clock.'
@@ -281,6 +310,70 @@ function NewCareer({
           <IconBolt className="h-4 w-4" /> Begin in League Two
         </Button>
       </Card>
+    </div>
+  );
+}
+
+function BoardCard({ career }: { career: CareerState }) {
+  const objectives = seasonObjectives(career);
+  const confidence = boardConfidence(career);
+  const rep = managerReputation(career);
+
+  const meterColor =
+    confidence.value >= 70 ? 'bg-pitch' : confidence.value >= 45 ? 'bg-gold' : 'bg-danger';
+
+  return (
+    <Card className="p-4">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-white/70">
+          The boardroom
+        </h2>
+        <Badge tone="gold">
+          Lv {rep.level} · {rep.title}
+        </Badge>
+      </div>
+
+      {/* Board confidence meter */}
+      <div className="mb-3">
+        <div className="mb-1 flex items-center justify-between text-[11px] text-white/50">
+          <span>Board confidence</span>
+          <span className="font-semibold text-white/75">{confidence.label}</span>
+        </div>
+        <div className="h-2 overflow-hidden rounded-full bg-white/10">
+          <div
+            className={['h-full rounded-full transition-[width] duration-500', meterColor].join(' ')}
+            style={{ width: `${confidence.value}%` }}
+            role="img"
+            aria-label={`Board confidence ${confidence.value} out of 100`}
+          />
+        </div>
+      </div>
+
+      {/* Season objectives */}
+      <div className="space-y-1.5">
+        {objectives.map((o) => (
+          <ObjectiveRow key={o.id} objective={o} />
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+function ObjectiveRow({ objective }: { objective: Objective }) {
+  const icon = objective.status === 'met' ? '✅' : objective.status === 'failed' ? '❌' : '◻️';
+  const tone =
+    objective.status === 'met'
+      ? 'text-pitch'
+      : objective.status === 'failed'
+        ? 'text-danger'
+        : 'text-white/70';
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <span aria-hidden>{icon}</span>
+      <span className={['min-w-0 flex-1 truncate', tone].join(' ')}>{objective.label}</span>
+      {objective.progress && (
+        <span className="shrink-0 font-mono text-[11px] text-white/40">{objective.progress}</span>
+      )}
     </div>
   );
 }

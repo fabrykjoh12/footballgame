@@ -2,24 +2,33 @@
  * Renders the final result to a square PNG "matchday card" on a <canvas>,
  * then shares it via the native share sheet (mobile) or downloads it
  * (desktop). No image assets and no dependencies — everything is drawn.
+ *
+ * Flavour (winner banner, accolade ribbon, biggest moment, best category)
+ * comes from the shared `shareCard` model, so the image matches the text.
  */
 
 import type { Room } from '../types/game';
-import { teamName } from './teamName';
-import { MATCH_MODES } from './matchModes';
 import { accuracyPercent } from './scoring';
+import { buildShareCard, type ShareContext } from './shareCard';
 
 const SIZE = 1080;
 
-export async function renderResultCard(room: Room): Promise<Blob | null> {
+export async function renderResultCard(
+  room: Room,
+  localPlayerId?: string,
+  ctx?: ShareContext,
+): Promise<Blob | null> {
   const [a, b] = room.players;
   if (!a || !b) return null;
+  const model = buildShareCard(room, localPlayerId, ctx);
+  if (!model) return null;
 
   const canvas = document.createElement('canvas');
   canvas.width = SIZE;
   canvas.height = SIZE;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
+  const ctx2d = canvas.getContext('2d');
+  if (!ctx2d) return null;
+  const c = ctx2d;
 
   // Wait for the brand fonts so the card matches the app.
   try {
@@ -29,42 +38,31 @@ export async function renderResultCard(room: Room): Promise<Blob | null> {
   }
 
   const total = room.selectedQuestions.length;
-  const winner =
-    a.goals !== b.goals
-      ? a.goals > b.goals
-        ? a
-        : b
-      : a.score !== b.score
-        ? a.score > b.score
-          ? a
-          : b
-        : null;
-
   const center = SIZE / 2;
   const sans = 'system-ui, sans-serif';
   const display = '"Space Grotesk", system-ui, sans-serif';
 
   // Background gradient.
-  const grad = ctx.createLinearGradient(0, 0, 0, SIZE);
+  const grad = c.createLinearGradient(0, 0, 0, SIZE);
   grad.addColorStop(0, '#0b1530');
   grad.addColorStop(1, '#05070d');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, SIZE, SIZE);
+  c.fillStyle = grad;
+  c.fillRect(0, 0, SIZE, SIZE);
 
   // Faint pitch markings.
-  ctx.strokeStyle = 'rgba(22,255,122,0.16)';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(56, 56, SIZE - 112, SIZE - 112);
-  ctx.beginPath();
-  ctx.moveTo(56, center);
-  ctx.lineTo(SIZE - 56, center);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(center, center, 130, 0, Math.PI * 2);
-  ctx.stroke();
+  c.strokeStyle = 'rgba(22,255,122,0.16)';
+  c.lineWidth = 3;
+  c.strokeRect(56, 56, SIZE - 112, SIZE - 112);
+  c.beginPath();
+  c.moveTo(56, center);
+  c.lineTo(SIZE - 56, center);
+  c.stroke();
+  c.beginPath();
+  c.arc(center, center, 130, 0, Math.PI * 2);
+  c.stroke();
 
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
+  c.textAlign = 'center';
+  c.textBaseline = 'middle';
 
   const text = (
     s: string,
@@ -74,72 +72,105 @@ export async function renderResultCard(room: Room): Promise<Blob | null> {
     font = display,
     weight = '700',
   ) => {
-    ctx.fillStyle = color;
-    ctx.font = `${weight} ${size}px ${font}`;
-    ctx.fillText(s, center, y);
+    c.fillStyle = color;
+    c.font = `${weight} ${size}px ${font}`;
+    c.fillText(s, center, y);
   };
 
   // Header.
-  ctx.save();
-  ctx.letterSpacing = '8px';
-  text('BALL KNOWLEDGE', 150, 40, '#16ff7a');
-  ctx.restore();
-  text('FULL TIME', 205, 24, 'rgba(255,255,255,0.45)', sans, '600');
+  c.save();
+  c.letterSpacing = '8px';
+  text('BALL KNOWLEDGE', 140, 40, '#16ff7a');
+  c.restore();
+  text('FULL TIME', 192, 24, 'rgba(255,255,255,0.45)', sans, '600');
+
+  // Accolade ribbon (perfect / comeback / nightmare / late winner / daily…).
+  if (model.accolade) {
+    const label = `${model.accolade.emoji}  ${model.accolade.label}`;
+    c.font = `800 30px ${display}`;
+    const w = c.measureText(label).width + 64;
+    const x = center - w / 2;
+    const y = 232;
+    c.fillStyle = 'rgba(255,210,74,0.16)';
+    roundRect(c, x, y - 30, w, 60, 30);
+    c.fill();
+    c.strokeStyle = 'rgba(255,210,74,0.5)';
+    c.lineWidth = 2;
+    roundRect(c, x, y - 30, w, 60, 30);
+    c.stroke();
+    text(label, y, 30, '#ffd24a', display, '800');
+    text(model.accolade.sub, y + 52, 22, 'rgba(255,255,255,0.55)', sans, '500');
+  }
 
   // Teams + score.
-  text(teamName(a.name), 320, 52, '#ffffff');
-  text(`${a.goals} – ${b.goals}`, 500, 210, '#16ff7a');
-  text(teamName(b.name), 690, 52, '#ffffff');
+  text(model.teamA, 340, 50, '#ffffff');
+  text(`${model.goalsA} – ${model.goalsB}`, 510, 200, '#16ff7a');
+  text(model.teamB, 690, 50, '#ffffff');
 
-  text(`${a.score} – ${b.score} points`, 775, 30, 'rgba(255,255,255,0.5)', sans, '500');
+  text(`${model.pointsA} – ${model.pointsB} points`, 770, 30, 'rgba(255,255,255,0.5)', sans, '500');
 
-  // Result banner (note when a level scoreline was decided on points).
-  const levelOnGoals = a.goals === b.goals;
-  const banner = !winner
-    ? 'Honours even — a draw'
-    : levelOnGoals
-      ? `${teamName(winner.name)} win on points`
-      : `${teamName(winner.name)} win`;
-  text(banner, 860, 42, '#ffd24a');
+  // Result banner + biggest moment.
+  text(model.resultBanner, 840, 42, '#ffd24a');
+  if (model.momentLine) {
+    text(model.momentLine, 888, 26, 'rgba(255,255,255,0.6)', sans, '500');
+  }
 
-  // Compact stats.
+  // Compact two-up stats.
   const stat = (label: string, va: string, vb: string, y: number) => {
-    ctx.font = `600 26px ${sans}`;
-    ctx.fillStyle = 'rgba(255,255,255,0.45)';
-    ctx.fillText(label, center, y);
-    ctx.font = `700 28px ${display}`;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(`${va}   ·   ${vb}`, center, y + 34);
+    c.font = `600 24px ${sans}`;
+    c.fillStyle = 'rgba(255,255,255,0.45)';
+    c.fillText(label, center, y);
+    c.font = `700 26px ${display}`;
+    c.fillStyle = '#ffffff';
+    c.fillText(`${va}   ·   ${vb}`, center, y + 32);
   };
   stat(
     'ACCURACY',
     `${accuracyPercent(a.correctAnswers, total)}%`,
     `${accuracyPercent(b.correctAnswers, total)}%`,
-    935,
+    948,
   );
-  stat('BEST STREAK', String(a.bestStreak), String(b.bestStreak), 1000);
+  stat('BEST STREAK', String(a.bestStreak), String(b.bestStreak), 1010);
 
-  // Footer: mode tagline + where to play (drives shares back to the game).
-  text(
-    `${MATCH_MODES[room.settings.mode].label}  ·  6 mini-games  ·  Prove your football IQ`,
-    1036,
-    21,
-    'rgba(255,255,255,0.4)',
-    sans,
-    '500',
-  );
+  // Footer: best category + mode, then the play URL.
+  const footerBits = [model.bestCategory ? `Best: ${model.bestCategory}` : null, model.modeLabel]
+    .filter(Boolean)
+    .join('  ·  ');
+  text(footerBits, 1046, 21, 'rgba(255,255,255,0.4)', sans, '500');
   const playUrl = `${window.location.host}${window.location.pathname}`.replace(/\/$/, '');
-  if (playUrl) text(playUrl, 1062, 22, '#16ff7a', sans, '600');
+  if (playUrl) text(playUrl, 1066, 20, '#16ff7a', sans, '600');
 
   return await new Promise<Blob | null>((resolve) =>
     canvas.toBlob((blob) => resolve(blob), 'image/png'),
   );
 }
 
+function roundRect(
+  c: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
+  const radius = Math.min(r, w / 2, h / 2);
+  c.beginPath();
+  c.moveTo(x + radius, y);
+  c.arcTo(x + w, y, x + w, y + h, radius);
+  c.arcTo(x + w, y + h, x, y + h, radius);
+  c.arcTo(x, y + h, x, y, radius);
+  c.arcTo(x, y, x + w, y, radius);
+  c.closePath();
+}
+
 export type ShareImageResult = 'shared' | 'downloaded' | 'failed';
 
-export async function shareResultImage(room: Room): Promise<ShareImageResult> {
-  const blob = await renderResultCard(room);
+export async function shareResultImage(
+  room: Room,
+  localPlayerId?: string,
+  ctx?: ShareContext,
+): Promise<ShareImageResult> {
+  const blob = await renderResultCard(room, localPlayerId, ctx);
   if (!blob) return 'failed';
 
   const file = new File([blob], 'ball-knowledge.png', { type: 'image/png' });

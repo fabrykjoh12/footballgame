@@ -36,9 +36,31 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
 }
 
+function normalizeKey(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+/**
+ * Explicit kit-colour overrides by (normalized) club name. A created club
+ * identity registers its chosen colour here so its kit shows everywhere the
+ * derived palette is used (scoreboard, timeline, post-match) without threading
+ * the colour through every call site. Names not registered fall back to the
+ * deterministic palette below.
+ */
+const overrides = new Map<string, string>();
+
+/** Register (or clear, with null) an explicit kit colour for a club name. */
+export function registerClubKit(name: string, color: string | null): void {
+  const key = normalizeKey(name);
+  if (!key) return;
+  if (color) overrides.set(key, color);
+  else overrides.delete(key);
+}
+
 export function teamIdentity(name: string, salt = 0): TeamIdentity {
-  const key = (name.trim().toLowerCase() || 'player') + (salt ? `~${salt}` : '');
-  const color = KITS[hashString(key) % KITS.length];
+  const override = salt === 0 ? overrides.get(normalizeKey(name)) : undefined;
+  const key = (normalizeKey(name) || 'player') + (salt ? `~${salt}` : '');
+  const color = override ?? KITS[hashString(key) % KITS.length];
   return { color, soft: hexToRgba(color, 0.16), ring: hexToRgba(color, 0.55) };
 }
 

@@ -25,7 +25,7 @@ import {
   type GameServiceOptions,
   type MultiplayerProvider,
 } from '../services/gameService';
-import { dailySettings } from '../lib/dailyChallenge';
+import { dailySettings, dailyRival } from '../lib/dailyChallenge';
 
 interface GameContextValue {
   room: Room | null;
@@ -161,7 +161,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
   );
   const playDaily = useCallback(
     async (name: string) => {
-      await startSession('demo', name);
+      // Face the day's deterministic fictional rival club.
+      await startSession('demo', name, undefined, { botName: dailyRival() });
       // Fixed mode + today's seed → the same match for everyone, then kick off.
       await serviceRef.current?.updateSettings(dailySettings());
       await serviceRef.current?.startMatch();

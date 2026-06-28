@@ -11,6 +11,8 @@ import type { DailyState } from './dailyChallenge';
 import { getDailyState } from './dailyChallenge';
 import type { HeadToHeadStore } from './headToHead';
 import { getHeadToHead } from './headToHead';
+import type { FeatId } from './feats';
+import { getFeats } from './feats';
 
 const KEY = 'bk_achievements_v1';
 
@@ -18,6 +20,7 @@ export interface AchievementContext {
   profile: ProfileStats;
   daily: DailyState;
   h2h: HeadToHeadStore;
+  feats: Set<FeatId>;
 }
 
 export interface AchievementDef {
@@ -95,6 +98,62 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     earned: (c) => c.daily.streak >= 7,
   },
   {
+    id: 'hat_trick_hero',
+    title: 'Hat-Trick Hero',
+    description: 'Land a 3-answer streak in a match.',
+    icon: '🎩',
+    earned: (c) => c.feats.has('hat_trick_answers'),
+  },
+  {
+    id: 'clean_sheet',
+    title: 'Clean Sheet',
+    description: 'Win without conceding a goal.',
+    icon: '🧤',
+    earned: (c) => c.feats.has('clean_sheet'),
+  },
+  {
+    id: 'win_on_points',
+    title: 'Edged It',
+    description: 'Win a match on points after a level scoreline.',
+    icon: '⚖️',
+    earned: (c) => c.feats.has('win_on_points'),
+  },
+  {
+    id: 'perfect_match',
+    title: 'Perfect Match',
+    description: 'Answer every question correctly.',
+    icon: '💎',
+    earned: (c) => c.feats.has('perfect_match'),
+  },
+  {
+    id: 'five_star',
+    title: 'Five-Star Performance',
+    description: 'Win a match scoring the maximum five goals.',
+    icon: '⭐',
+    earned: (c) => c.feats.has('five_star'),
+  },
+  {
+    id: 'comeback_king',
+    title: 'Comeback King',
+    description: 'Win after trailing by two goals.',
+    icon: '🔄',
+    earned: (c) => c.feats.has('comeback'),
+  },
+  {
+    id: 'stoppage_hero',
+    title: 'Stoppage-Time Hero',
+    description: 'Win a match in sudden-death stoppage time.',
+    icon: '⏱️',
+    earned: (c) => c.feats.has('stoppage_winner'),
+  },
+  {
+    id: 'nightmare_survivor',
+    title: 'Nightmare Survivor',
+    description: 'Win a match on Nightmare difficulty.',
+    icon: '😈',
+    earned: (c) => c.feats.has('nightmare_win'),
+  },
+  {
     id: 'contender',
     title: 'Title Contender',
     description: 'Reach a 60% win rate over 10+ matches.',
@@ -150,7 +209,12 @@ function writeStored(ids: string[]): void {
 
 /** Build the context from current local progress. */
 export function currentContext(): AchievementContext {
-  return { profile: getProfileStats(), daily: getDailyState(), h2h: getHeadToHead() };
+  return {
+    profile: getProfileStats(),
+    daily: getDailyState(),
+    h2h: getHeadToHead(),
+    feats: getFeats(),
+  };
 }
 
 /** The full list with an `unlocked` flag, for rendering the badge grid. */

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Player, PlayerResult, QuestionResult } from '../../types/game';
 import { RESULT_AUTOADVANCE_MS } from '../../services/matchEngine';
 import { teamName } from '../../lib/teamName';
+import { describeAttack, type AttackTone } from '../../lib/attackFraming';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -13,8 +14,20 @@ interface ResultRevealProps {
   localPlayerId: string;
   isHost: boolean;
   isLastQuestion: boolean;
+  /** Per-question time budget — drives Big Chance vs Half Chance framing. */
+  questionDurationMs?: number;
+  /** Match minute this question landed on — drives late-game framing. */
+  matchMinute?: number;
   onNext: () => void;
 }
+
+/** Map an attack-phase tone onto a Badge tone. */
+const PHASE_TONE: Record<AttackTone, 'pitch' | 'gold' | 'muted' | 'danger'> = {
+  goal: 'gold',
+  good: 'pitch',
+  neutral: 'muted',
+  bad: 'danger',
+};
 
 export function ResultReveal({
   result,
@@ -22,6 +35,8 @@ export function ResultReveal({
   localPlayerId,
   isHost,
   isLastQuestion,
+  questionDurationMs = 15000,
+  matchMinute,
   onNext,
 }: ResultRevealProps) {
   const [secondsLeft, setSecondsLeft] = useState(
@@ -67,12 +82,18 @@ export function ResultReveal({
             label={teamName(local.name)}
             isYou
             result={result.results[local.id]}
+            questionDurationMs={questionDurationMs}
+            matchMinute={matchMinute}
+            seed={0}
           />
         )}
         {opponent && (
           <PlayerResultCard
             label={teamName(opponent.name)}
             result={result.results[opponent.id]}
+            questionDurationMs={questionDurationMs}
+            matchMinute={matchMinute}
+            seed={1}
           />
         )}
       </div>
@@ -126,13 +147,33 @@ function PlayerResultCard({
   label,
   result,
   isYou = false,
+  questionDurationMs,
+  matchMinute,
+  seed = 0,
 }: {
   label: string;
   result: PlayerResult | undefined;
   isYou?: boolean;
+  questionDurationMs: number;
+  matchMinute?: number;
+  seed?: number;
 }) {
   if (!result) return null;
   const { isCorrect, selectedAnswer, breakdown, events } = result;
+
+  const phase = describeAttack(
+    {
+      scoredGoal: result.scoredGoal,
+      isCorrect,
+      answered: selectedAnswer !== null,
+      pointsEarned: breakdown.total,
+      streakBonus: breakdown.streakBonus,
+      timeTakenMs: result.timeTakenMs,
+      totalTimeMs: questionDurationMs,
+      minute: matchMinute,
+    },
+    seed,
+  );
 
   return (
     <Card
@@ -144,6 +185,12 @@ function PlayerResultCard({
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="truncate text-sm font-semibold">{label}</span>
         {isYou && <Badge tone="pitch">You</Badge>}
+      </div>
+
+      {/* Football framing: every answer is an attack phase. */}
+      <div className="mb-2.5">
+        <Badge tone={PHASE_TONE[phase.tone]}>{phase.label}</Badge>
+        <p className="mt-1.5 text-[11px] leading-snug text-white/55">{phase.detail}</p>
       </div>
 
       <div className="flex items-center gap-2">

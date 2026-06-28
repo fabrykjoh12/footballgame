@@ -28,6 +28,10 @@ function hash(str: string): number {
 
 export function teamName(playerName: string): string {
   const name = (playerName || 'Player').trim();
+  // A multi-word name is already a full club name (a created club identity, a
+  // named rival, etc.) — use it verbatim. Only single-word handles ("Sara")
+  // get a deterministic club suffix appended.
+  if (/\s/.test(name)) return name;
   const suffix = SUFFIXES[hash(name) % SUFFIXES.length];
   return `${name} ${suffix}`;
 }

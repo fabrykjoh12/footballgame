@@ -5,6 +5,7 @@ import { play } from '../../lib/sound';
 import { teamName } from '../../lib/teamName';
 import { recordMatchResult } from '../../lib/profileStats';
 import { refreshAchievements } from '../../lib/achievements';
+import { recordMatchFeats } from '../../lib/feats';
 import {
   getCupSave,
   getCup,
@@ -18,9 +19,10 @@ import {
   type CupRound,
   type CupRun,
 } from '../../lib/cup';
+import { shareResultImage } from '../../lib/shareImage';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { IconArrowRight, IconTrophy, IconBack } from '../ui/icons';
+import { IconArrowRight, IconTrophy, IconBack, IconShare, IconCheck } from '../ui/icons';
 
 interface Resolved {
   def: CupDef;
@@ -34,6 +36,7 @@ export function CupResult() {
   const { room, localPlayerId, leaveRoom, playCareer } = useGame();
   const [name] = useLocalStorage('bk_name', '');
   const [resolved, setResolved] = useState<Resolved | null>(null);
+  const [imgState, setImgState] = useState<'idle' | 'working' | 'done'>('idle');
   const recorded = useRef(false);
 
   const me = room?.players.find((p) => p.id === localPlayerId) ?? null;
@@ -44,6 +47,7 @@ export function CupResult() {
     recorded.current = true;
 
     recordMatchResult(room, localPlayerId);
+    recordMatchFeats(room, localPlayerId);
     refreshAchievements();
 
     const before = getCupSave();
@@ -76,6 +80,15 @@ export function CupResult() {
 
   const status = resolved?.run.status;
   const nextRound = resolved ? currentRound(resolved.run, resolved.def) : null;
+
+  const shareImg = async () => {
+    setImgState('working');
+    const ctx =
+      status === 'won' && resolved ? { cupWin: { cupName: resolved.def.name } } : undefined;
+    const result = await shareResultImage(room, localPlayerId, ctx);
+    setImgState(result === 'failed' ? 'idle' : 'done');
+    if (result !== 'failed') setTimeout(() => setImgState('idle'), 2200);
+  };
 
   return (
     <div className="flex flex-col gap-4 py-4 animate-fade-in">
@@ -117,6 +130,12 @@ export function CupResult() {
           </p>
         )}
       </Card>
+
+      {/* Share */}
+      <Button variant="secondary" fullWidth onClick={shareImg} disabled={imgState === 'working'}>
+        {imgState === 'done' ? <IconCheck className="h-4 w-4 text-pitch" /> : <IconShare className="h-4 w-4" />}
+        {imgState === 'working' ? 'Rendering…' : imgState === 'done' ? 'Shared!' : 'Share result'}
+      </Button>
 
       {/* Actions */}
       {status === 'playing' && nextRound ? (

@@ -4,8 +4,10 @@
  * normal local game whose settings carry the day's seed.
  */
 
-import type { MatchSettings, Room } from '../types/game';
+import type { Category, MatchSettings, Room } from '../types/game';
 import { dailySeed, previousDay, todayString } from './seededRandom';
+import { dailyRivalName } from './dailyRival';
+import { summarizeMatch } from './matchStats';
 import { notifyProgressChanged } from './progress';
 
 const KEY = 'bk_daily_v1';
@@ -17,6 +19,11 @@ export interface DailyState {
   lastScore: number;
   lastOutcome: 'win' | 'loss' | 'draw' | null;
   playsTotal: number;
+  /** Goals scored / conceded in today's official result (for the scoreline + share). */
+  lastGoalsFor: number;
+  lastGoalsAgainst: number;
+  /** Best-performing category in today's official result. */
+  lastBestCategory: Category | null;
 }
 
 const EMPTY: DailyState = {
@@ -26,6 +33,9 @@ const EMPTY: DailyState = {
   lastScore: 0,
   lastOutcome: null,
   playsTotal: 0,
+  lastGoalsFor: 0,
+  lastGoalsAgainst: 0,
+  lastBestCategory: null,
 };
 
 export function getDailyState(): DailyState {
@@ -75,6 +85,11 @@ export function dailySettings(dateStr: string = todayString()): Partial<MatchSet
   };
 }
 
+/** The fictional rival club you face in today's Daily Rival Match. */
+export function dailyRival(dateStr: string = todayString()): string {
+  return dailyRivalName(dateStr);
+}
+
 /** Record a finished Daily Challenge for the local player. Once per day. */
 export function recordDailyResult(room: Room, localPlayerId: string): DailyState {
   const state = getDailyState();
@@ -91,6 +106,8 @@ export function recordDailyResult(room: Room, localPlayerId: string): DailyState
     else if (me.score !== opp.score) outcome = me.score > opp.score ? 'win' : 'loss';
   }
 
+  const summary = summarizeMatch(room);
+
   const next: DailyState = {
     lastPlayedDate: today,
     streak: nextStreak(state.lastPlayedDate, state.streak, today),
@@ -98,6 +115,9 @@ export function recordDailyResult(room: Room, localPlayerId: string): DailyState
     lastScore: me.score,
     lastOutcome: outcome,
     playsTotal: state.playsTotal + 1,
+    lastGoalsFor: me.goals,
+    lastGoalsAgainst: opp?.goals ?? 0,
+    lastBestCategory: summary.players[me.id]?.bestCategory?.category ?? null,
   };
   save(next);
   return next;

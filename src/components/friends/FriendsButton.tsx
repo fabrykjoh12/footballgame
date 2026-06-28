@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useFriends } from '../../context/FriendsProvider';
 import { formatFriendCode, isValidFriendCode } from '../../lib/friends';
+import { getRecentOpponents } from '../../lib/recentOpponents';
+import { getOpponentRecord, h2hSummary, h2hKey } from '../../lib/headToHead';
 import { Button } from '../ui/Button';
 import { IconUsers, IconClose, IconCheck, IconCopy } from '../ui/icons';
 
@@ -39,6 +41,10 @@ function FriendsModal({ onClose }: { onClose: () => void }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // Real opponents you've recently faced and haven't added yet.
+  const friendKeys = new Set(friends.map((f) => h2hKey(f.name)));
+  const recent = getRecentOpponents().filter((o) => !friendKeys.has(h2hKey(o.name)));
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -178,12 +184,25 @@ function FriendsModal({ onClose }: { onClose: () => void }) {
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-semibold">{f.name}</span>
-                    {f.code && (
-                      <span className="block truncate font-mono text-[11px] text-white/40">
-                        {formatFriendCode(f.code)}
-                        {f.uid ? ' · online' : ''}
-                      </span>
-                    )}
+                    {(() => {
+                      const rec = getOpponentRecord(f.name);
+                      if (rec && rec.played > 0) {
+                        return (
+                          <span className="block truncate text-[11px] text-white/45">
+                            vs you: {h2hSummary(rec)}
+                          </span>
+                        );
+                      }
+                      if (f.code) {
+                        return (
+                          <span className="block truncate font-mono text-[11px] text-white/40">
+                            {formatFriendCode(f.code)}
+                            {f.uid ? ' · online' : ''}
+                          </span>
+                        );
+                      }
+                      return null;
+                    })()}
                   </span>
                   <button
                     type="button"
@@ -198,6 +217,45 @@ function FriendsModal({ onClose }: { onClose: () => void }) {
             </ul>
           )}
         </div>
+
+        {/* Recent opponents you can add in one tap */}
+        {recent.length > 0 && (
+          <div className="mt-4">
+            <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/40">
+              Recent opponents
+            </h3>
+            <ul className="flex max-h-40 flex-col gap-1.5 overflow-y-auto">
+              {recent.map((o) => {
+                const rec = getOpponentRecord(o.name);
+                return (
+                  <li
+                    key={o.name}
+                    className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2"
+                  >
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 text-sm font-bold text-white/70">
+                      {o.name.charAt(0).toUpperCase()}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold">{o.name}</span>
+                      <span className="block truncate text-[11px] text-white/45">
+                        {rec && rec.played > 0
+                          ? `vs you: ${h2hSummary(rec)}`
+                          : `${o.games} game${o.games === 1 ? '' : 's'}`}
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => addByName(o.name)}
+                      className="answer-press rounded-lg border border-pitch/30 bg-pitch/10 px-2.5 py-1 text-xs font-semibold text-pitch hover:bg-pitch/20"
+                    >
+                      Add
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
       </div>
     </div>,
     document.body,

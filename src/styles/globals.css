@@ -133,3 +133,44 @@
     display: none;
   }
 }
+
+/* ---- Accessibility preferences (manual toggles via lib/settings) ---- */
+
+/* Manual reduced-motion override (on top of the OS media query). */
+.a11y-reduce-motion *,
+.a11y-reduce-motion *::before,
+.a11y-reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+.a11y-reduce-motion .confetti-piece {
+  display: none;
+}
+
+/* Larger text — bump the root font size; the rem-based UI scales with it. */
+.a11y-large-text {
+  font-size: 118%;
+}
+
+/* High contrast — strengthen text, borders and glass surfaces. */
+.a11y-contrast body {
+  color: #ffffff;
+}
+
+.a11y-contrast .glass,
+.a11y-contrast .glass-strong {
+  background-color: rgba(10, 15, 28, 0.92) !important;
+  backdrop-filter: none !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.a11y-contrast .text-white\/40,
+.a11y-contrast .text-white\/45,
+.a11y-contrast .text-white\/50,
+.a11y-contrast .text-white\/55,
+.a11y-contrast .text-white\/60 {
+  color: rgba(255, 255, 255, 0.85) !important;
+}

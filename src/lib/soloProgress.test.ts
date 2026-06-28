@@ -42,3 +42,22 @@ describe('bestForMode', () => {
     expect(bestForMode(p, 'gauntlet')).toBe(7100);
   });
 });
+
+import { buildSoloShareText } from './soloProgress';
+
+describe('buildSoloShareText', () => {
+  it('summarises a survival run', () => {
+    const t = buildSoloShareText({ mode: 'survival', score: 0, survived: 7 });
+    expect(t).toContain('survived 7 questions');
+    expect(t).toContain('Ball Knowledge');
+  });
+  it('summarises a time attack run with points', () => {
+    const t = buildSoloShareText({ mode: 'time_attack', score: 5400, survived: 9 });
+    expect(t).toContain('5,400 points');
+  });
+  it('flags a perfect gauntlet and a personal best', () => {
+    const t = buildSoloShareText({ mode: 'gauntlet', score: 9000, survived: 10, total: 10, perfect: true, isBest: true });
+    expect(t).toContain('aced the Gauntlet');
+    expect(t).toContain('personal best');
+  });
+});

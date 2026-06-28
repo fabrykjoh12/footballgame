@@ -8,10 +8,19 @@ import {
   resetProfileStats,
   winRate,
 } from '../../lib/profileStats';
-import { getDailyState, hasPlayedToday } from '../../lib/dailyChallenge';
 import { getCareer, divisionByTier } from '../../lib/career';
+import {
+  getClubIdentity,
+  saveClubIdentity,
+  type ClubIdentity,
+} from '../../lib/clubIdentity';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
+import { DailyRivalCard } from './DailyRivalCard';
+import { ClubBadge } from '../club/ClubBadge';
+import { ClubIdentityModal } from '../club/ClubIdentityModal';
+import { SettingsModal } from '../settings/SettingsModal';
+import { CosmeticsModal } from '../cosmetics/CosmeticsModal';
 import { TrophyCabinet } from './TrophyCabinet';
 import { LeaguesCard } from '../leagues/LeaguesCard';
 import {
@@ -20,7 +29,6 @@ import {
   IconScale,
   IconTrophy,
   IconBolt,
-  IconClock,
   IconArrowRight,
 } from '../ui/icons';
 
@@ -72,9 +80,18 @@ export function HomePage({
   const [showJoin, setShowJoin] = useState(false);
   const [code, setCode] = useState('');
   const [stats, setStats] = useState(() => getProfileStats());
-  const [daily] = useState(() => getDailyState());
   const [career] = useState(() => getCareer());
-  const playedDailyToday = hasPlayedToday(daily);
+  const [club, setClub] = useState<ClubIdentity | null>(() => getClubIdentity());
+  const [editingClub, setEditingClub] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showCosmetics, setShowCosmetics] = useState(false);
+
+  const saveClub = (identity: ClubIdentity) => {
+    saveClubIdentity(identity);
+    setClub(identity);
+    setName(identity.name); // the club name becomes the player's match name
+    setEditingClub(false);
+  };
 
   // Prefill the join code from a shared link (?room=BK7Q2).
   useEffect(() => {
@@ -103,6 +120,42 @@ export function HomePage({
           Prove your football IQ against your friends.
         </p>
       </div>
+
+      {/* Your Club */}
+      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+        {club ? (
+          <div className="flex items-center gap-3">
+            <ClubBadge identity={club} size={52} />
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-display text-lg font-bold">{club.name}</div>
+              <div className="truncate text-xs text-white/55">
+                {club.nickname} · {club.stadium}
+              </div>
+            </div>
+            <Button variant="ghost" onClick={() => setEditingClub(true)}>
+              Edit
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-semibold">Create your club</div>
+              <div className="text-xs text-white/55">
+                Name, kit colours, badge — used across the whole game.
+              </div>
+            </div>
+            <Button onClick={() => setEditingClub(true)}>Create</Button>
+          </div>
+        )}
+      </Card>
+
+      {editingClub && (
+        <ClubIdentityModal
+          initial={club}
+          onSave={saveClub}
+          onClose={() => setEditingClub(false)}
+        />
+      )}
 
       {/* Entry card */}
       <Card
@@ -221,61 +274,8 @@ export function HomePage({
         </p>
       </Card>
 
-      {/* Daily Challenge */}
-      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-        <div className="mb-2 flex items-center gap-2">
-          <IconClock className="h-5 w-5 text-gold" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-            Daily Challenge
-          </h2>
-          {daily.streak > 0 && (
-            <span className="ml-auto text-xs font-bold text-gold">
-              🔥 {daily.streak}-day streak
-            </span>
-          )}
-        </div>
-
-        {playedDailyToday ? (
-          <>
-            <p className="text-xs leading-relaxed text-white/55">
-              Done for today — you scored{' '}
-              <span className="font-semibold text-pitch">
-                {daily.lastScore.toLocaleString()}
-              </span>
-              {daily.lastOutcome ? ` (${daily.lastOutcome})` : ''}. Best:{' '}
-              {daily.bestScore.toLocaleString()}.
-            </p>
-            <div className="mt-3">
-              <Button
-                variant="ghost"
-                fullWidth
-                disabled={connecting}
-                onClick={() => playDaily(name.trim() || 'You')}
-              >
-                Play again (practice)
-              </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <p className="text-xs leading-relaxed text-white/55">
-              The same 10 questions for everyone today.{' '}
-              {daily.streak > 0
-                ? `Keep your ${daily.streak}-day streak alive!`
-                : 'Play each day to build a streak.'}
-            </p>
-            <div className="mt-3">
-              <Button
-                fullWidth
-                disabled={connecting}
-                onClick={() => playDaily(name.trim() || 'You')}
-              >
-                Play today’s challenge
-              </Button>
-            </div>
-          </>
-        )}
-      </Card>
+      {/* Daily Rival Match */}
+      <DailyRivalCard name={name} connecting={connecting} onPlay={playDaily} />
 
       {/* Career Mode */}
       <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
@@ -429,6 +429,18 @@ export function HomePage({
           </Card>
         ))}
       </div>
+
+      {/* Settings, cosmetics & data */}
+      <div className="mx-auto flex items-center gap-4 text-xs text-white/40">
+        <button type="button" onClick={() => setShowCosmetics(true)} className="hover:text-white">
+          🎨 Cosmetics
+        </button>
+        <button type="button" onClick={() => setShowSettings(true)} className="hover:text-white">
+          ⚙ Settings &amp; data
+        </button>
+      </div>
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {showCosmetics && <CosmeticsModal onClose={() => setShowCosmetics(false)} />}
     </div>
   );
 }

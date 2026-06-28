@@ -1,16 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useGame } from '../../context/GameProvider';
 import { play } from '../../lib/sound';
-import type { Player } from '../../types/game';
+import type { Category, Player } from '../../types/game';
 import { MATCH_MODES } from '../../lib/matchModes';
 import { teamName } from '../../lib/teamName';
 import { accuracyPercent } from '../../lib/scoring';
 import { getPlayerTitle } from '../../lib/playerTitle';
+import { summarizeMatch, type PlayerMatchStats } from '../../lib/matchStats';
+import { matchIdentities } from '../../lib/teamIdentity';
+import { CATEGORY_OPTIONS } from '../../lib/categories';
+import { FULL_TIME, type TimelineMark } from '../../lib/matchTimeline';
 import { buildShareText } from '../../lib/shareResult';
 import { shareResultImage } from '../../lib/shareImage';
 import { recordMatchResult } from '../../lib/profileStats';
 import { recordDailyResult } from '../../lib/dailyChallenge';
 import { refreshAchievements } from '../../lib/achievements';
+import { recordMatchFeats } from '../../lib/feats';
 import type { AchievementDef } from '../../lib/achievements';
 import { getOpponentRecord, h2hSummary } from '../../lib/headToHead';
 import { dailyBoardId, submitScore, submitPersonalBest } from '../../lib/leaderboard';
@@ -40,6 +45,8 @@ export function FinalResult() {
     return null; // genuine draw
   }, [room]);
 
+  const summary = useMemo(() => (room ? summarizeMatch(room) : null), [room]);
+
   // Final-whistle audio: fanfare if you won, plain whistle otherwise.
   useEffect(() => {
     if (room?.status !== 'finished') return;
@@ -52,6 +59,7 @@ export function FinalResult() {
     if (room?.status !== 'finished') return;
     recordMatchResult(room, localPlayerId);
     if (room.settings.isDaily) recordDailyResult(room, localPlayerId);
+    recordMatchFeats(room, localPlayerId);
     setUnlocked(refreshAchievements());
 
     const me = room.players.find((p) => p.id === localPlayerId);
@@ -77,7 +85,7 @@ export function FinalResult() {
 
   const share = async () => {
     try {
-      await navigator.clipboard.writeText(buildShareText(room));
+      await navigator.clipboard.writeText(buildShareText(room, localPlayerId));
       setShared(true);
       setTimeout(() => setShared(false), 1800);
     } catch {
@@ -87,7 +95,7 @@ export function FinalResult() {
 
   const shareImg = async () => {
     setImgState('working');
-    const result = await shareResultImage(room);
+    const result = await shareResultImage(room, localPlayerId);
     setImgState(
       result === 'shared' ? 'shared' : result === 'downloaded' ? 'saved' : 'idle',
     );
@@ -148,10 +156,47 @@ export function FinalResult() {
         )}
       </Card>
 
+      {/* Man of the Match + biggest moment */}
+      {summary && (
+        <MatchHonours
+          room={room}
+          motmId={summary.motmId}
+          biggest={summary.biggest}
+          localPlayerId={localPlayerId}
+        />
+      )}
+
+      {/* Possession-style knowledge share */}
+      {summary && (
+        <KnowledgeShareBar
+          a={a}
+          b={b}
+          shareA={summary.players[a.id]?.knowledgeShare ?? 50}
+          shareB={summary.players[b.id]?.knowledgeShare ?? 50}
+        />
+      )}
+
+      {/* Timeline replay */}
+      {summary && summary.timeline.length > 0 && (
+        <TimelineReplay a={a} b={b} marks={summary.timeline} />
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <StatsCard player={a} total={total} isYou={a.id === localPlayerId} isWinner={winner?.id === a.id} />
-        <StatsCard player={b} total={total} isYou={b.id === localPlayerId} isWinner={winner?.id === b.id} />
+        <StatsCard
+          player={a}
+          stats={summary?.players[a.id]}
+          total={total}
+          isYou={a.id === localPlayerId}
+          isWinner={winner?.id === a.id}
+        />
+        <StatsCard
+          player={b}
+          stats={summary?.players[b.id]}
+          total={total}
+          isYou={b.id === localPlayerId}
+          isWinner={winner?.id === b.id}
+        />
       </div>
 
       <div className="flex flex-wrap justify-center gap-2">
@@ -241,13 +286,19 @@ export function FinalResult() {
   );
 }
 
+function categoryLabel(c: Category): string {
+  return CATEGORY_OPTIONS.find((o) => o.id === c)?.label ?? c;
+}
+
 function StatsCard({
   player,
+  stats,
   total,
   isYou,
   isWinner,
 }: {
   player: Player;
+  stats?: PlayerMatchStats;
   total: number;
   isYou: boolean;
   isWinner?: boolean;
@@ -284,9 +335,26 @@ function StatsCard({
           value={`${accuracyPercent(player.correctAnswers, total)}%`}
         />
         <Stat label="Correct" value={`${player.correctAnswers}/${total}`} />
+        {stats && <Stat label="Shots / chances" value={`${stats.shots} / ${stats.chances}`} />}
         <Stat label="Best streak" value={String(player.bestStreak)} />
         <Stat label="Fastest" value={fastest} />
       </dl>
+
+      {stats?.bestCategory && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          <Badge tone="pitch">
+            Best: {categoryLabel(stats.bestCategory.category)} {stats.bestCategory.accuracy}%
+          </Badge>
+          {stats.weakestCategory &&
+            stats.weakestCategory.category !== stats.bestCategory.category &&
+            stats.weakestCategory.accuracy < 100 && (
+              <Badge tone="danger">
+                Weakest: {categoryLabel(stats.weakestCategory.category)}{' '}
+                {stats.weakestCategory.accuracy}%
+              </Badge>
+            )}
+        </div>
+      )}
     </Card>
   );
 }
@@ -296,6 +364,134 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="flex items-center justify-between">
       <dt className="text-white/45">{label}</dt>
       <dd className="font-mono font-semibold">{value}</dd>
+    </div>
+  );
+}
+
+function MatchHonours({
+  room,
+  motmId,
+  biggest,
+  localPlayerId,
+}: {
+  room: import('../../types/game').Room;
+  motmId: string | null;
+  biggest: import('../../lib/matchStats').BiggestMoment | null;
+  localPlayerId: string;
+}) {
+  const motm = room.players.find((p) => p.id === motmId);
+  const bigPlayer = biggest ? room.players.find((p) => p.id === biggest.playerId) : null;
+  if (!motm && !biggest) return null;
+
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      {motm && (
+        <Card className="border-gold/30 p-4">
+          <div className="text-[10px] uppercase tracking-[0.18em] text-gold/80">
+            Man of the Match
+          </div>
+          <div className="mt-1 truncate font-display text-lg font-bold text-gold">
+            {teamName(motm.name)}
+            {motm.id === localPlayerId ? ' (You)' : ''}
+          </div>
+          <div className="mt-0.5 text-xs text-white/50">
+            {motm.correctAnswers} correct · {motm.score} pts
+          </div>
+        </Card>
+      )}
+      {biggest && bigPlayer && (
+        <Card className="p-4">
+          <div className="text-[10px] uppercase tracking-[0.18em] text-white/40">
+            Biggest moment
+          </div>
+          <div className="mt-1 font-display text-lg font-bold text-white">
+            {biggest.minute}' {biggest.label}
+          </div>
+          <div className="mt-0.5 truncate text-xs text-white/50">{teamName(bigPlayer.name)}</div>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function KnowledgeShareBar({
+  a,
+  b,
+  shareA,
+  shareB,
+}: {
+  a: Player;
+  b: Player;
+  shareA: number;
+  shareB: number;
+}) {
+  const [idA, idB] = matchIdentities(a.name, b.name);
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-[10px] font-medium uppercase tracking-wide text-white/40">
+        <span>{shareA}% {teamName(a.name)}</span>
+        <span>Knowledge</span>
+        <span>{teamName(b.name)} {shareB}%</span>
+      </div>
+      <div
+        className="flex h-2.5 overflow-hidden rounded-full bg-white/10"
+        role="img"
+        aria-label={`Knowledge share: ${teamName(a.name)} ${shareA} percent, ${teamName(b.name)} ${shareB} percent`}
+      >
+        <div style={{ width: `${shareA}%`, backgroundColor: idA.color }} />
+        <div style={{ width: `${shareB}%`, backgroundColor: idB.color }} />
+      </div>
+    </div>
+  );
+}
+
+function TimelineReplay({
+  a,
+  b,
+  marks,
+}: {
+  a: Player;
+  b: Player;
+  marks: TimelineMark[];
+}) {
+  const [idA, idB] = matchIdentities(a.name, b.name);
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-white/35">
+        <span>0'</span>
+        <span className="uppercase tracking-wide">Match replay</span>
+        <span>90'</span>
+      </div>
+      <div className="relative h-2 rounded-full bg-white/10">
+        {marks.map((m) => {
+          const color = m.side === 'home' ? idA.color : idB.color;
+          const left = `${(Math.min(m.minute, FULL_TIME) / FULL_TIME) * 100}%`;
+          const title = `${m.label} — ${m.minute}' (${m.side === 'home' ? teamName(a.name) : teamName(b.name)})`;
+          if (m.weight === 'goal') {
+            return (
+              <span
+                key={m.key}
+                title={title}
+                aria-label={title}
+                className="absolute -top-1.5 h-2 w-2 -translate-x-1/2 rounded-full ring-2 ring-ink-900"
+                style={{ left, backgroundColor: color }}
+              />
+            );
+          }
+          return (
+            <span
+              key={m.key}
+              title={title}
+              aria-label={title}
+              className={[
+                'absolute top-3 h-1.5 w-1.5 -translate-x-1/2 rounded-full',
+                m.weight === 'miss' ? 'opacity-40' : 'opacity-70',
+              ].join(' ')}
+              style={{ left, backgroundColor: color }}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

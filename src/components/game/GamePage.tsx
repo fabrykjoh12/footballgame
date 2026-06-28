@@ -163,6 +163,12 @@ export function GamePage() {
           localPlayerId={localPlayerId}
           isHost={isHost}
           isLastQuestion={room.currentQuestionIndex >= total - 1}
+          questionDurationMs={room.settings.questionDurationMs}
+          matchMinute={
+            stoppageRound > 0
+              ? 90 + stoppageRound
+              : Math.round(((room.currentQuestionIndex + 1) / total) * 90)
+          }
           onNext={nextQuestion}
         />
       )}
