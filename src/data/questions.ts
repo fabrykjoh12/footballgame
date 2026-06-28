@@ -4,6 +4,7 @@ import { QUESTIONS_B7 } from './questionsB7';
 import { QUESTIONS_B8 } from './questionsB8';
 import { QUESTIONS_B9 } from './questionsB9';
 import { QUESTIONS_B10 } from './questionsB10';
+import { QUESTIONS_B11 } from './questionsB11';
 
 /* ============================================================================
  * Ball Knowledge — seed question database.
@@ -8719,4 +8720,6 @@ export const QUESTIONS: Question[] = [
   ...QUESTIONS_B9,
   // True-nightmare batch (nightmare only; deep cuts, exact figures).
   ...QUESTIONS_B10,
+  // True-nightmare batch #2 (nightmare only; legends, records).
+  ...QUESTIONS_B11,
 ];
