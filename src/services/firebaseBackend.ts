@@ -32,7 +32,7 @@ import {
   doc,
   getDoc,
   getDocs,
-  getFirestore,
+  initializeFirestore,
   limit as fbLimit,
   onSnapshot,
   orderBy,
@@ -62,7 +62,11 @@ function ensure(): { auth: Auth; db: Firestore } | null {
   if (!app) {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
-    db = getFirestore(app);
+    // Auto-detect long-polling: Firestore's default WebChannel transport can
+    // stall 10–30s before falling back behind proxies / VPNs / ad-blockers /
+    // strict networks, which shows up as a hung "Restoring your progress…"
+    // splash. Letting the SDK detect and switch to long-polling avoids it.
+    db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
   }
   return auth && db ? { auth, db } : null;
 }
