@@ -29,6 +29,8 @@ import type {
 } from '../../lib/mysteryPlayer/mysteryPlayerTypes';
 import { PlayerSearch } from './PlayerSearch';
 import { QuestionBuilder } from './QuestionBuilder';
+import { MysteryOnlineGame } from './MysteryOnlineGame';
+import { isAblyConfigured } from '../../lib/realtimeConfig';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -42,6 +44,7 @@ export function MysteryPlayerGame({ onExit }: { onExit: () => void }) {
   const [opponent, setOpponent] = useState<'cpu' | 'hotseat'>('cpu');
   const [settings, setSettings] = useState<RoomSettings>(() => getMysteryStore().settings);
   const [state, setState] = useState<MysteryState | null>(null);
+  const [online, setOnline] = useState(false);
   const rng = useRef(mulberry32(Math.floor(Date.now() % 0xffffffff)));
 
   const start = () => {
@@ -56,6 +59,10 @@ export function MysteryPlayerGame({ onExit }: { onExit: () => void }) {
     setState(g);
   };
 
+  if (online) {
+    return <MysteryOnlineGame settings={settings} name={name} onExit={() => setOnline(false)} />;
+  }
+
   if (!state) {
     return (
       <MysteryLobby
@@ -64,6 +71,7 @@ export function MysteryPlayerGame({ onExit }: { onExit: () => void }) {
         settings={settings}
         setSettings={setSettings}
         onStart={start}
+        onOnline={() => setOnline(true)}
         onExit={onExit}
       />
     );
@@ -91,6 +99,7 @@ function MysteryLobby({
   settings,
   setSettings,
   onStart,
+  onOnline,
   onExit,
 }: {
   opponent: 'cpu' | 'hotseat';
@@ -98,6 +107,7 @@ function MysteryLobby({
   settings: RoomSettings;
   setSettings: (s: RoomSettings) => void;
   onStart: () => void;
+  onOnline: () => void;
   onExit: () => void;
 }) {
   const set = (patch: Partial<RoomSettings>) => setSettings({ ...settings, ...patch });
@@ -177,6 +187,11 @@ function MysteryLobby({
       <Button size="lg" fullWidth onClick={onStart}>
         <IconBolt className="h-4 w-4" /> Start duel
       </Button>
+      {isAblyConfigured && (
+        <Button variant="secondary" fullWidth onClick={onOnline}>
+          🌐 Play a friend online
+        </Button>
+      )}
       {(settings.questionMode !== 'verified' || settings.answerMode === 'manual') && (
         <p className="text-center text-[11px] text-white/40">
           {settings.answerMode === 'manual'
