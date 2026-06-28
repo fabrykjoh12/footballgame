@@ -102,6 +102,7 @@ export const CLUBS: ClubInfo[] = [
   { name: 'Eintracht Frankfurt', country: 'Germany', league: 'Bundesliga', aliases: ['Frankfurt'] },
   { name: 'VfB Stuttgart', country: 'Germany', league: 'Bundesliga', aliases: ['Stuttgart'] },
   { name: 'Borussia Mönchengladbach', country: 'Germany', league: 'Bundesliga', aliases: ['Borussia Monchengladbach', 'Gladbach', "M'gladbach"] },
+  { name: 'Hoffenheim', country: 'Germany', league: 'Bundesliga', aliases: ['TSG Hoffenheim'] },
   { name: 'Hamburger SV', country: 'Germany', league: 'Bundesliga', aliases: ['Hamburg', 'HSV'] },
   { name: 'Kaiserslautern', country: 'Germany', league: 'Bundesliga', aliases: ['1. FC Kaiserslautern'] },
   { name: 'Nürnberg', country: 'Germany', league: 'Bundesliga', aliases: ['Nurnberg', '1. FC Nürnberg'] },
