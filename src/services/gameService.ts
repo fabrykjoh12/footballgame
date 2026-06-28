@@ -14,7 +14,6 @@
 
 import type { GameService } from '../types/game';
 import { isAblyConfigured, isSupabaseConfigured } from '../lib/realtimeConfig';
-import { LocalGameService } from './localGameService';
 
 export type GameIntent = 'create' | 'join' | 'demo';
 export type MultiplayerProvider = 'ably' | 'supabase' | null;
@@ -38,6 +37,13 @@ async function createRemoteService(): Promise<GameService> {
   return new SupabaseGameService();
 }
 
+// Lazy-load the local service so the question bank (questionPicker → QUESTIONS)
+// is code-split out of the main bundle and only fetched when a match starts.
+async function createLocalService(opts?: GameServiceOptions): Promise<GameService> {
+  const { LocalGameService } = await import('./localGameService');
+  return new LocalGameService(opts);
+}
+
 export interface GameServiceOptions {
   /** Career Mode: force the CPU opponent's name (local service only). */
   botName?: string;
@@ -47,16 +53,16 @@ export async function createGameService(
   intent: GameIntent,
   opts?: GameServiceOptions,
 ): Promise<GameService> {
-  if (intent === 'demo') return new LocalGameService(opts);
+  if (intent === 'demo') return createLocalService(opts);
   if (multiplayerAvailable) {
     try {
       return await createRemoteService();
     } catch {
       // Fall back gracefully if the remote client can't initialise.
-      return new LocalGameService();
+      return createLocalService();
     }
   }
-  return new LocalGameService();
+  return createLocalService(opts);
 }
 
 export type { GameService };
