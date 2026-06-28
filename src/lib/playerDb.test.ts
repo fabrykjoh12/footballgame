@@ -116,12 +116,18 @@ describe('player roster integrity', () => {
     }
   });
 
-  it('birth year, when present, is sane (before debut, plausible range)', () => {
+  it('birth year, when present, is sane (plausible career ages)', () => {
     for (const p of PLAYERS) {
       if (p.birthYear === undefined) continue;
       expect(p.birthYear).toBeGreaterThan(1925);
       expect(p.birthYear).toBeLessThan(2010);
       expect(p.birthYear).toBeLessThan(p.debutYear);
+      // Debut age must be realistic (catches a swapped/typo'd year).
+      const debutAge = p.debutYear - p.birthYear;
+      expect(debutAge).toBeGreaterThanOrEqual(14);
+      expect(debutAge).toBeLessThanOrEqual(32);
+      // Nobody plays past their late 40s (Buffon retired at 45).
+      if (p.lastYear !== undefined) expect(p.lastYear - p.birthYear).toBeLessThanOrEqual(46);
     }
   });
 });
