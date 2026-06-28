@@ -7,11 +7,13 @@ import {
   recentConnectionIds,
   recordSeenConnections,
   recordConnectionsResult,
+  dailyConnection,
   CONNECTIONS_QUESTION_MS,
   CONNECTIONS_RUN_LENGTH,
   type Connection,
   type ConnectionGrade,
 } from '../../lib/connections';
+import { recordDailyConnectionResult } from '../../lib/dailyConnections';
 import { refreshAchievements } from '../../lib/achievements';
 import { useCountdown } from '../../hooks/useCountdown';
 import { play } from '../../lib/sound';
@@ -28,14 +30,20 @@ interface FinishedRun {
   total: number;
   bestStreak: number;
   isBest: boolean;
+  /** Present in Daily mode: the day's solved-streak outcome. */
+  daily?: { streak: number; solved: boolean };
 }
 
 /**
  * "Connections" solo run: name a player who has played for BOTH shown clubs.
  * Self-contained (own state/timers, never touches the 1v1 match engine).
+ * In `daily` mode it's a single deterministic puzzle/day with its own streak.
  */
-export function ConnectionsGame({ onExit }: { onExit: () => void }) {
-  const puzzles = useMemo(() => pickConnections(recentConnectionIds()), []);
+export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void; daily?: boolean }) {
+  const puzzles = useMemo(
+    () => (daily ? [dailyConnection()] : pickConnections(recentConnectionIds())),
+    [daily],
+  );
 
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<'question' | 'reveal' | 'finished'>('question');
@@ -110,12 +118,19 @@ export function ConnectionsGame({ onExit }: { onExit: () => void }) {
   useEffect(() => {
     if (phase !== 'finished' || recorded.current) return;
     recorded.current = true;
+    if (daily) {
+      const solved = correct > 0;
+      const st = recordDailyConnectionResult(solved);
+      play(solved ? 'win' : 'whistle');
+      setFinished({ score, correct, total: puzzles.length, bestStreak, isBest: false, daily: { streak: st.streak, solved } });
+      return;
+    }
     recordSeenConnections(puzzles.map((p) => p.id));
     const { isBest } = recordConnectionsResult({ score, correct, bestStreak });
     refreshAchievements();
     play(score > 0 ? 'win' : 'whistle');
     setFinished({ score, correct, total: puzzles.length, bestStreak, isBest });
-  }, [phase, score, correct, bestStreak, puzzles]);
+  }, [phase, score, correct, bestStreak, puzzles, daily]);
 
   if (phase === 'finished') {
     return <ConnectionsResult run={finished} onExit={onExit} />;
@@ -130,7 +145,7 @@ export function ConnectionsGame({ onExit }: { onExit: () => void }) {
         </Button>
         <div className="flex items-center gap-2">
           <Badge tone="pitch">
-            <IconRoute className="h-4 w-4" /> Connections
+            <IconRoute className="h-4 w-4" /> {daily ? 'Daily Connections' : 'Connections'}
           </Badge>
         </div>
       </div>
@@ -273,6 +288,30 @@ function ConnectionsResult({ run, onExit }: { run: FinishedRun | null; onExit: (
   const score = run?.score ?? 0;
   const correct = run?.correct ?? 0;
   const total = run?.total ?? CONNECTIONS_RUN_LENGTH;
+
+  if (run?.daily) {
+    const { solved, streak } = run.daily;
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
+        <div className="text-5xl" aria-hidden>{solved ? '🔗' : '🫥'}</div>
+        <div>
+          <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">Daily Connections</div>
+          <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">
+            {solved ? 'Solved!' : 'Missed today'}
+          </h1>
+          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm font-semibold text-gold">
+            🔥 {streak} day{streak === 1 ? '' : 's'} streak
+          </div>
+        </div>
+        <p className="max-w-xs text-sm text-white/55">
+          One puzzle a day — come back tomorrow to keep the streak going.
+        </p>
+        <Button size="lg" onClick={onExit}>
+          Back to home <IconArrowRight className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">

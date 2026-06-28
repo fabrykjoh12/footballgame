@@ -32,7 +32,9 @@ import {
   IconTrophy,
   IconBolt,
   IconArrowRight,
+  IconCheck,
 } from '../ui/icons';
+import { getDailyConnectionsState, hasPlayedDailyConnectionToday } from '../../lib/dailyConnections';
 
 const FEATURES = [
   {
@@ -62,12 +64,14 @@ export function HomePage({
   onOpenModes,
   onOpenCup,
   onOpenConnections,
+  onOpenConnectionsDaily,
   onOpenMystery,
 }: {
   onOpenCareer: () => void;
   onOpenModes: () => void;
   onOpenCup: () => void;
   onOpenConnections: () => void;
+  onOpenConnectionsDaily: () => void;
   onOpenMystery: () => void;
 }) {
   const {
@@ -84,6 +88,8 @@ export function HomePage({
   const [showJoin, setShowJoin] = useState(false);
   const [code, setCode] = useState('');
   const [stats, setStats] = useState(() => getProfileStats());
+  const [dailyConn] = useState(() => getDailyConnectionsState());
+  const dailyConnDone = hasPlayedDailyConnectionToday(dailyConn);
   const [career] = useState(() => getCareer());
   const [club, setClub] = useState<ClubIdentity | null>(() => getClubIdentity());
   const [editingClub, setEditingClub] = useState(false);
@@ -381,10 +387,21 @@ export function HomePage({
           Two clubs, one answer: <span className="font-semibold text-white/75">type a player who
           turned out for both</span>. Ten puzzles, ramping from easy to nightmare — surnames are fine.
         </p>
-        <div className="mt-3">
+        <div className="mt-3 flex flex-col gap-2">
           <Button fullWidth onClick={onOpenConnections}>
             Play Connections <IconArrowRight className="h-4 w-4" />
           </Button>
+          {dailyConnDone ? (
+            <div className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] py-2 text-xs text-white/55">
+              <IconCheck className="h-4 w-4 text-pitch" />
+              Daily done — 🔥 {dailyConn.streak} day{dailyConn.streak === 1 ? '' : 's'} · back tomorrow
+            </div>
+          ) : (
+            <Button variant="secondary" fullWidth onClick={onOpenConnectionsDaily}>
+              <IconBolt className="h-4 w-4" /> Daily puzzle
+              {dailyConn.streak > 0 && <span className="ml-1 text-gold">🔥 {dailyConn.streak}</span>}
+            </Button>
+          )}
         </div>
       </Card>
 

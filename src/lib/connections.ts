@@ -8,7 +8,14 @@ import type { Difficulty, PointsBreakdown } from '../types/game';
 import { QUESTIONS } from '../data/questions';
 import { CONNECTIONS, type Connection } from '../data/connections';
 import { PLAYERS, playersForClubPair } from '../data/players';
+import { hashString, todayString } from './seededRandom';
 import { pushSeen } from './questionHistory';
+
+/** The deterministic Daily Connections puzzle for a given day (same for all). */
+export function dailyConnection(dateStr: string = todayString()): Connection {
+  const idx = hashString(`connections:${dateStr}`) % CONNECTIONS.length;
+  return CONNECTIONS[idx];
+}
 
 export type { Connection } from '../data/connections';
 
