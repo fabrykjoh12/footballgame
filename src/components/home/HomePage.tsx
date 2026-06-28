@@ -20,6 +20,7 @@ import { DailyRivalCard } from './DailyRivalCard';
 import { ClubBadge } from '../club/ClubBadge';
 import { ClubIdentityModal } from '../club/ClubIdentityModal';
 import { SettingsModal } from '../settings/SettingsModal';
+import { CosmeticsModal } from '../cosmetics/CosmeticsModal';
 import { TrophyCabinet } from './TrophyCabinet';
 import { LeaguesCard } from '../leagues/LeaguesCard';
 import {
@@ -83,6 +84,7 @@ export function HomePage({
   const [club, setClub] = useState<ClubIdentity | null>(() => getClubIdentity());
   const [editingClub, setEditingClub] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showCosmetics, setShowCosmetics] = useState(false);
 
   const saveClub = (identity: ClubIdentity) => {
     saveClubIdentity(identity);
@@ -428,15 +430,17 @@ export function HomePage({
         ))}
       </div>
 
-      {/* Settings & data */}
-      <button
-        type="button"
-        onClick={() => setShowSettings(true)}
-        className="mx-auto text-xs text-white/40 hover:text-white"
-      >
-        ⚙ Settings &amp; data
-      </button>
+      {/* Settings, cosmetics & data */}
+      <div className="mx-auto flex items-center gap-4 text-xs text-white/40">
+        <button type="button" onClick={() => setShowCosmetics(true)} className="hover:text-white">
+          🎨 Cosmetics
+        </button>
+        <button type="button" onClick={() => setShowSettings(true)} className="hover:text-white">
+          ⚙ Settings &amp; data
+        </button>
+      </div>
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {showCosmetics && <CosmeticsModal onClose={() => setShowCosmetics(false)} />}
     </div>
   );
 }

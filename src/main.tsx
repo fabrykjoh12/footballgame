@@ -5,6 +5,7 @@ import './styles/globals.css';
 import { unlockAudio } from './lib/sound';
 import { hydrateClubKit } from './lib/clubIdentity';
 import { hydrateSettings } from './lib/settings';
+import { hydrateCosmetics } from './lib/cosmetics';
 
 // Browsers require a user gesture before audio can start; unlock once.
 window.addEventListener('pointerdown', () => unlockAudio(), { once: true });
@@ -13,6 +14,8 @@ window.addEventListener('pointerdown', () => unlockAudio(), { once: true });
 hydrateClubKit();
 // Apply persisted accessibility / display settings.
 hydrateSettings();
+// Apply the chosen cosmetic accent + pitch pattern.
+hydrateCosmetics();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

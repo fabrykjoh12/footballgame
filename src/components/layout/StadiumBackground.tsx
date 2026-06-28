@@ -9,8 +9,11 @@ export function StadiumBackground() {
       {/* Base gradient */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_#101a33_0%,_#080c16_45%,_#05070d_100%)]" />
 
-      {/* Top neon glow */}
-      <div className="absolute -top-40 left-1/2 h-96 w-[120vw] -translate-x-1/2 rounded-full bg-pitch/10 blur-[120px]" />
+      {/* Top neon glow — accent colour comes from the selected cosmetic. */}
+      <div
+        className="absolute -top-40 left-1/2 h-96 w-[120vw] -translate-x-1/2 rounded-full blur-[120px]"
+        style={{ backgroundColor: 'var(--bk-accent-soft, rgba(22,255,122,0.1))' }}
+      />
 
       {/* Faint pitch markings */}
       <svg
@@ -42,12 +45,12 @@ export function StadiumBackground() {
         <path d="M380 570 A 10 10 0 0 0 370 580" />
       </svg>
 
-      {/* Subtle vertical mowing stripes */}
+      {/* Pitch pattern — style + accent come from the selected cosmetic. */}
       <div
         className="absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage:
-            'repeating-linear-gradient(90deg, #16ff7a 0 2px, transparent 2px 80px)',
+            'var(--bk-pitch-pattern, repeating-linear-gradient(90deg, #16ff7a 0 2px, transparent 2px 80px))',
         }}
       />
 
