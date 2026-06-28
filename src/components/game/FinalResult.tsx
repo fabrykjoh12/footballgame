@@ -7,6 +7,7 @@ import { teamName } from '../../lib/teamName';
 import { accuracyPercent } from '../../lib/scoring';
 import { getPlayerTitle } from '../../lib/playerTitle';
 import { summarizeMatch, type PlayerMatchStats } from '../../lib/matchStats';
+import { punditVerdict } from '../../lib/punditry';
 import { matchIdentities } from '../../lib/teamIdentity';
 import { CATEGORY_OPTIONS } from '../../lib/categories';
 import { FULL_TIME, type TimelineMark } from '../../lib/matchTimeline';
@@ -83,6 +84,19 @@ export function FinalResult() {
   // Level on goals but a winner exists → it was decided on points.
   const onPoints = !isDraw && a.goals === b.goals;
 
+  const verdict = punditVerdict(
+    {
+      winnerName: winner ? teamName(winner.name) : null,
+      onPoints,
+      goalDiff: winner ? Math.abs(a.goals - b.goals) : 0,
+      comeback: !!winner && (summary?.players[winner.id]?.maxDeficit ?? 0) >= 2,
+      lateWinner:
+        !!winner && summary?.biggest?.kind === 'late_winner' && summary.biggest.playerId === winner.id,
+      nightmare: !!winner && room.settings.mode === 'nightmare',
+    },
+    total,
+  );
+
   const share = async () => {
     try {
       await navigator.clipboard.writeText(buildShareText(room, localPlayerId));
@@ -154,6 +168,11 @@ export function FinalResult() {
             Goals were level, so the higher points total takes it.
           </p>
         )}
+
+        {/* Pundit's verdict — broadcast flavour. */}
+        <p className="mx-auto mt-3 max-w-prose border-t border-white/10 pt-3 text-sm italic text-white/60">
+          “{verdict}”
+        </p>
       </Card>
 
       {/* Man of the Match + biggest moment */}
