@@ -32,7 +32,6 @@ import {
   IconTrophy,
   IconBolt,
   IconArrowRight,
-  IconCheck,
 } from '../ui/icons';
 import { getDailyConnectionsState, hasPlayedDailyConnectionToday } from '../../lib/dailyConnections';
 
@@ -354,173 +353,29 @@ export function HomePage({
         </Card>
       )}
 
-      {/* Game Modes (solo arcade) */}
+      {/* Game Modes hub — compact grid of every mode */}
       <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-        <div className="mb-2 flex items-center gap-2">
+        <div className="mb-3 flex items-center gap-2">
           <IconBolt className="h-5 w-5 text-pitch" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-            Game Modes
-          </h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">Game Modes</h2>
           <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
-            Singleplayer
+            Pick your challenge
           </span>
         </div>
-        <p className="text-xs leading-relaxed text-white/55">
-          Solo challenges: <span className="font-semibold text-white/75">Survival</span> (one life,
-          rising difficulty), <span className="font-semibold text-white/75">Time Attack</span> (60s
-          sprint) and <span className="font-semibold text-white/75">The Gauntlet</span> (one of every
-          mini-game).
-        </p>
-        <div className="mt-3">
-          <Button fullWidth onClick={onOpenModes}>
-            Browse modes <IconArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </Card>
-
-      {/* Connections (name a player who played for both clubs) */}
-      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-        <div className="mb-2 flex items-center gap-2">
-          <IconRoute className="h-5 w-5 text-pitch" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-            Connections
-          </h2>
-          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
-            Singleplayer
-          </span>
-        </div>
-        <p className="text-xs leading-relaxed text-white/55">
-          Two clubs, one answer: <span className="font-semibold text-white/75">type a player who
-          turned out for both</span>. Ten puzzles, ramping from easy to nightmare — surnames are fine.
-        </p>
-        <div className="mt-3 flex flex-col gap-2">
-          <Button fullWidth onClick={onOpenConnections}>
-            Play Connections <IconArrowRight className="h-4 w-4" />
-          </Button>
-          {dailyConnDone ? (
-            <div className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] py-2 text-xs text-white/55">
-              <IconCheck className="h-4 w-4 text-pitch" />
-              Daily done — 🔥 {dailyConn.streak} day{dailyConn.streak === 1 ? '' : 's'} · back tomorrow
-            </div>
-          ) : (
-            <Button variant="secondary" fullWidth onClick={onOpenConnectionsDaily}>
-              <IconBolt className="h-4 w-4" /> Daily puzzle
-              {dailyConn.streak > 0 && <span className="ml-1 text-gold">🔥 {dailyConn.streak}</span>}
-            </Button>
-          )}
-        </div>
-      </Card>
-
-      {/* Manager Merry-go-round (manager who managed both clubs) */}
-      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-        <div className="mb-2 flex items-center gap-2">
-          <span aria-hidden className="text-lg">🎩</span>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-            Manager Merry-go-round
-          </h2>
-          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
-            Singleplayer
-          </span>
-        </div>
-        <p className="text-xs leading-relaxed text-white/55">
-          Two clubs, one boss: <span className="font-semibold text-white/75">name a manager who took
-          charge of both</span>. Survive as long as your dugout knowledge holds.
-        </p>
-        <div className="mt-3">
-          <Button fullWidth onClick={onOpenManagers}>
-            Play Manager Merry-go-round <IconArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </Card>
-
-      {/* Career Path (guess the player from their clubs) */}
-      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-        <div className="mb-2 flex items-center gap-2">
-          <IconRoute className="h-5 w-5 text-pitch" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-            Career Path
-          </h2>
-          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
-            Singleplayer
-          </span>
-        </div>
-        <p className="text-xs leading-relaxed text-white/55">
-          A player’s clubs reveal one by one — <span className="font-semibold text-white/75">name them
-          with as few clues as you dare</span>. Keep the streak alive.
-        </p>
-        <div className="mt-3">
-          <Button fullWidth onClick={onOpenCareerPath}>
-            Play Career Path <IconArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </Card>
-
-      {/* Older or Younger? (birth-year survival) */}
-      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-        <div className="mb-2 flex items-center gap-2">
-          <span aria-hidden className="text-lg">🎂</span>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-            Older or Younger?
-          </h2>
-          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
-            Singleplayer
-          </span>
-        </div>
-        <p className="text-xs leading-relaxed text-white/55">
-          Higher/Lower with footballers: <span className="font-semibold text-white/75">guess if the next
-          player is older or younger</span>. How long a streak can you survive?
-        </p>
-        <div className="mt-3">
-          <Button fullWidth onClick={onOpenOlderYounger}>
-            Play Older or Younger? <IconArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </Card>
-
-      {/* Mystery Player Duel (deduction mode) */}
-      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-        <div className="mb-2 flex items-center gap-2">
-          <span aria-hidden className="text-lg">🕵️</span>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-            Mystery Player Duel
-          </h2>
-          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
-            1v1 · CPU
-          </span>
-        </div>
-        <p className="text-xs leading-relaxed text-white/55">
-          Football Guess Who. Both pick any player in secret, then ask yes/no
-          questions to unmask your opponent’s pick. <span className="font-semibold text-white/75">Pick anyone — let’s
-          see if your friend really knows ball.</span>
-        </p>
-        <div className="mt-3">
-          <Button fullWidth onClick={onOpenMystery}>
-            Start a duel <IconArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </Card>
-
-      {/* Cup Runs (themed knockout tournaments) */}
-      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-        <div className="mb-2 flex items-center gap-2">
-          <IconTrophy className="h-5 w-5 text-gold" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-            Cup Runs
-          </h2>
-          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
-            Singleplayer
-          </span>
-        </div>
-        <p className="text-xs leading-relaxed text-white/55">
-          Themed knockout tournaments — the <span className="font-semibold text-white/75">Champions
-          Run</span>, <span className="font-semibold text-white/75">World Cup Dream</span> and a quick{' '}
-          <span className="font-semibold text-white/75">Cup Sprint</span>. Win every tie to lift the
-          trophy.
-        </p>
-        <div className="mt-3">
-          <Button fullWidth onClick={onOpenCup}>
-            Enter a cup <IconArrowRight className="h-4 w-4" />
-          </Button>
+        <div className="grid grid-cols-2 gap-2">
+          <ModeTile emoji="🔗" name="Connections" sub="Played for both clubs" onClick={onOpenConnections} />
+          <ModeTile
+            emoji="📅"
+            name="Daily Connections"
+            sub={dailyConnDone ? `Done · 🔥 ${dailyConn.streak}` : dailyConn.streak > 0 ? `🔥 ${dailyConn.streak}-day streak` : 'One puzzle a day'}
+            onClick={onOpenConnectionsDaily}
+          />
+          <ModeTile emoji="🧭" name="Career Path" sub="Guess from the clubs" onClick={onOpenCareerPath} />
+          <ModeTile emoji="🎂" name="Older or Younger?" sub="Birth-year Higher/Lower" onClick={onOpenOlderYounger} />
+          <ModeTile emoji="🎩" name="Managers" sub="Managed both clubs" onClick={onOpenManagers} />
+          <ModeTile emoji="🕵️" name="Mystery Duel" sub="Football Guess Who" onClick={onOpenMystery} />
+          <ModeTile emoji="🏆" name="Cup Runs" sub="Knockout tournaments" onClick={onOpenCup} />
+          <ModeTile emoji="⚡" name="Arcade" sub="Survival · Time Attack" onClick={onOpenModes} />
         </div>
       </Card>
 
@@ -601,5 +456,29 @@ function ProfileStat({ value, label }: { value: string; label: string }) {
         {label}
       </div>
     </div>
+  );
+}
+
+/** A compact tappable tile in the Game Modes grid. */
+function ModeTile({
+  emoji,
+  name,
+  sub,
+  onClick,
+}: {
+  emoji: string;
+  name: string;
+  sub: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-start gap-1 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left transition hover:border-pitch/40 hover:bg-white/[0.06] answer-press"
+    >
+      <span className="text-xl" aria-hidden>{emoji}</span>
+      <span className="text-sm font-semibold leading-tight text-white/90">{name}</span>
+      <span className="text-[10px] leading-tight text-white/45">{sub}</span>
+    </button>
   );
 }
