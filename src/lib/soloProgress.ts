@@ -3,7 +3,7 @@
  * leaderboard); the pure update rule is unit-tested.
  */
 
-import type { SoloMode } from './soloModes';
+import { SOLO_MODES, type SoloMode } from './soloModes';
 
 const KEY = 'bk_solo_v1';
 
@@ -54,6 +54,32 @@ export function bestForMode(p: SoloProgress, mode: SoloMode): number {
   if (mode === 'survival') return p.survivalBest;
   if (mode === 'time_attack') return p.timeAttackBest;
   return p.gauntletBest;
+}
+
+export interface SoloShareInput {
+  mode: SoloMode;
+  score: number;
+  survived: number;
+  total?: number;
+  perfect?: boolean;
+  isBest?: boolean;
+}
+
+/** Pure: a copy-paste share line for a finished solo run. */
+export function buildSoloShareText(run: SoloShareInput): string {
+  const label = SOLO_MODES[run.mode].label;
+  let headline: string;
+  if (run.mode === 'survival') {
+    headline = `survived ${run.survived} question${run.survived === 1 ? '' : 's'}`;
+  } else if (run.mode === 'time_attack') {
+    headline = `banked ${run.score.toLocaleString()} points`;
+  } else {
+    headline = run.perfect
+      ? 'aced the Gauntlet'
+      : `got ${run.survived}/${run.total ?? 10} in the Gauntlet`;
+  }
+  const best = run.isBest ? ' 🏆 New personal best!' : '';
+  return `⚽ Ball Knowledge — ${label}\nI ${headline}.${best}\nThink you can beat it?`;
 }
 
 export function getSoloProgress(): SoloProgress {

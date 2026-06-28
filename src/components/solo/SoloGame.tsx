@@ -9,7 +9,7 @@ import {
   type SoloMode,
   type SoloGrade,
 } from '../../lib/soloModes';
-import { recordSoloResult } from '../../lib/soloProgress';
+import { recordSoloResult, buildSoloShareText } from '../../lib/soloProgress';
 import { recentlySeenIds, recordSeenQuestions } from '../../lib/questionHistory';
 import { refreshAchievements } from '../../lib/achievements';
 import { useCountdown } from '../../hooks/useCountdown';
@@ -18,7 +18,7 @@ import { QuestionCard } from '../game/QuestionCard';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { IconBack, IconCheck, IconClose, IconBolt } from '../ui/icons';
+import { IconBack, IconCheck, IconClose, IconBolt, IconShare } from '../ui/icons';
 
 const REVEAL_MS: Record<SoloMode, number> = {
   survival: 2100,
@@ -277,6 +277,26 @@ function SoloResult({
   const cfg = SOLO_MODES[mode];
   const score = run?.score ?? 0;
   const survived = run?.survived ?? 0;
+  const [shared, setShared] = useState(false);
+
+  const share = async () => {
+    const text = buildSoloShareText({
+      mode,
+      score,
+      survived,
+      total: run?.total,
+      perfect: run?.perfect,
+      isBest: run?.isBest,
+    });
+    try {
+      if (navigator.share) await navigator.share({ text });
+      else await navigator.clipboard.writeText(text);
+      setShared(true);
+      setTimeout(() => setShared(false), 1800);
+    } catch {
+      /* dismissed */
+    }
+  };
 
   const headline =
     mode === 'survival'
@@ -312,9 +332,15 @@ function SoloResult({
         </div>
       </Card>
 
-      <Button size="lg" onClick={onExit}>
-        Back to modes
-      </Button>
+      <div className="flex w-full max-w-xs flex-col gap-2">
+        <Button variant="secondary" fullWidth onClick={share}>
+          {shared ? <IconCheck className="h-4 w-4 text-pitch" /> : <IconShare className="h-4 w-4" />}
+          {shared ? 'Shared!' : 'Share result'}
+        </Button>
+        <Button size="lg" fullWidth onClick={onExit}>
+          Back to modes
+        </Button>
+      </div>
     </div>
   );
 }
