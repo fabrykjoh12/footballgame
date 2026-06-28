@@ -134,6 +134,17 @@
   }
 }
 
+/* Sweeping shine for the hero match-preview card. */
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 /* ---- Accessibility preferences (manual toggles via lib/settings) ---- */
 
 /* Manual reduced-motion override (on top of the OS media query). */
