@@ -21,6 +21,8 @@ import { ClubBadge } from '../club/ClubBadge';
 import { ClubIdentityModal } from '../club/ClubIdentityModal';
 import { SettingsModal } from '../settings/SettingsModal';
 import { CosmeticsModal } from '../cosmetics/CosmeticsModal';
+import { OnboardingOverlay } from '../onboarding/OnboardingOverlay';
+import { hasOnboarded } from '../../lib/onboarding';
 import { TrophyCabinet } from './TrophyCabinet';
 import { LeaguesCard } from '../leagues/LeaguesCard';
 import {
@@ -85,6 +87,7 @@ export function HomePage({
   const [editingClub, setEditingClub] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showCosmetics, setShowCosmetics] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => !hasOnboarded());
 
   const saveClub = (identity: ClubIdentity) => {
     saveClubIdentity(identity);
@@ -438,6 +441,13 @@ export function HomePage({
       </div>
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       {showCosmetics && <CosmeticsModal onClose={() => setShowCosmetics(false)} />}
+      {showOnboarding && (
+        <OnboardingOverlay
+          onCreateClub={() => setEditingClub(true)}
+          onPlay={() => playDemo(name.trim() || 'You')}
+          onClose={() => setShowOnboarding(false)}
+        />
+      )}
     </div>
   );
 }
