@@ -9,9 +9,16 @@ import {
   winRate,
 } from '../../lib/profileStats';
 import { getCareer, divisionByTier } from '../../lib/career';
+import {
+  getClubIdentity,
+  saveClubIdentity,
+  type ClubIdentity,
+} from '../../lib/clubIdentity';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { DailyRivalCard } from './DailyRivalCard';
+import { ClubBadge } from '../club/ClubBadge';
+import { ClubIdentityModal } from '../club/ClubIdentityModal';
 import { TrophyCabinet } from './TrophyCabinet';
 import { LeaguesCard } from '../leagues/LeaguesCard';
 import {
@@ -72,6 +79,15 @@ export function HomePage({
   const [code, setCode] = useState('');
   const [stats, setStats] = useState(() => getProfileStats());
   const [career] = useState(() => getCareer());
+  const [club, setClub] = useState<ClubIdentity | null>(() => getClubIdentity());
+  const [editingClub, setEditingClub] = useState(false);
+
+  const saveClub = (identity: ClubIdentity) => {
+    saveClubIdentity(identity);
+    setClub(identity);
+    setName(identity.name); // the club name becomes the player's match name
+    setEditingClub(false);
+  };
 
   // Prefill the join code from a shared link (?room=BK7Q2).
   useEffect(() => {
@@ -100,6 +116,42 @@ export function HomePage({
           Prove your football IQ against your friends.
         </p>
       </div>
+
+      {/* Your Club */}
+      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+        {club ? (
+          <div className="flex items-center gap-3">
+            <ClubBadge identity={club} size={52} />
+            <div className="min-w-0 flex-1">
+              <div className="truncate font-display text-lg font-bold">{club.name}</div>
+              <div className="truncate text-xs text-white/55">
+                {club.nickname} · {club.stadium}
+              </div>
+            </div>
+            <Button variant="ghost" onClick={() => setEditingClub(true)}>
+              Edit
+            </Button>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-semibold">Create your club</div>
+              <div className="text-xs text-white/55">
+                Name, kit colours, badge — used across the whole game.
+              </div>
+            </div>
+            <Button onClick={() => setEditingClub(true)}>Create</Button>
+          </div>
+        )}
+      </Card>
+
+      {editingClub && (
+        <ClubIdentityModal
+          initial={club}
+          onSave={saveClub}
+          onClose={() => setEditingClub(false)}
+        />
+      )}
 
       {/* Entry card */}
       <Card
