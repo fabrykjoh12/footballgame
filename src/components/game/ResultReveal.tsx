@@ -3,6 +3,7 @@ import type { Player, PlayerResult, QuestionResult } from '../../types/game';
 import { RESULT_AUTOADVANCE_MS } from '../../services/matchEngine';
 import { teamName } from '../../lib/teamName';
 import { describeAttack, type AttackTone } from '../../lib/attackFraming';
+import { speedComparison } from '../../lib/answerInsight';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -55,6 +56,25 @@ export function ResultReveal({
   const local = players.find((p) => p.id === localPlayerId);
   const opponent = players.find((p) => p.id !== localPlayerId);
 
+  const localRes = local ? result.results[local.id] : undefined;
+  const oppRes = opponent ? result.results[opponent.id] : undefined;
+  const insight =
+    localRes && oppRes && opponent
+      ? speedComparison(
+          {
+            correct: localRes.isCorrect,
+            answered: localRes.selectedAnswer !== null,
+            timeTakenMs: localRes.timeTakenMs,
+          },
+          {
+            correct: oppRes.isCorrect,
+            answered: oppRes.selectedAnswer !== null,
+            timeTakenMs: oppRes.timeTakenMs,
+          },
+          teamName(opponent.name),
+        )
+      : null;
+
   return (
     <div className="flex flex-col gap-4 animate-slide-up">
       {/* Correct answer */}
@@ -97,6 +117,11 @@ export function ResultReveal({
           />
         )}
       </div>
+
+      {/* Speed-vs-opponent insight */}
+      {insight && (
+        <p className="-mt-1 text-center text-xs text-white/55">{insight}</p>
+      )}
 
       {/* Advance control */}
       {isHost ? (
