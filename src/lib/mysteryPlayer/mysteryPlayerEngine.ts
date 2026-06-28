@@ -41,6 +41,7 @@ export function createMysteryGame(opts: CreateOptions): MysteryState {
     commit: blankRecord(players, () => ''),
     turn: players[0].id,
     pendingFree: null,
+    pendingVerified: null,
     bonusFor: null,
     history: [],
     knowledge: blankRecord(players, () => []),
@@ -76,6 +77,7 @@ function clone(s: MysteryState): MysteryState {
     matchScore: { ...s.matchScore },
     history: [...s.history],
     pendingFree: s.pendingFree ? { ...s.pendingFree } : null,
+    pendingVerified: s.pendingVerified ? { ...s.pendingVerified } : null,
   };
 }
 
@@ -117,7 +119,11 @@ function pushHistory(
   s.history.push({ ...entry, id: s.history.length + 1, round: s.roundNumber });
 }
 
-/** Ask a verified question — answered automatically from the opponent's pick. */
+/**
+ * Ask a verified (structured) question. In `auto` answer mode it resolves
+ * immediately from the opponent's pick; in `manual` mode it's handed to the
+ * opponent to answer by hand (resolved by `answerVerifiedManual`).
+ */
 export function askVerified(
   state: MysteryState,
   playerId: string,
@@ -128,12 +134,42 @@ export function askVerified(
   const oppPlayer = mysteryPlayerById(state.secret[oppId] ?? '');
   if (!oppPlayer) return state;
 
+  if (state.settings.answerMode === 'manual') {
+    const s = clone(state);
+    s.phase = 'awaiting_manual';
+    s.pendingVerified = { askerId: playerId, question };
+    return s;
+  }
+
   const answer = answerVerified(oppPlayer, question);
   const s = clone(state);
   s.knowledge[playerId] = [...s.knowledge[playerId], { question, answer }];
   s.questionsAsked[playerId] += 1;
   pushHistory(s, { askerId: playerId, type: 'verified', label: questionLabel(question), answer });
   passTurn(s, playerId);
+  return s;
+}
+
+/**
+ * Resolve a pending manual verified question with the opponent's Yes/No/Unsure.
+ * Yes/No record a verified fact (so the candidate helper filters on it); Unsure
+ * is logged only, like a free question.
+ */
+export function answerVerifiedManual(state: MysteryState, answer: FreeAnswer): MysteryState {
+  if (state.phase !== 'awaiting_manual' || !state.pendingVerified) return state;
+  const { askerId, question } = state.pendingVerified;
+  const s = clone(state);
+  if (answer === 'unsure') {
+    pushHistory(s, { askerId, type: 'free', label: questionLabel(question), answer });
+  } else {
+    const bool = answer === 'yes';
+    s.knowledge[askerId] = [...s.knowledge[askerId], { question, answer: bool }];
+    pushHistory(s, { askerId, type: 'verified', label: questionLabel(question), answer: bool });
+  }
+  s.questionsAsked[askerId] += 1;
+  s.pendingVerified = null;
+  s.phase = 'active';
+  passTurn(s, askerId);
   return s;
 }
 
@@ -240,6 +276,7 @@ export function nextRound(state: MysteryState): MysteryState {
   }
   s.history = [];
   s.pendingFree = null;
+  s.pendingVerified = null;
   s.bonusFor = null;
   s.roundWinner = null;
   s.turn = state.players[0].id;

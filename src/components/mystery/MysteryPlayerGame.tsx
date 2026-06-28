@@ -8,18 +8,21 @@ import {
   askVerified,
   askFree,
   answerFree,
+  answerVerifiedManual,
   makeGuess,
   skipTurn,
   nextRound,
   currentCandidates,
   opponentOf,
 } from '../../lib/mysteryPlayer/mysteryPlayerEngine';
-import { cpuChoosePlayer, cpuTakeTurn, cpuAnswerFree } from '../../lib/mysteryPlayer/mysteryPlayerCpu';
+import { cpuChoosePlayer, cpuTakeTurn, cpuAnswerFree, cpuAnswerVerified } from '../../lib/mysteryPlayer/mysteryPlayerCpu';
+import { questionLabel } from '../../lib/mysteryPlayer/mysteryPlayerQuestions';
 import { getMysteryStore, saveMysterySettings, recordDuelResult } from '../../lib/mysteryPlayer/mysteryPlayerStorage';
 import { buildMysteryShareText } from '../../lib/mysteryPlayer/mysteryPlayerShare';
 import { roundsToWin } from '../../lib/mysteryPlayer/mysteryPlayerScoring';
 import type {
   DuelPlayer,
+  FreeAnswer,
   MysteryState,
   RoomSettings,
   VerifiedQuestion,
@@ -147,6 +150,12 @@ function MysteryLobby({
             <Seg small active={settings.questionMode === 'free'} onClick={() => set({ questionMode: 'free' })}>Free</Seg>
             <Seg small active={settings.questionMode === 'mixed'} onClick={() => set({ questionMode: 'mixed' })}>Mixed</Seg>
           </Row>
+          {settings.questionMode !== 'free' && (
+            <Row label="Verified answers">
+              <Seg small active={settings.answerMode === 'auto'} onClick={() => set({ answerMode: 'auto' })}>Auto</Seg>
+              <Seg small active={settings.answerMode === 'manual'} onClick={() => set({ answerMode: 'manual' })}>Manual</Seg>
+            </Row>
+          )}
           <Row label="Candidate helper">
             <Seg small active={settings.candidateHelper} onClick={() => set({ candidateHelper: true })}>On</Seg>
             <Seg small active={!settings.candidateHelper} onClick={() => set({ candidateHelper: false })}>Off</Seg>
@@ -168,9 +177,11 @@ function MysteryLobby({
       <Button size="lg" fullWidth onClick={onStart}>
         <IconBolt className="h-4 w-4" /> Start duel
       </Button>
-      {settings.questionMode !== 'verified' && (
+      {(settings.questionMode !== 'verified' || settings.answerMode === 'manual') && (
         <p className="text-center text-[11px] text-white/40">
-          Free questions are answered by hand by your opponent. Use with friends.
+          {settings.answerMode === 'manual'
+            ? 'Manual answers: your opponent taps Yes/No themselves — authentic Guess Who, best with a friend.'
+            : 'Free questions are answered by hand by your opponent. Use with friends.'}
         </p>
       )}
     </div>
@@ -246,8 +257,10 @@ function MysteryRunner({
   const activePersonId = useMemo(() => {
     if (state.phase === 'selecting') return state.players.find((p) => !state.locked[p.id] && !p.isCpu)?.id ?? null;
     if (state.phase === 'active') return state.turn;
-    if (state.phase === 'awaiting_manual' && state.pendingFree)
-      return opponentOf(state, state.pendingFree.askerId);
+    if (state.phase === 'awaiting_manual') {
+      const askerId = state.pendingFree?.askerId ?? state.pendingVerified?.askerId;
+      return askerId != null ? opponentOf(state, askerId) : null;
+    }
     return null;
   }, [state]);
 
@@ -267,6 +280,15 @@ function MysteryRunner({
       const answerer = opponentOf(state, state.pendingFree.askerId);
       if (playerById(answerer).isCpu) {
         const id = setTimeout(() => setState(answerFree(state, cpuAnswerFree())), 700);
+        return () => clearTimeout(id);
+      }
+    }
+    if (state.phase === 'awaiting_manual' && state.pendingVerified) {
+      const answerer = opponentOf(state, state.pendingVerified.askerId);
+      if (playerById(answerer).isCpu) {
+        const secretId = state.secret[answerer] ?? '';
+        const ans = cpuAnswerVerified(secretId, state.pendingVerified.question);
+        const id = setTimeout(() => setState(answerVerifiedManual(state, ans)), 700);
         return () => clearTimeout(id);
       }
     }
@@ -362,6 +384,16 @@ function MysteryRunner({
     const mySecret = s.phase === 'active' ? mysteryPlayerById(s.secret[s.turn] ?? '') : null;
     const candidates = s.phase === 'active' ? currentCandidates(s, s.turn) : [];
     const mode = s.settings.questionMode;
+    // A pending manual answer — either a free-text question or a structured
+    // (verified) one in manual answer mode. Unified so the prompt renders once.
+    const manualPrompt =
+      s.phase === 'awaiting_manual'
+        ? s.pendingFree
+          ? { askerId: s.pendingFree.askerId, text: `“${s.pendingFree.text}”`, onAnswer: (a: FreeAnswer) => answerFree(s, a) }
+          : s.pendingVerified
+            ? { askerId: s.pendingVerified.askerId, text: questionLabel(s.pendingVerified.question), onAnswer: (a: FreeAnswer) => answerVerifiedManual(s, a) }
+            : null
+        : null;
 
     return (
       <div className="flex flex-col gap-4 py-4 animate-fade-in">
@@ -374,16 +406,16 @@ function MysteryRunner({
 
         {/* Status */}
         <Card strong className="p-4">
-          {s.phase === 'awaiting_manual' && s.pendingFree ? (
+          {manualPrompt ? (
             <div className="text-center">
               <div className="text-xs uppercase tracking-wide text-white/40">
-                {playerById(s.pendingFree.askerId).name} asks you
+                {playerById(manualPrompt.askerId).name} asks you
               </div>
-              <p className="mt-1 font-display text-lg font-bold">“{s.pendingFree.text}”</p>
+              <p className="mt-1 font-display text-lg font-bold">{manualPrompt.text}</p>
               <div className="mt-3 flex justify-center gap-2">
-                <Button onClick={() => { setState(answerFree(s, 'yes')); setRevealedFor(null); }}>Yes</Button>
-                <Button variant="secondary" onClick={() => { setState(answerFree(s, 'no')); setRevealedFor(null); }}>No</Button>
-                <Button variant="ghost" onClick={() => { setState(answerFree(s, 'unsure')); setRevealedFor(null); }}>Unsure</Button>
+                <Button onClick={() => { setState(manualPrompt.onAnswer('yes')); setRevealedFor(null); }}>Yes</Button>
+                <Button variant="secondary" onClick={() => { setState(manualPrompt.onAnswer('no')); setRevealedFor(null); }}>No</Button>
+                <Button variant="ghost" onClick={() => { setState(manualPrompt.onAnswer('unsure')); setRevealedFor(null); }}>Unsure</Button>
               </div>
             </div>
           ) : (

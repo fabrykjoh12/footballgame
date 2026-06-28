@@ -101,6 +101,15 @@ export interface VerifiedFact {
 /* ------------------------------------------------------------------ */
 
 export type QuestionMode = 'verified' | 'free' | 'mixed';
+/**
+ * How structured (verified) questions get answered:
+ *  - `auto`   — answered automatically from the opponent's secret metadata
+ *               (great vs CPU / solo).
+ *  - `manual` — the opponent taps Yes/No/Unsure themselves (authentic Guess
+ *               Who; the natural mode for two humans / online). The candidate
+ *               helper still filters on a Yes/No answer.
+ */
+export type AnswerMode = 'auto' | 'manual';
 export type WrongGuessPenalty = 'lose_turn' | 'free_question' | 'instant_loss' | 'none';
 export type MatchFormat = 'single' | 'bo3' | 'bo5';
 export type TurnTimer = 15 | 30 | 45 | 60;
@@ -109,6 +118,7 @@ export interface RoomSettings {
   timerOn: boolean;
   turnTimer: TurnTimer;
   questionMode: QuestionMode;
+  answerMode: AnswerMode;
   candidateHelper: boolean;
   penalty: WrongGuessPenalty;
   format: MatchFormat;
@@ -118,6 +128,7 @@ export const DEFAULT_SETTINGS: RoomSettings = {
   timerOn: false,
   turnTimer: 30,
   questionMode: 'mixed',
+  answerMode: 'auto',
   candidateHelper: true,
   penalty: 'free_question',
   format: 'single',
@@ -146,8 +157,10 @@ export interface MysteryState {
   /** Commit hashes per player (fairness / online readiness). */
   commit: Record<string, string>;
   turn: string;
-  /** Pending free question awaiting a manual answer. */
+  /** Pending free-text question awaiting a manual answer. */
   pendingFree: { askerId: string; text: string } | null;
+  /** Pending structured question awaiting a manual Yes/No (answerMode 'manual'). */
+  pendingVerified: { askerId: string; question: VerifiedQuestion } | null;
   /** A player owed a bonus question (from the free-question penalty). */
   bonusFor: string | null;
   history: HistoryEntry[];

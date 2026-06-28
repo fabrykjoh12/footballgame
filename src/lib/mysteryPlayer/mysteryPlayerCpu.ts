@@ -6,7 +6,7 @@
  * It can't parse free text, so it answers free questions "unsure".
  */
 
-import { MYSTERY_PLAYERS } from '../../data/mysteryPlayers';
+import { MYSTERY_PLAYERS, mysteryPlayerById } from '../../data/mysteryPlayers';
 import {
   answerVerified,
   CONTINENT_OPTIONS,
@@ -34,6 +34,13 @@ export function cpuChoosePlayer(rng: Rng): string {
 /** The CPU's answer to a free (manual) question — it can't read intent. */
 export function cpuAnswerFree(): FreeAnswer {
   return 'unsure';
+}
+
+/** The CPU answers a manual verified question truthfully from its own secret. */
+export function cpuAnswerVerified(secretId: string, question: VerifiedQuestion): FreeAnswer {
+  const secret = mysteryPlayerById(secretId);
+  if (!secret) return 'unsure';
+  return answerVerified(secret, question) ? 'yes' : 'no';
 }
 
 function candidateQuestionPool(candidates: { nationality: string }[]): VerifiedQuestion[] {

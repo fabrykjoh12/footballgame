@@ -16,6 +16,7 @@ import {
   askVerified,
   askFree,
   answerFree,
+  answerVerifiedManual,
   makeGuess,
   skipTurn,
   nextRound,
@@ -181,6 +182,44 @@ describe('engine — free questions', () => {
     expect(s.phase).toBe('active');
     expect(s.history[0]).toMatchObject({ type: 'free', answer: 'yes' });
     expect(s.knowledge['a']).toHaveLength(0); // free never filters
+    expect(s.turn).toBe('b');
+  });
+});
+
+describe('engine — manual answer mode', () => {
+  const PL: VerifiedQuestion = { kind: 'league', value: 'Premier League' };
+
+  it('auto mode resolves a verified question immediately', () => {
+    let s = activeGame('lionel_messi', 'kevin_de_bruyne', { answerMode: 'auto' });
+    s = askVerified(s, 'a', PL);
+    expect(s.phase).toBe('active');
+    expect(s.knowledge['a']).toHaveLength(1);
+  });
+
+  it('manual mode routes the question to the opponent before recording', () => {
+    let s = activeGame('lionel_messi', 'kevin_de_bruyne', { answerMode: 'manual' });
+    s = askVerified(s, 'a', PL);
+    expect(s.phase).toBe('awaiting_manual');
+    expect(s.pendingVerified).toMatchObject({ askerId: 'a' });
+    expect(s.knowledge['a']).toHaveLength(0); // nothing recorded until answered
+  });
+
+  it('a manual Yes records a filtering fact and passes the turn', () => {
+    let s = activeGame('lionel_messi', 'kevin_de_bruyne', { answerMode: 'manual' });
+    s = askVerified(s, 'a', PL);
+    s = answerVerifiedManual(s, 'yes');
+    expect(s.phase).toBe('active');
+    expect(s.knowledge['a']).toEqual([{ question: PL, answer: true }]);
+    expect(s.history.at(-1)).toMatchObject({ type: 'verified', answer: true });
+    expect(s.turn).toBe('b');
+  });
+
+  it('a manual Unsure logs without recording a filtering fact', () => {
+    let s = activeGame('lionel_messi', 'kevin_de_bruyne', { answerMode: 'manual' });
+    s = askVerified(s, 'a', PL);
+    s = answerVerifiedManual(s, 'unsure');
+    expect(s.knowledge['a']).toHaveLength(0);
+    expect(s.history.at(-1)).toMatchObject({ type: 'free', answer: 'unsure' });
     expect(s.turn).toBe('b');
   });
 });
