@@ -44,6 +44,8 @@ export interface PlayerMatchStats {
   bestCategory: CategoryRecord | null;
   /** Weakest category (lowest accuracy, min 1 question). */
   weakestCategory: CategoryRecord | null;
+  /** Largest goal deficit faced at any point (for comeback detection). */
+  maxDeficit: number;
 }
 
 export type MomentKind = 'late_winner' | 'equalizer' | 'goal' | 'big_chance';
@@ -96,6 +98,7 @@ function emptyStats(player: Player): PlayerMatchStats {
     bigChances: 0,
     bestCategory: null,
     weakestCategory: null,
+    maxDeficit: 0,
   };
 }
 
@@ -205,6 +208,14 @@ export function summarizeMatch(room: Room): MatchSummary {
           considerMoment({ kind: 'goal', minute, playerId: scorer, label: MOMENT_LABEL.goal });
         }
       }
+    }
+
+    // Track each side's worst goal deficit so far (for comeback detection).
+    if (a && b) {
+      const ga = prevGoals.get(a.id) ?? 0;
+      const gb = prevGoals.get(b.id) ?? 0;
+      stats[a.id].maxDeficit = Math.max(stats[a.id].maxDeficit, gb - ga);
+      stats[b.id].maxDeficit = Math.max(stats[b.id].maxDeficit, ga - gb);
     }
 
     // Timeline marks for replay (reuse the live timeline builder).

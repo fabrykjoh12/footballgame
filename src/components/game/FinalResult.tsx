@@ -83,7 +83,7 @@ export function FinalResult() {
 
   const share = async () => {
     try {
-      await navigator.clipboard.writeText(buildShareText(room));
+      await navigator.clipboard.writeText(buildShareText(room, localPlayerId));
       setShared(true);
       setTimeout(() => setShared(false), 1800);
     } catch {
@@ -93,7 +93,7 @@ export function FinalResult() {
 
   const shareImg = async () => {
     setImgState('working');
-    const result = await shareResultImage(room);
+    const result = await shareResultImage(room, localPlayerId);
     setImgState(
       result === 'shared' ? 'shared' : result === 'downloaded' ? 'saved' : 'idle',
     );

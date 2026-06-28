@@ -12,16 +12,18 @@ import {
   yourPosition,
   type CareerState,
 } from '../../lib/career';
+import { shareResultImage } from '../../lib/shareImage';
 import { LeagueTable } from './LeagueTable';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { IconArrowRight, IconTrophy } from '../ui/icons';
+import { IconArrowRight, IconTrophy, IconShare, IconCheck } from '../ui/icons';
 
 /** Post-fixture screen for Career Mode: shows the result and updates the table. */
 export function CareerResult() {
   const { room, localPlayerId, leaveRoom } = useGame();
   const [career, setCareer] = useState<CareerState | null>(null);
+  const [imgState, setImgState] = useState<'idle' | 'working' | 'done'>('idle');
 
   const me = room?.players.find((p) => p.id === localPlayerId) ?? null;
   const opp = room?.players.find((p) => p.id !== localPlayerId) ?? null;
@@ -61,6 +63,18 @@ export function CareerResult() {
   const seasonOver = career != null && career.status !== 'in_season';
   const division = career ? divisionByTier(career.tier) : null;
   const position = career ? yourPosition(career) : 0;
+  const promoted = !!career?.lastOutcome?.promoted;
+
+  const shareImg = async () => {
+    setImgState('working');
+    const ctx =
+      promoted && career?.lastOutcome
+        ? { promotion: { divisionLabel: divisionByTier(career.lastOutcome.toTier).name } }
+        : undefined;
+    const result = await shareResultImage(room, localPlayerId, ctx);
+    setImgState(result === 'failed' ? 'idle' : 'done');
+    if (result !== 'failed') setTimeout(() => setImgState('idle'), 2200);
+  };
 
   return (
     <div className="flex flex-col gap-4 py-4 animate-fade-in">
@@ -112,10 +126,22 @@ export function CareerResult() {
         </p>
       )}
 
-      <Button fullWidth size="lg" onClick={leaveRoom}>
-        {seasonOver ? 'View season summary' : 'Back to hub'}{' '}
-        <IconArrowRight className="h-4 w-4" />
-      </Button>
+      <div className="flex flex-col gap-2">
+        <Button variant="secondary" fullWidth onClick={shareImg} disabled={imgState === 'working'}>
+          {imgState === 'done' ? <IconCheck className="h-4 w-4 text-pitch" /> : <IconShare className="h-4 w-4" />}
+          {imgState === 'working'
+            ? 'Rendering…'
+            : imgState === 'done'
+              ? 'Shared!'
+              : promoted
+                ? 'Share promotion'
+                : 'Share result'}
+        </Button>
+        <Button fullWidth size="lg" onClick={leaveRoom}>
+          {seasonOver ? 'View season summary' : 'Back to hub'}{' '}
+          <IconArrowRight className="h-4 w-4" />
+        </Button>
+      </div>
     </div>
   );
 }
