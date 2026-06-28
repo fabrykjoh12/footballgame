@@ -7,6 +7,7 @@
 import type { Difficulty, PointsBreakdown } from '../types/game';
 import { QUESTIONS } from '../data/questions';
 import { CONNECTIONS, type Connection } from '../data/connections';
+import { PLAYERS, playersForClubPair } from '../data/players';
 import { pushSeen } from './questionHistory';
 
 export type { Connection } from '../data/connections';
@@ -46,15 +47,41 @@ export function normalizeName(raw: string): string {
 }
 
 /**
- * Does `input` name one of the puzzle's accepted players? Forgiving: matches a
+ * The full set of accepted players for a puzzle: its hand-curated `accept` list
+ * (the headline answers, shown on the reveal) UNION everyone in the player
+ * database who actually played for both clubs. The DB augmentation is what lets
+ * an obscure-but-valid answer count even if nobody hand-listed it — and it gets
+ * better automatically as the roster grows.
+ */
+export function acceptedPlayersFor(conn: Connection): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const add = (name: string) => {
+    const norm = normalizeName(name);
+    if (norm && !seen.has(norm)) {
+      seen.add(norm);
+      out.push(name);
+    }
+  };
+  conn.accept.forEach(add);
+  for (const p of playersForClubPair(conn.clubA, conn.clubB)) add(p.name);
+  return out;
+}
+
+/**
+ * Does `input` name an accepted player for this puzzle? Forgiving: matches a
  * full name, a trailing portion (surname or multi-word surname like
- * "van der vaart"), or a configured alias/nickname.
+ * "van der vaart"), or a configured alias/nickname. Accepts both the curated
+ * list and any DB player who played for both clubs.
  */
 export function matchesConnection(input: string | null | undefined, conn: Connection): boolean {
   if (!input) return false;
   const n = normalizeName(input);
   if (n.length < 2) return false;
   const candidates = [...conn.accept, ...(conn.aliases ?? [])];
+  for (const p of playersForClubPair(conn.clubA, conn.clubB)) {
+    candidates.push(p.name, ...p.aliases);
+  }
   for (const player of candidates) {
     const pn = normalizeName(player);
     if (!pn) continue;
@@ -93,6 +120,7 @@ export function playerNameIndex(): string[] {
   for (const c of CONNECTIONS) {
     for (const a of c.accept) add(a);
   }
+  for (const p of PLAYERS) add(p.name);
   NAME_INDEX = [...set.values()].sort((a, b) => a.localeCompare(b));
   return NAME_INDEX;
 }

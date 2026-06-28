@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   pickConnections,
   gradeConnection,
+  acceptedPlayersFor,
   suggestNames,
   recentConnectionIds,
   recordSeenConnections,
@@ -131,9 +132,6 @@ export function ConnectionsGame({ onExit }: { onExit: () => void }) {
           <Badge tone="pitch">
             <IconRoute className="h-4 w-4" /> Connections
           </Badge>
-          <span className="rounded-full border border-gold/30 bg-gold/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-gold">
-            Beta
-          </span>
         </div>
       </div>
 
@@ -183,7 +181,14 @@ export function ConnectionsGame({ onExit }: { onExit: () => void }) {
             )}
           </div>
           <p className="mt-1 font-normal text-white/75">
-            Accepted: <span className="font-semibold text-white/90">{puzzle.accept.join(', ')}</span>
+            Accepted:{' '}
+            <span className="font-semibold text-white/90">
+              {(() => {
+                const all = acceptedPlayersFor(puzzle);
+                const shown = all.slice(0, 8);
+                return shown.join(', ') + (all.length > shown.length ? ', …' : '');
+              })()}
+            </span>
           </p>
           {puzzle.note && <p className="mt-0.5 text-xs font-normal text-white/50">{puzzle.note}</p>}
         </div>

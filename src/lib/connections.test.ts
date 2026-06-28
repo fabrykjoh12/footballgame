@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   normalizeName,
   matchesConnection,
+  acceptedPlayersFor,
   suggestNames,
   pickConnections,
   gradeConnection,
@@ -50,6 +51,37 @@ describe('matchesConnection', () => {
     expect(matchesConnection('', ARS_BAR)).toBe(false);
     expect(matchesConnection(null, ARS_BAR)).toBe(false);
     expect(matchesConnection('a', ARS_BAR)).toBe(false);
+  });
+});
+
+describe('matchesConnection — database augmentation', () => {
+  // No curated accept list at all; matching comes purely from the player DB.
+  const ARS_JUV: Connection = {
+    id: 'test-ars-juv',
+    clubA: 'Arsenal',
+    clubB: 'Juventus',
+    accept: [],
+    difficulty: 'medium',
+  };
+
+  it('accepts a DB player who played for both clubs, even with an empty accept list', () => {
+    expect(matchesConnection('Henry', ARS_JUV)).toBe(true); // Henry: Juventus + Arsenal
+    expect(matchesConnection('Patrick Vieira', ARS_JUV)).toBe(true);
+  });
+
+  it('still rejects someone who did not play for both', () => {
+    expect(matchesConnection('Lionel Messi', ARS_JUV)).toBe(false);
+  });
+
+  it('resolves club aliases when deriving from the DB', () => {
+    const INT_ARS: Connection = { id: 't', clubA: 'Inter', clubB: 'Arsenal', accept: [], difficulty: 'hard' };
+    expect(matchesConnection('Vieira', INT_ARS)).toBe(true); // Inter → Inter Milan
+  });
+
+  it('acceptedPlayersFor unions the curated list with DB-derived names', () => {
+    const accepted = acceptedPlayersFor(ARS_JUV);
+    expect(accepted).toContain('Thierry Henry');
+    expect(accepted).toContain('Patrick Vieira');
   });
 });
 
