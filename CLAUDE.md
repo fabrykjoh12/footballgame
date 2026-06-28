@@ -22,7 +22,7 @@ sign-in with cross-device progress sync** (Firebase Auth), a
 per-device **question-freshness**, Daily Challenge, local profile/stats, sound,
 share-as-image, live commentary, a 0–90' match timeline, **sudden-death stoppage
 time**, a lobby topic filter, deterministic per-team kit colours, a premium UI
-pass, and **338 unit tests** gating an auto-deploy pipeline.
+pass, and **366 unit tests** gating an auto-deploy pipeline.
 
 > "Football" always means **European football / soccer**. Never use real club
 > badges or player photos — visuals are gradients, pitch patterns, icons, type.
@@ -38,7 +38,7 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (338 tests across lib/, data/, services/)
+npm test         # vitest run (366 tests across lib/, data/, services/)
 ```
 
 Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). **CI runs the
@@ -152,6 +152,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Career progression layer (pure, derived — no schema change: rival club personalities, designated season rival, board objectives w/ live status, board confidence meter, manager reputation) | `src/lib/careerProgression.ts` |
 | Solo arcade modes (Survival / Time Attack / Gauntlet; self-contained, no match engine) | `src/lib/soloModes.ts`, `src/lib/soloProgress.ts`, `src/components/solo/` |
 | Connections solo mode (typed "player who played for both clubs"; fuzzy match + autocomplete; self-contained, no match engine) | `src/lib/connections.ts`, `src/data/connections.ts`, `src/components/connections/` |
+| Mystery Player Duel (standalone "football Guess Who": secret pick + yes/no verified questions, candidate helper, penalties, Bo-series; hot-seat + CPU; own engine, no match engine) | `src/lib/mysteryPlayer/`, `src/data/mysteryPlayers.ts`, `src/components/mystery/` |
 | Themed Cup Runs (knockout tournaments over local matches, like Career) | `src/lib/cup.ts`, `src/components/cup/` |
 | Optional sign-in + cross-device progress sync (Firebase) | `src/context/AuthProvider.tsx`, `src/lib/progress.ts`, `src/lib/firebaseConfig.ts`, `src/services/firebaseBackend.ts`, `src/components/auth/` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |
@@ -292,7 +293,7 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-`npm test` runs **338 tests** across 40 files: `scoring` (incl. **`guessAccuracy` +
+`npm test` runs **366 tests** across 42 files: `scoring` (incl. **`guessAccuracy` +
 closeness-scaled points** for Guess the Number), `questionPicker` (distribution,
 difficulty, anti-bias shuffle, determinism, topic filter, **history-avoidance**
 that exhausts unseen questions first but stays deterministic when seeded),
@@ -363,7 +364,7 @@ Gotchas:
   (image+text), commentary (now an `aria-live` region), timeline, sudden death,
   topic filter, kit colours, premium UI across all screens, **solo arcade modes**
   (Survival / Time Attack / Gauntlet), **themed Cup Runs**, and a **Connections**
-  *(beta)* typed mode, 338 tests + CI.
+  *(beta)* typed mode, 366 tests + CI.
 - 🧪 **Connections is shipped as BETA.** It works and is unit-tested + browser-
   smoked, but it's flagged Beta in the UI because the `accept` lists are
   hand-curated — a valid but obscure player can read as wrong (softened by the

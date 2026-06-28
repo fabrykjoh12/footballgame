@@ -62,11 +62,13 @@ export function HomePage({
   onOpenModes,
   onOpenCup,
   onOpenConnections,
+  onOpenMystery,
 }: {
   onOpenCareer: () => void;
   onOpenModes: () => void;
   onOpenCup: () => void;
   onOpenConnections: () => void;
+  onOpenMystery: () => void;
 }) {
   const {
     createRoom,
@@ -385,6 +387,29 @@ export function HomePage({
         <div className="mt-3">
           <Button fullWidth onClick={onOpenConnections}>
             Play Connections <IconArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </Card>
+
+      {/* Mystery Player Duel (deduction mode) */}
+      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+        <div className="mb-2 flex items-center gap-2">
+          <span aria-hidden className="text-lg">🕵️</span>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
+            Mystery Player Duel
+          </h2>
+          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
+            1v1 · CPU
+          </span>
+        </div>
+        <p className="text-xs leading-relaxed text-white/55">
+          Football Guess Who. Both pick any player in secret, then ask yes/no
+          questions to unmask your opponent’s pick. <span className="font-semibold text-white/75">Pick anyone — let’s
+          see if your friend really knows ball.</span>
+        </p>
+        <div className="mt-3">
+          <Button fullWidth onClick={onOpenMystery}>
+            Start a duel <IconArrowRight className="h-4 w-4" />
           </Button>
         </div>
       </Card>
