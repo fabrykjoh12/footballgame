@@ -67,6 +67,7 @@ export function HomePage({
   onOpenConnectionsDaily,
   onOpenMystery,
   onOpenOlderYounger,
+  onOpenCareerPath,
 }: {
   onOpenCareer: () => void;
   onOpenModes: () => void;
@@ -75,6 +76,7 @@ export function HomePage({
   onOpenConnectionsDaily: () => void;
   onOpenMystery: () => void;
   onOpenOlderYounger: () => void;
+  onOpenCareerPath: () => void;
 }) {
   const {
     createRoom,
@@ -404,6 +406,28 @@ export function HomePage({
               {dailyConn.streak > 0 && <span className="ml-1 text-gold">🔥 {dailyConn.streak}</span>}
             </Button>
           )}
+        </div>
+      </Card>
+
+      {/* Career Path (guess the player from their clubs) */}
+      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+        <div className="mb-2 flex items-center gap-2">
+          <IconRoute className="h-5 w-5 text-pitch" />
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
+            Career Path
+          </h2>
+          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
+            Singleplayer
+          </span>
+        </div>
+        <p className="text-xs leading-relaxed text-white/55">
+          A player’s clubs reveal one by one — <span className="font-semibold text-white/75">name them
+          with as few clues as you dare</span>. Keep the streak alive.
+        </p>
+        <div className="mt-3">
+          <Button fullWidth onClick={onOpenCareerPath}>
+            Play Career Path <IconArrowRight className="h-4 w-4" />
+          </Button>
         </div>
       </Card>
 
