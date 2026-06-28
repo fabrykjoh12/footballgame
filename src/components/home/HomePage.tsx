@@ -19,6 +19,7 @@ import { Card } from '../ui/Card';
 import { DailyRivalCard } from './DailyRivalCard';
 import { ClubBadge } from '../club/ClubBadge';
 import { ClubIdentityModal } from '../club/ClubIdentityModal';
+import { SettingsModal } from '../settings/SettingsModal';
 import { TrophyCabinet } from './TrophyCabinet';
 import { LeaguesCard } from '../leagues/LeaguesCard';
 import {
@@ -81,6 +82,7 @@ export function HomePage({
   const [career] = useState(() => getCareer());
   const [club, setClub] = useState<ClubIdentity | null>(() => getClubIdentity());
   const [editingClub, setEditingClub] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const saveClub = (identity: ClubIdentity) => {
     saveClubIdentity(identity);
@@ -425,6 +427,16 @@ export function HomePage({
           </Card>
         ))}
       </div>
+
+      {/* Settings & data */}
+      <button
+        type="button"
+        onClick={() => setShowSettings(true)}
+        className="mx-auto text-xs text-white/40 hover:text-white"
+      >
+        ⚙ Settings &amp; data
+      </button>
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </div>
   );
 }
