@@ -6,12 +6,32 @@
 
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
 const CODE_PREFIX = 'BK';
-const CODE_BODY_LENGTH = 3;
+// 5 body chars over a 30-char alphabet ≈ 24M combinations, so random
+// collisions between concurrent rooms are vanishingly unlikely (the old
+// 3-char codes gave only ~27k). Matches the league/friend code lengths.
+const CODE_BODY_LENGTH = 5;
+
+/** A uniform random index into the alphabet, crypto-backed when available. */
+function randomIndex(): number {
+  const n = ALPHABET.length;
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    // Rejection-sample to avoid modulo bias.
+    const limit = Math.floor(0xffffffff / n) * n;
+    const buf = new Uint32Array(1);
+    let v: number;
+    do {
+      crypto.getRandomValues(buf);
+      v = buf[0];
+    } while (v >= limit);
+    return v % n;
+  }
+  return Math.floor(Math.random() * n);
+}
 
 export function generateRoomCode(): string {
   let body = '';
   for (let i = 0; i < CODE_BODY_LENGTH; i++) {
-    body += ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+    body += ALPHABET[randomIndex()];
   }
   return CODE_PREFIX + body;
 }
