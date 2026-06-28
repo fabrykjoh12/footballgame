@@ -4,6 +4,7 @@ import { play } from '../../lib/sound';
 import { teamName } from '../../lib/teamName';
 import { recordMatchResult } from '../../lib/profileStats';
 import { refreshAchievements } from '../../lib/achievements';
+import { recordMatchFeats } from '../../lib/feats';
 import {
   getCareer,
   saveCareer,
@@ -39,6 +40,7 @@ export function CareerResult() {
   useEffect(() => {
     if (!room || room.status !== 'finished' || !me || !opp) return;
     recordMatchResult(room, localPlayerId);
+    recordMatchFeats(room, localPlayerId);
     refreshAchievements();
     const sig = `${room.createdAt}:${room.selectedQuestions.map((q) => q.id).join(',')}`;
     const current = getCareer();

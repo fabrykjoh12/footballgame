@@ -5,6 +5,7 @@ import { play } from '../../lib/sound';
 import { teamName } from '../../lib/teamName';
 import { recordMatchResult } from '../../lib/profileStats';
 import { refreshAchievements } from '../../lib/achievements';
+import { recordMatchFeats } from '../../lib/feats';
 import {
   getCupSave,
   getCup,
@@ -46,6 +47,7 @@ export function CupResult() {
     recorded.current = true;
 
     recordMatchResult(room, localPlayerId);
+    recordMatchFeats(room, localPlayerId);
     refreshAchievements();
 
     const before = getCupSave();

@@ -35,6 +35,7 @@ function ctx(over: Partial<AchievementContext> = {}): AchievementContext {
     profile: { ...emptyProfile, ...over.profile },
     daily: { ...emptyDaily, ...over.daily },
     h2h: over.h2h ?? {},
+    feats: over.feats ?? new Set(),
   };
 }
 

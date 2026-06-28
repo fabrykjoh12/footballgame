@@ -15,6 +15,7 @@ import { shareResultImage } from '../../lib/shareImage';
 import { recordMatchResult } from '../../lib/profileStats';
 import { recordDailyResult } from '../../lib/dailyChallenge';
 import { refreshAchievements } from '../../lib/achievements';
+import { recordMatchFeats } from '../../lib/feats';
 import type { AchievementDef } from '../../lib/achievements';
 import { getOpponentRecord, h2hSummary } from '../../lib/headToHead';
 import { dailyBoardId, submitScore, submitPersonalBest } from '../../lib/leaderboard';
@@ -58,6 +59,7 @@ export function FinalResult() {
     if (room?.status !== 'finished') return;
     recordMatchResult(room, localPlayerId);
     if (room.settings.isDaily) recordDailyResult(room, localPlayerId);
+    recordMatchFeats(room, localPlayerId);
     setUnlocked(refreshAchievements());
 
     const me = room.players.find((p) => p.id === localPlayerId);
