@@ -68,6 +68,7 @@ export function HomePage({
   onOpenMystery,
   onOpenOlderYounger,
   onOpenCareerPath,
+  onOpenManagers,
 }: {
   onOpenCareer: () => void;
   onOpenModes: () => void;
@@ -77,6 +78,7 @@ export function HomePage({
   onOpenMystery: () => void;
   onOpenOlderYounger: () => void;
   onOpenCareerPath: () => void;
+  onOpenManagers: () => void;
 }) {
   const {
     createRoom,
@@ -406,6 +408,28 @@ export function HomePage({
               {dailyConn.streak > 0 && <span className="ml-1 text-gold">🔥 {dailyConn.streak}</span>}
             </Button>
           )}
+        </div>
+      </Card>
+
+      {/* Manager Merry-go-round (manager who managed both clubs) */}
+      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+        <div className="mb-2 flex items-center gap-2">
+          <span aria-hidden className="text-lg">🎩</span>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
+            Manager Merry-go-round
+          </h2>
+          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
+            Singleplayer
+          </span>
+        </div>
+        <p className="text-xs leading-relaxed text-white/55">
+          Two clubs, one boss: <span className="font-semibold text-white/75">name a manager who took
+          charge of both</span>. Survive as long as your dugout knowledge holds.
+        </p>
+        <div className="mt-3">
+          <Button fullWidth onClick={onOpenManagers}>
+            Play Manager Merry-go-round <IconArrowRight className="h-4 w-4" />
+          </Button>
         </div>
       </Card>
 
