@@ -12,7 +12,7 @@ score ("Sara FC 3–2 Jonas United"). React + TypeScript + Vite + Tailwind.
 Fully playable offline vs a CPU; real-time multiplayer via Ably (or Supabase)
 when keys are present.
 
-Built and working: 10 mini-games, **1,143 questions**, live Ably 1v1 (verified +
+Built and working: 10 mini-games, **1,177 questions**, live Ably 1v1 (verified +
 hardened), a singleplayer **Career Mode** (climb from League Two to the Premier
 League), **solo arcade game modes** (Survival / Time Attack / Gauntlet), a typed **Connections** mode *(beta)* — name a player who played for both clubs, **themed Cup
 Runs** (knockout tournaments), **optional
@@ -145,7 +145,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Scoring, goals, events, sudden-death helpers (pure) | `src/lib/scoring.ts` |
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize, tiebreakers) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
-| Question database (1,143 Qs, 10 types) | `src/data/questions.ts` |
+| Question database (1,177 Qs, 10 types) | `src/data/questions.ts` |
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
 | Daily Rival Match + seeded RNG (deterministic per-day fixture vs a named fictional rival; streak, scoreline, best category, "beat my result" challenge links, tomorrow countdown) | `src/lib/dailyChallenge.ts`, `src/lib/dailyRival.ts`, `src/lib/seededRandom.ts`, `src/components/home/DailyRivalCard.tsx` |
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
@@ -353,7 +353,7 @@ Gotchas:
 
 ## Status & open items
 
-- ✅ Done: 10 mini-games, 1,143 Qs, live Ably 1v1 + hardening (incl. **guest-side
+- ✅ Done: 10 mini-games, 1,177 Qs, live Ably 1v1 + hardening (incl. **guest-side
   host-drop detection** → reconnecting/failed instead of a frozen match),
   **Career Mode** (singleplayer league climb), **optional sign-in + cross-device
   progress sync** (Firebase Auth email link), Daily Challenge, profile/stats,
@@ -408,7 +408,7 @@ bang-for-buck; none are committed yet — confirm with the owner before building
   report affordance to grow the lists. Eventually fold it into the 1v1 mix as an
   11th type once the matcher is battle-tested (it'd need a `QuestionCard` text
   branch + a host-side accept-list grade in `matchEngine.submitAnswer`).
-- **More content** — keep growing the 1,143-question bank (the batched
+- **More content** — keep growing the 1,177-question bank (the batched
   `questionsBX.ts` + integrity-test pipeline is proven); watch the per-type /
   per-difficulty pool depth (smallest Casual pools are guess_the_number ~25,
   spot_the_lie ~27).
