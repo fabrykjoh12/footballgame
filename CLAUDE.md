@@ -22,7 +22,7 @@ sign-in with cross-device progress sync** (Firebase Auth), a
 per-device **question-freshness**, Daily Challenge, local profile/stats, sound,
 share-as-image, live commentary, a 0–90' match timeline, **sudden-death stoppage
 time**, a lobby topic filter, deterministic per-team kit colours, a premium UI
-pass, and **241 unit tests** gating an auto-deploy pipeline.
+pass, and **255 unit tests** gating an auto-deploy pipeline.
 
 > "Football" always means **European football / soccer**. Never use real club
 > badges or player photos — visuals are gradients, pitch patterns, icons, type.
@@ -38,7 +38,7 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (241 tests across lib/, data/, services/)
+npm test         # vitest run (255 tests across lib/, data/, services/)
 ```
 
 Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). **CI runs the
@@ -147,7 +147,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Topic/category filter options | `src/lib/categories.ts` |
 | Question database (1,111 Qs, 10 types) | `src/data/questions.ts` |
 | Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
-| Daily Challenge + seeded RNG (deterministic per-day match) | `src/lib/dailyChallenge.ts`, `src/lib/seededRandom.ts` |
+| Daily Rival Match + seeded RNG (deterministic per-day fixture vs a named fictional rival; streak, scoreline, best category, "beat my result" challenge links, tomorrow countdown) | `src/lib/dailyChallenge.ts`, `src/lib/dailyRival.ts`, `src/lib/seededRandom.ts`, `src/components/home/DailyRivalCard.tsx` |
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
 | Solo arcade modes (Survival / Time Attack / Gauntlet; self-contained, no match engine) | `src/lib/soloModes.ts`, `src/lib/soloProgress.ts`, `src/components/solo/` |
 | Connections solo mode (typed "player who played for both clubs"; fuzzy match + autocomplete; self-contained, no match engine) | `src/lib/connections.ts`, `src/data/connections.ts`, `src/components/connections/` |
@@ -290,7 +290,7 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-`npm test` runs **241 tests** across 27 files: `scoring` (incl. **`guessAccuracy` +
+`npm test` runs **255 tests** across 28 files: `scoring` (incl. **`guessAccuracy` +
 closeness-scaled points** for Guess the Number), `questionPicker` (distribution,
 difficulty, anti-bias shuffle, determinism, topic filter, **history-avoidance**
 that exhausts unseen questions first but stays deterministic when seeded),
@@ -361,7 +361,7 @@ Gotchas:
   (image+text), commentary (now an `aria-live` region), timeline, sudden death,
   topic filter, kit colours, premium UI across all screens, **solo arcade modes**
   (Survival / Time Attack / Gauntlet), **themed Cup Runs**, and a **Connections**
-  *(beta)* typed mode, 241 tests + CI.
+  *(beta)* typed mode, 255 tests + CI.
 - 🧪 **Connections is shipped as BETA.** It works and is unit-tested + browser-
   smoked, but it's flagged Beta in the UI because the `accept` lists are
   hand-curated — a valid but obscure player can read as wrong (softened by the
