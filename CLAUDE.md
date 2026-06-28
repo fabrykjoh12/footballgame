@@ -14,7 +14,7 @@ when keys are present.
 
 Built and working: 10 mini-games, **1,177 questions**, live Ably 1v1 (verified +
 hardened), a singleplayer **Career Mode** (climb from League Two to the Premier
-League), **solo arcade game modes** (Survival / Time Attack / Gauntlet), a typed **Connections** mode *(beta)* — name a player who played for both clubs, **themed Cup
+League), **solo arcade game modes** (Survival / Time Attack / Gauntlet), a **database-backed Connections** mode — name a player who played for both clubs, **themed Cup
 Runs** (knockout tournaments), **optional
 sign-in with cross-device progress sync** (Firebase Auth), a
 **friends list with friend codes + invite-to-room** (no dictating codes), an
@@ -25,7 +25,18 @@ time**, a lobby topic filter, a standalone **Mystery Player Duel** mode (footbal
 Guess Who; hot-seat + CPU), **user-created club identity**, **cosmetic unlocks**,
 **save export/import**, **first-run onboarding**, an accessibility/settings panel,
 deterministic per-team kit colours, a premium UI
-pass, and **366 unit tests** gating an auto-deploy pipeline.
+pass, and **414 unit tests** gating an auto-deploy pipeline.
+
+> **Central player database (NEW):** `src/data/players.ts` + `src/data/clubs.ts`
+> + `src/lib/playerDb.ts` — 299 curated players (stable facts: clubs, nationality,
+> position, era, trophies, **birth year**) over a 165-club canonical registry
+> with alias resolution. Many modes read from it: Mystery Player Duel (unified
+> onto it), **Connections** (now database-backed, accepts anyone who played for
+> both clubs — **out of beta**), **Daily Connections**, and **Older or Younger?**
+> (birth-year Higher/Lower). Mystery Player Duel also gained a **manual answer
+> mode** and **online 1v1** (`ablyMysteryService.ts`, host-authoritative + secret
+> redaction — built, needs device testing). Home bundle is code-split (~270 kB;
+> modes + data load on demand).
 
 > **Difficulty (reworked):** Casual = easy+medium (18s clock) · Serious =
 > medium+hard (15s) · **Nightmare = nightmare-tagged questions ONLY + a brutal
@@ -46,7 +57,7 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (366 tests across lib/, data/, services/)
+npm test         # vitest run (414 tests across lib/, data/, services/)
 ```
 
 Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). **CI runs the
@@ -154,13 +165,17 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize, tiebreakers) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
 | Question database (1,177 Qs, 10 types) | `src/data/questions.ts` |
+| **Central player database** (299 players, stable facts incl. birthYear) + canonical club registry (165 clubs, alias resolution) + pure query layer (playedForBoth, byNationality/Position/League, careerChain, cluesFor) | `src/data/players.ts`, `src/data/clubs.ts`, `src/lib/playerDb.ts` |
+| Daily Connections (one seeded puzzle/day + solved-day streak) | `src/lib/dailyConnections.ts` (+ `dailyConnection()` in `connections.ts`) |
+| Older or Younger? (birth-year Higher/Lower survival mode) | `src/lib/olderYounger.ts`, `src/components/solo/OlderYoungerGame.tsx` |
+| Mystery online 1v1 (host-authoritative via Ably; forces manual answers + redacts secrets — built, not device-tested) | `src/services/ablyMysteryService.ts`, `src/components/mystery/MysteryOnlineGame.tsx` |
 | Match modes + per-mode clock (Casual easy+med/18s · Serious med+hard/15s · Nightmare nightmare-only/9s; `MODE_DURATION_MS`, `durationForMode`) | `src/lib/matchModes.ts` |
 | Daily Rival Match + seeded RNG (deterministic per-day fixture vs a named fictional rival; streak, scoreline, best category, "beat my result" challenge links, tomorrow countdown) | `src/lib/dailyChallenge.ts`, `src/lib/dailyRival.ts`, `src/lib/seededRandom.ts`, `src/components/home/DailyRivalCard.tsx` |
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
 | Career progression layer (pure, derived — no schema change: rival club personalities, designated season rival, board objectives w/ live status, board confidence meter, manager reputation) | `src/lib/careerProgression.ts` |
 | Solo arcade modes (Survival / Time Attack / Gauntlet; self-contained, no match engine) | `src/lib/soloModes.ts`, `src/lib/soloProgress.ts`, `src/components/solo/` |
 | Connections solo mode (typed "player who played for both clubs"; fuzzy match + autocomplete; self-contained, no match engine) | `src/lib/connections.ts`, `src/data/connections.ts`, `src/components/connections/` |
-| Mystery Player Duel (standalone "football Guess Who": secret pick + yes/no verified questions, candidate helper, penalties, Bo-series; hot-seat + CPU; own engine, no match engine) | `src/lib/mysteryPlayer/`, `src/data/mysteryPlayers.ts`, `src/components/mystery/` |
+| Mystery Player Duel (standalone "football Guess Who": secret pick + yes/no verified questions, candidate helper, penalties, Bo-series; hot-seat + CPU + **online 1v1**; **auto OR manual answers**; own engine, no match engine) | `src/lib/mysteryPlayer/`, `src/data/mysteryPlayers.ts` (now a thin view over the central player DB), `src/components/mystery/` |
 | Themed Cup Runs (knockout tournaments over local matches, like Career) | `src/lib/cup.ts`, `src/components/cup/` |
 | Optional sign-in + cross-device progress sync (Firebase) | `src/context/AuthProvider.tsx`, `src/lib/progress.ts`, `src/lib/firebaseConfig.ts`, `src/services/firebaseBackend.ts`, `src/components/auth/` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |
@@ -222,8 +237,13 @@ streaks/stats; the streak bonus only applies then. The match engine derives
   unconfigured. This is **independent of multiplayer** (Ably/Supabase). Save
   sites notify via a `bk:progress-changed` window event from each
   `save()`/`saveCareer()`. Setup in `FIREBASE_SETUP.md`.
-- **Connections** *(beta)* — a typed singleplayer mode: "name a player who has
-  played for BOTH clubs". Self-contained (`lib/connections.ts` +
+- **Connections** *(out of beta — database-backed)* — a typed singleplayer mode:
+  "name a player who has played for BOTH clubs". `matchesConnection` now accepts
+  anyone in the central player DB who actually played for both clubs (via
+  `playersForClubPair`), so a valid answer isn't rejected just because it wasn't
+  hand-listed — coverage grows with the roster. Curated `accept` lists remain as
+  the headline reveal. Also has a **Daily Connections** (one seeded puzzle/day +
+  streak). Self-contained (`lib/connections.ts` +
   `data/connections.ts` + `components/connections/`), mirroring the solo-modes
   pattern — **no match-engine changes**. 27 curated club-pair puzzles with
   generous, fact-checked `accept` lists across all four difficulty tiers (men's
@@ -372,7 +392,9 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-`npm test` runs **366 tests** across 40 files. Newer suites from the match-feel /
+`npm test` runs **414 tests** across 44 files (incl. `playerDb`, `roomCode`,
+`dailyConnections`, `olderYounger`, and the Connections DB-augmentation +
+Mystery manual-mode suites). Newer suites from the match-feel /
 identity / Mystery work: `attackFraming`, `matchTimeline`, `matchStats`,
 `answerInsight`, `punditry`, `dailyRival`, `shareCard`, `clubIdentity`,
 `careerProgression`, `feats`, `recentOpponents`, `cosmetics`, `backup`,
@@ -450,7 +472,7 @@ Gotchas:
   (image+text), commentary (now an `aria-live` region), timeline, sudden death,
   topic filter, kit colours, premium UI across all screens, **solo arcade modes**
   (Survival / Time Attack / Gauntlet), **themed Cup Runs**, and a **Connections**
-  *(beta)* typed mode, 366 tests + CI.
+  typed mode, 414 tests + CI.
 - ✅ Done (recent match-feel / retention / identity / mode work — all merged to
   `main` + auto-deployed): **question-as-attack framing**, livelier
   **timeline + commentary**, **richer post-match** (knowledge share / MOTM /
@@ -461,14 +483,20 @@ Gotchas:
   **first-run onboarding**, **recent opponents**, a sharper **homepage**
   (Play-vs-CPU CTA + animated preview card), the **Nightmare difficulty rework**
   (nightmare-only + 9s clock) with **1,177 questions**, and the standalone
-  **Mystery Player Duel** mode (hot-seat + CPU, 123-player database).
-- 🧪 **Connections is shipped as BETA.** It works and is unit-tested + browser-
-  smoked, but it's flagged Beta in the UI because the `accept` lists are
-  hand-curated — a valid but obscure player can read as wrong (softened by the
-  "Accepted: …" reveal). To harden it out of beta: expand accept-lists + puzzle
-  count, optionally add a Daily Connections, and consider a "report this answer"
-  affordance. Data lives in `src/data/connections.ts`; matcher in
-  `src/lib/connections.ts`.
+  **Mystery Player Duel** mode (hot-seat + CPU + **online 1v1**, **auto OR manual
+  answers**, now over the central 299-player database).
+- ✅ **Connections is OUT of beta (database-backed).** `matchesConnection` now
+  accepts the curated `accept` list UNION anyone in the central player DB who
+  played for both clubs, so obscure-but-valid answers count and coverage grows
+  with the roster. **Daily Connections** shipped (one seeded puzzle/day +
+  streak). A "report this answer" affordance is still a possible future nicety.
+  Data: `src/data/connections.ts`; matcher + `dailyConnection()`:
+  `src/lib/connections.ts`; daily streak: `src/lib/dailyConnections.ts`.
+- 🧪 **Mystery online 1v1 is BUILT but NOT device-tested.** Host-authoritative
+  via `ablyMysteryService.ts` (forces manual answers + redacts secrets on the
+  wire); reached via "Play a friend online" in the Mystery lobby when Ably is
+  configured. Local hot-seat/CPU is untouched and the Ably SDK is lazy-loaded.
+  Needs two devices to verify (same status as the Supabase path).
 - ⏳ Open: **friends / leaderboard / friend-leagues online layer** is built +
   code-split + gated on Firebase sign-in, but **not device-tested** (needs two
   signed-in accounts). **Friend leagues** = private season tables fed by each
