@@ -24,6 +24,7 @@ const STYLES: Record<
 export function GoalAnimation() {
   const { events, clearEvent, room } = useGame();
   const current = events[0];
+  const status = room?.status;
 
   useEffect(() => {
     if (!current) return;
@@ -32,7 +33,17 @@ export function GoalAnimation() {
     return () => clearTimeout(t);
   }, [current, clearEvent]);
 
-  if (!current) return null;
+  // Dismiss any lingering goal overlay the instant a new question begins.
+  // Otherwise pressing "Next question" during the ~1.7s animation advances the
+  // match while the overlay stays on screen, covering the next question.
+  useEffect(() => {
+    if (status === 'in_question' || status === 'starting') {
+      for (const e of events) clearEvent(e.nonce);
+    }
+  }, [status, events, clearEvent]);
+
+  // Belt-and-braces: never render the overlay over a live question.
+  if (!current || status === 'in_question' || status === 'starting') return null;
 
   const player = room?.players.find((p) => p.id === current.playerId);
   const style = STYLES[current.kind];
