@@ -19,9 +19,10 @@ const ConnectionsGame = lazy(() => import('./components/connections/ConnectionsG
 const CupHub = lazy(() => import('./components/cup/CupHub').then((m) => ({ default: m.CupHub })));
 const CupResult = lazy(() => import('./components/cup/CupResult').then((m) => ({ default: m.CupResult })));
 const MysteryPlayerGame = lazy(() => import('./components/mystery/MysteryPlayerGame').then((m) => ({ default: m.MysteryPlayerGame })));
+const OlderYoungerGame = lazy(() => import('./components/solo/OlderYoungerGame').then((m) => ({ default: m.OlderYoungerGame })));
 
 /** Top-level singleplayer view when no match is in progress. */
-type View = 'home' | 'career' | 'modes' | 'cup' | 'connections' | 'connectionsDaily' | 'mystery';
+type View = 'home' | 'career' | 'modes' | 'cup' | 'connections' | 'connectionsDaily' | 'mystery' | 'olderYounger';
 
 /** Brief gate while a signed-in session's progress is restored. */
 function SyncSplash() {
@@ -71,6 +72,7 @@ function activeScreen(
   if (view === 'connections') return <ConnectionsGame onExit={() => setView('home')} />;
   if (view === 'connectionsDaily') return <ConnectionsGame daily onExit={() => setView('home')} />;
   if (view === 'mystery') return <MysteryPlayerGame onExit={() => setView('home')} />;
+  if (view === 'olderYounger') return <OlderYoungerGame onExit={() => setView('home')} />;
   return (
     <HomePage
       onOpenCareer={() => setView('career')}
@@ -79,6 +81,7 @@ function activeScreen(
       onOpenConnections={() => setView('connections')}
       onOpenConnectionsDaily={() => setView('connectionsDaily')}
       onOpenMystery={() => setView('mystery')}
+      onOpenOlderYounger={() => setView('olderYounger')}
     />
   );
 }

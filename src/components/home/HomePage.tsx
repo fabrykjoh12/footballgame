@@ -66,6 +66,7 @@ export function HomePage({
   onOpenConnections,
   onOpenConnectionsDaily,
   onOpenMystery,
+  onOpenOlderYounger,
 }: {
   onOpenCareer: () => void;
   onOpenModes: () => void;
@@ -73,6 +74,7 @@ export function HomePage({
   onOpenConnections: () => void;
   onOpenConnectionsDaily: () => void;
   onOpenMystery: () => void;
+  onOpenOlderYounger: () => void;
 }) {
   const {
     createRoom,
@@ -402,6 +404,28 @@ export function HomePage({
               {dailyConn.streak > 0 && <span className="ml-1 text-gold">🔥 {dailyConn.streak}</span>}
             </Button>
           )}
+        </div>
+      </Card>
+
+      {/* Older or Younger? (birth-year survival) */}
+      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
+        <div className="mb-2 flex items-center gap-2">
+          <span aria-hidden className="text-lg">🎂</span>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
+            Older or Younger?
+          </h2>
+          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
+            Singleplayer
+          </span>
+        </div>
+        <p className="text-xs leading-relaxed text-white/55">
+          Higher/Lower with footballers: <span className="font-semibold text-white/75">guess if the next
+          player is older or younger</span>. How long a streak can you survive?
+        </p>
+        <div className="mt-3">
+          <Button fullWidth onClick={onOpenOlderYounger}>
+            Play Older or Younger? <IconArrowRight className="h-4 w-4" />
+          </Button>
         </div>
       </Card>
 
