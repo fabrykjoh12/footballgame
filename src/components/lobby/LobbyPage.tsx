@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useGame } from '../../context/GameProvider';
-import { MATCH_MODE_LIST } from '../../lib/matchModes';
+import { MATCH_MODE_LIST, durationForMode } from '../../lib/matchModes';
 import { CATEGORY_OPTIONS } from '../../lib/categories';
 import type { Category } from '../../types/game';
 import { teamName } from '../../lib/teamName';
@@ -123,7 +123,10 @@ export function LobbyPage() {
                 key={mode.id}
                 type="button"
                 disabled={!isHost}
-                onClick={() => isHost && updateSettings({ mode: mode.id })}
+                onClick={() =>
+                  isHost &&
+                  updateSettings({ mode: mode.id, questionDurationMs: durationForMode(mode.id) })
+                }
                 aria-pressed={selected}
                 className={[
                   'answer-press rounded-xl border p-3 text-left transition-colors',

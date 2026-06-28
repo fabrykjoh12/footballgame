@@ -3,6 +3,7 @@ import { PITCH_ZONES } from '../lib/positions';
 import { QUESTIONS_B7 } from './questionsB7';
 import { QUESTIONS_B8 } from './questionsB8';
 import { QUESTIONS_B9 } from './questionsB9';
+import { QUESTIONS_B10 } from './questionsB10';
 
 /* ============================================================================
  * Ball Knowledge — seed question database.
@@ -8716,4 +8717,6 @@ export const QUESTIONS: Question[] = [
   ...QUESTIONS_B8,
   // Difficult expansion batch #2 (hard / nightmare; deep facts).
   ...QUESTIONS_B9,
+  // True-nightmare batch (nightmare only; deep cuts, exact figures).
+  ...QUESTIONS_B10,
 ];

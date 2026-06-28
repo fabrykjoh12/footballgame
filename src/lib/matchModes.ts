@@ -26,22 +26,37 @@ export const MATCH_MODES: Record<MatchMode, MatchModeConfig> = {
   casual: {
     id: 'casual',
     label: 'Casual Match',
-    description: 'Easy + Medium. Friendly kickabout for everyone.',
+    description: 'Easy + Medium, a relaxed clock. Friendly kickabout for everyone.',
     difficulties: ['easy', 'medium'],
   },
   serious: {
     id: 'serious',
     label: 'Serious Ball Knowledge',
-    description: 'Medium + Hard. For the group-chat football brains.',
+    description: 'Medium + Hard, standard clock. For the group-chat football brains.',
     difficulties: ['medium', 'hard'],
   },
   nightmare: {
     id: 'nightmare',
     label: 'Nightmare Mode',
-    description: 'Hard + Nightmare. Only true scholars survive.',
-    difficulties: ['hard', 'nightmare'],
+    description: 'Nightmare questions only, a brutal 9-second clock. Deep cuts, exact figures — no mercy.',
+    difficulties: ['nightmare'],
   },
 };
+
+/**
+ * Per-mode question clock. Nightmare is deliberately punishing: a 9-second
+ * timer leaves no room to deliberate (and reveals fewer Who-Am-I clues, which
+ * unlock every 5s), while Casual is generous.
+ */
+export const MODE_DURATION_MS: Record<MatchMode, number> = {
+  casual: 18_000,
+  serious: 15_000,
+  nightmare: 9_000,
+};
+
+export function durationForMode(mode: MatchMode): number {
+  return MODE_DURATION_MS[mode] ?? DEFAULT_QUESTION_DURATION_MS;
+}
 
 export const MATCH_MODE_LIST: MatchModeConfig[] = [
   MATCH_MODES.casual,
@@ -57,6 +72,6 @@ export function defaultSettings(mode: MatchMode = 'casual'): MatchSettings {
   return {
     mode,
     questionCount: DEFAULT_QUESTION_COUNT,
-    questionDurationMs: DEFAULT_QUESTION_DURATION_MS,
+    questionDurationMs: durationForMode(mode),
   };
 }
