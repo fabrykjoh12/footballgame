@@ -55,6 +55,8 @@ export interface Player {
   clubs: string[];
   /** Leagues played in (derived from clubs unless overridden). */
   leagues: string[];
+  /** Year of birth (stable fact; omitted where not yet recorded). */
+  birthYear?: number;
   debutYear: number;
   lastYear?: number;
   active: boolean;
@@ -73,6 +75,8 @@ export interface PlayerSeed {
   clubs: string[];
   /** Optional explicit leagues; derived from clubs when omitted. */
   leagues?: string[];
+  /** Year of birth (stable fact; optional). */
+  birthYear?: number;
   debutYear: number;
   lastYear?: number;
   /** Space-separated trophy tokens: cl bd wc eu cp lg. */
@@ -174,6 +178,7 @@ export function buildPlayer(seed: PlayerSeed): Player {
     primaryPosition: seed.positions[0],
     clubs,
     leagues,
+    birthYear: seed.birthYear,
     debutYear: seed.debutYear,
     lastYear: seed.lastYear,
     active: seed.lastYear === undefined,

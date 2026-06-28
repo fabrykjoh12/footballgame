@@ -115,6 +115,15 @@ describe('player roster integrity', () => {
       if (p.name.split(/\s+/).length > 1) expect(p.aliases.length).toBeGreaterThan(0);
     }
   });
+
+  it('birth year, when present, is sane (before debut, plausible range)', () => {
+    for (const p of PLAYERS) {
+      if (p.birthYear === undefined) continue;
+      expect(p.birthYear).toBeGreaterThan(1925);
+      expect(p.birthYear).toBeLessThan(2010);
+      expect(p.birthYear).toBeLessThan(p.debutYear);
+    }
+  });
 });
 
 describe('builder', () => {

@@ -247,6 +247,77 @@ const SEED: PlayerSeed[] = [
   { id: 'gabriel_jesus', name: 'Gabriel Jesus', nationality: 'Brazil', positions: ['forward', 'striker'], clubs: ['Palmeiras', 'Manchester City', 'Arsenal'], debutYear: 2015, won: 'cp lg', aliases: ['Jesus'] },
   { id: 'bruno_guimaraes', name: 'Bruno Guimarães', nationality: 'Brazil', positions: ['midfielder'], clubs: ['Lyon', 'Newcastle United'], debutYear: 2017, won: '', aliases: ['Guimaraes', 'Guimarães'] },
   { id: 'darwin_nunez', name: 'Darwin Núñez', nationality: 'Uruguay', positions: ['striker', 'forward'], clubs: ['Benfica', 'Liverpool'], debutYear: 2017, won: '', aliases: ['Nunez', 'Núñez'] },
+
+  // ================= Growth batch 2 — depth (with birth years) =================
+
+  // ---- Defenders ----
+  { id: 'franco_baresi', name: 'Franco Baresi', nationality: 'Italy', positions: ['defender'], clubs: ['AC Milan'], debutYear: 1977, lastYear: 1997, birthYear: 1960, won: 'cl lg', aliases: ['Baresi'] },
+  { id: 'jaap_stam', name: 'Jaap Stam', nationality: 'Netherlands', positions: ['defender'], clubs: ['PSV', 'Manchester United', 'Lazio', 'AC Milan'], debutYear: 1992, lastYear: 2007, birthYear: 1972, won: 'cl lg', aliases: ['Stam'] },
+  { id: 'nemanja_vidic', name: 'Nemanja Vidić', nationality: 'Serbia', positions: ['defender'], clubs: ['Spartak Moscow', 'Manchester United', 'Inter Milan'], debutYear: 2000, lastYear: 2016, birthYear: 1981, won: 'cl lg', aliases: ['Vidic'] },
+  { id: 'patrice_evra', name: 'Patrice Evra', nationality: 'France', positions: ['defender'], clubs: ['Monaco', 'Manchester United', 'Juventus', 'Marseille', 'West Ham United'], debutYear: 2000, lastYear: 2019, birthYear: 1981, won: 'cl lg', aliases: ['Evra'] },
+  { id: 'gary_neville', name: 'Gary Neville', nationality: 'England', positions: ['defender'], clubs: ['Manchester United'], debutYear: 1992, lastYear: 2011, birthYear: 1975, won: 'cl lg', aliases: ['Neville'] },
+  { id: 'jamie_carragher', name: 'Jamie Carragher', nationality: 'England', positions: ['defender'], clubs: ['Liverpool'], debutYear: 1996, lastYear: 2013, birthYear: 1978, won: 'cl', aliases: ['Carragher'] },
+  { id: 'sol_campbell', name: 'Sol Campbell', nationality: 'England', positions: ['defender'], clubs: ['Tottenham Hotspur', 'Arsenal', 'Newcastle United'], debutYear: 1992, lastYear: 2012, birthYear: 1974, won: 'lg', aliases: ['Campbell'] },
+  { id: 'lucio', name: 'Lúcio', nationality: 'Brazil', positions: ['defender'], clubs: ['Bayer Leverkusen', 'Bayern Munich', 'Inter Milan'], debutYear: 1997, lastYear: 2020, birthYear: 1978, won: 'cl wc lg', aliases: ['Lucio'] },
+  { id: 'pepe', name: 'Pepe', nationality: 'Portugal', positions: ['defender'], clubs: ['Porto', 'Real Madrid', 'Beşiktaş'], debutYear: 2001, lastYear: 2024, birthYear: 1983, won: 'cl eu lg' },
+  { id: 'raphael_varane', name: 'Raphaël Varane', nationality: 'France', positions: ['defender'], clubs: ['Lens', 'Real Madrid', 'Manchester United'], debutYear: 2010, lastYear: 2024, birthYear: 1993, won: 'cl wc lg', aliases: ['Varane'] },
+  { id: 'kyle_walker', name: 'Kyle Walker', nationality: 'England', positions: ['defender'], clubs: ['Tottenham Hotspur', 'Manchester City', 'AC Milan'], debutYear: 2009, birthYear: 1990, won: 'cl lg', aliases: ['Walker'] },
+  { id: 'joao_cancelo', name: 'João Cancelo', nationality: 'Portugal', positions: ['defender'], clubs: ['Benfica', 'Valencia', 'Juventus', 'Manchester City', 'Barcelona', 'Al Hilal'], debutYear: 2012, birthYear: 1994, won: 'lg', aliases: ['Cancelo'] },
+  { id: 'david_alaba', name: 'David Alaba', nationality: 'Austria', positions: ['defender'], clubs: ['Bayern Munich', 'Real Madrid'], debutYear: 2010, birthYear: 1992, won: 'cl lg', aliases: ['Alaba'] },
+  { id: 'theo_hernandez', name: 'Theo Hernández', nationality: 'France', positions: ['defender'], clubs: ['Atlético Madrid', 'Real Madrid', 'AC Milan', 'Al Hilal'], debutYear: 2016, birthYear: 1997, won: 'lg', aliases: ['Theo Hernandez'] },
+  { id: 'alessandro_bastoni', name: 'Alessandro Bastoni', nationality: 'Italy', positions: ['defender'], clubs: ['Atalanta', 'Inter Milan'], debutYear: 2016, birthYear: 1999, won: 'lg', aliases: ['Bastoni'] },
+  { id: 'lisandro_martinez', name: 'Lisandro Martínez', nationality: 'Argentina', positions: ['defender'], clubs: ['Ajax', 'Manchester United'], debutYear: 2017, birthYear: 1998, won: 'wc lg' },
+  { id: 'cristian_romero', name: 'Cristian Romero', nationality: 'Argentina', positions: ['defender'], clubs: ['Genoa', 'Atalanta', 'Tottenham Hotspur'], debutYear: 2016, birthYear: 1998, won: 'wc', aliases: ['Romero', 'Cuti Romero'] },
+
+  // ---- Goalkeepers ----
+  { id: 'peter_schmeichel', name: 'Peter Schmeichel', nationality: 'Denmark', positions: ['goalkeeper'], clubs: ['Manchester United', 'Aston Villa', 'Manchester City'], debutYear: 1987, lastYear: 2003, birthYear: 1963, won: 'cl eu lg', aliases: ['Schmeichel'] },
+  { id: 'david_de_gea', name: 'David de Gea', nationality: 'Spain', positions: ['goalkeeper'], clubs: ['Atlético Madrid', 'Manchester United', 'Fiorentina'], debutYear: 2009, birthYear: 1990, won: '', aliases: ['de Gea'] },
+  { id: 'emiliano_martinez', name: 'Emiliano Martínez', nationality: 'Argentina', positions: ['goalkeeper'], clubs: ['Arsenal', 'Aston Villa'], debutYear: 2010, birthYear: 1992, won: 'wc cp', aliases: ['Dibu Martinez', 'Emi Martinez'] },
+  { id: 'keylor_navas', name: 'Keylor Navas', nationality: 'Costa Rica', positions: ['goalkeeper'], clubs: ['Real Madrid', 'Paris Saint-Germain'], debutYear: 2008, birthYear: 1986, won: 'cl lg', aliases: ['Navas'] },
+
+  // ---- Midfielders ----
+  { id: 'deco', name: 'Deco', nationality: 'Portugal', positions: ['midfielder'], clubs: ['Porto', 'Barcelona', 'Chelsea'], debutYear: 1997, lastYear: 2013, birthYear: 1977, won: 'cl lg' },
+  { id: 'yaya_toure', name: 'Yaya Touré', nationality: 'Ivory Coast', positions: ['midfielder'], clubs: ['Olympiacos', 'Monaco', 'Barcelona', 'Manchester City'], debutYear: 2001, lastYear: 2018, birthYear: 1983, won: 'cl lg', aliases: ['Toure', 'Yaya Toure'] },
+  { id: 'claude_makelele', name: 'Claude Makélélé', nationality: 'France', positions: ['midfielder'], clubs: ['Nantes', 'Real Madrid', 'Chelsea', 'Paris Saint-Germain'], debutYear: 1991, lastYear: 2011, birthYear: 1973, won: 'cl lg', aliases: ['Makelele'] },
+  { id: 'ivan_rakitic', name: 'Ivan Rakitić', nationality: 'Croatia', positions: ['midfielder'], clubs: ['Schalke 04', 'Sevilla', 'Barcelona'], debutYear: 2005, birthYear: 1988, won: 'cl lg', aliases: ['Rakitic'] },
+  { id: 'ivan_perisic', name: 'Ivan Perišić', nationality: 'Croatia', positions: ['winger', 'midfielder'], clubs: ['Borussia Dortmund', 'Wolfsburg', 'Inter Milan', 'Tottenham Hotspur', 'Bayern Munich'], debutYear: 2009, birthYear: 1989, won: 'lg', aliases: ['Perisic'] },
+  { id: 'mateo_kovacic', name: 'Mateo Kovačić', nationality: 'Croatia', positions: ['midfielder'], clubs: ['Dinamo Zagreb', 'Inter Milan', 'Real Madrid', 'Chelsea', 'Manchester City'], debutYear: 2010, birthYear: 1994, won: 'cl lg', aliases: ['Kovacic'] },
+  { id: 'thiago_alcantara', name: 'Thiago Alcântara', nationality: 'Spain', positions: ['midfielder'], clubs: ['Barcelona', 'Bayern Munich', 'Liverpool'], debutYear: 2009, lastYear: 2024, birthYear: 1991, won: 'cl lg', aliases: ['Thiago', 'Thiago Alcantara'] },
+  { id: 'marco_reus', name: 'Marco Reus', nationality: 'Germany', positions: ['forward', 'midfielder'], clubs: ['Borussia Mönchengladbach', 'Borussia Dortmund', 'LA Galaxy'], debutYear: 2009, birthYear: 1989, won: '', aliases: ['Reus'] },
+  { id: 'isco', name: 'Isco', nationality: 'Spain', positions: ['midfielder'], clubs: ['Valencia', 'Real Madrid', 'Real Betis'], debutYear: 2010, birthYear: 1992, won: 'cl lg' },
+  { id: 'koke', name: 'Koke', nationality: 'Spain', positions: ['midfielder'], clubs: ['Atlético Madrid'], debutYear: 2009, birthYear: 1992, won: 'lg' },
+  { id: 'juan_mata', name: 'Juan Mata', nationality: 'Spain', positions: ['midfielder'], clubs: ['Valencia', 'Chelsea', 'Manchester United'], debutYear: 2007, birthYear: 1988, won: 'cl wc eu lg', aliases: ['Mata'] },
+  { id: 'pedro_rodriguez', name: 'Pedro', nationality: 'Spain', positions: ['forward', 'winger'], clubs: ['Barcelona', 'Chelsea', 'Roma', 'Lazio'], debutYear: 2008, birthYear: 1987, won: 'cl wc eu lg', aliases: ['Pedro Rodriguez'] },
+  { id: 'marco_asensio', name: 'Marco Asensio', nationality: 'Spain', positions: ['forward', 'midfielder'], clubs: ['Mallorca', 'Real Madrid', 'Paris Saint-Germain'], debutYear: 2014, birthYear: 1996, won: 'cl lg', aliases: ['Asensio'] },
+  { id: 'rui_costa', name: 'Rui Costa', nationality: 'Portugal', positions: ['midfielder'], clubs: ['Benfica', 'Fiorentina', 'AC Milan'], debutYear: 1990, lastYear: 2008, birthYear: 1972, won: 'cl lg' },
+  { id: 'gheorghe_hagi', name: 'Gheorghe Hagi', nationality: 'Romania', positions: ['midfielder', 'forward'], clubs: ['Real Madrid', 'Barcelona', 'Galatasaray'], debutYear: 1982, lastYear: 2001, birthYear: 1965, won: 'lg', aliases: ['Hagi'] },
+
+  // ---- Wingers & forwards ----
+  { id: 'angel_di_maria', name: 'Ángel Di María', nationality: 'Argentina', positions: ['winger', 'forward'], clubs: ['Benfica', 'Real Madrid', 'Manchester United', 'Paris Saint-Germain', 'Juventus'], debutYear: 2007, birthYear: 1988, won: 'cl wc cp lg', aliases: ['Di Maria'] },
+  { id: 'gonzalo_higuain', name: 'Gonzalo Higuaín', nationality: 'Argentina', positions: ['striker'], clubs: ['River Plate', 'Real Madrid', 'Napoli', 'Juventus', 'AC Milan', 'Inter Miami'], debutYear: 2005, lastYear: 2023, birthYear: 1987, won: 'lg', aliases: ['Higuain'] },
+  { id: 'paulo_dybala', name: 'Paulo Dybala', nationality: 'Argentina', positions: ['forward'], clubs: ['Palermo', 'Juventus', 'Roma'], debutYear: 2011, birthYear: 1993, won: 'wc lg', aliases: ['Dybala'] },
+  { id: 'philippe_coutinho', name: 'Philippe Coutinho', nationality: 'Brazil', positions: ['midfielder', 'forward'], clubs: ['Inter Milan', 'Liverpool', 'Barcelona', 'Aston Villa', 'Vasco da Gama'], debutYear: 2010, birthYear: 1992, won: 'cl lg', aliases: ['Coutinho'] },
+  { id: 'willian', name: 'Willian', nationality: 'Brazil', positions: ['winger'], clubs: ['Shakhtar Donetsk', 'Chelsea', 'Arsenal', 'Fulham'], debutYear: 2006, birthYear: 1988, won: 'lg' },
+  { id: 'memphis_depay', name: 'Memphis Depay', nationality: 'Netherlands', positions: ['forward', 'winger'], clubs: ['PSV', 'Manchester United', 'Lyon', 'Barcelona', 'Atlético Madrid'], debutYear: 2011, birthYear: 1994, won: 'lg', aliases: ['Depay', 'Memphis'] },
+  { id: 'hakim_ziyech', name: 'Hakim Ziyech', nationality: 'Morocco', positions: ['winger', 'midfielder'], clubs: ['Ajax', 'Chelsea', 'Galatasaray'], debutYear: 2012, birthYear: 1993, won: 'cl lg', aliases: ['Ziyech'] },
+  { id: 'christian_pulisic', name: 'Christian Pulisic', nationality: 'United States', positions: ['winger', 'forward'], clubs: ['Borussia Dortmund', 'Chelsea', 'AC Milan'], debutYear: 2016, birthYear: 1998, won: 'cl', aliases: ['Pulisic'] },
+  { id: 'leroy_sane', name: 'Leroy Sané', nationality: 'Germany', positions: ['winger', 'forward'], clubs: ['Schalke 04', 'Manchester City', 'Bayern Munich'], debutYear: 2014, birthYear: 1996, won: 'lg', aliases: ['Sane'] },
+  { id: 'serge_gnabry', name: 'Serge Gnabry', nationality: 'Germany', positions: ['winger', 'forward'], clubs: ['Arsenal', 'Werder Bremen', 'Bayern Munich'], debutYear: 2012, birthYear: 1995, won: 'cl lg', aliases: ['Gnabry'] },
+  { id: 'kingsley_coman', name: 'Kingsley Coman', nationality: 'France', positions: ['winger', 'forward'], clubs: ['Paris Saint-Germain', 'Juventus', 'Bayern Munich', 'Al Nassr'], debutYear: 2013, birthYear: 1996, won: 'cl lg', aliases: ['Coman'] },
+  { id: 'ferran_torres', name: 'Ferran Torres', nationality: 'Spain', positions: ['forward', 'winger'], clubs: ['Valencia', 'Manchester City', 'Barcelona'], debutYear: 2017, birthYear: 2000, won: 'lg', aliases: ['Ferran'] },
+  { id: 'jadon_sancho', name: 'Jadon Sancho', nationality: 'England', positions: ['winger', 'forward'], clubs: ['Manchester City', 'Borussia Dortmund', 'Manchester United', 'Chelsea'], debutYear: 2017, birthYear: 2000, won: '', aliases: ['Sancho'] },
+  { id: 'davor_suker', name: 'Davor Šuker', nationality: 'Croatia', positions: ['striker', 'forward'], clubs: ['Sevilla', 'Real Madrid', 'Arsenal'], debutYear: 1989, lastYear: 2003, birthYear: 1968, won: 'cl lg', aliases: ['Suker'] },
+  { id: 'jurgen_klinsmann', name: 'Jürgen Klinsmann', nationality: 'Germany', positions: ['striker', 'forward'], clubs: ['VfB Stuttgart', 'Inter Milan', 'Monaco', 'Tottenham Hotspur', 'Bayern Munich'], debutYear: 1981, lastYear: 1998, birthYear: 1964, won: 'wc eu lg', aliases: ['Klinsmann'] },
+
+  // ---- Strikers ----
+  { id: 'christian_vieri', name: 'Christian Vieri', nationality: 'Italy', positions: ['striker'], clubs: ['Juventus', 'Atlético Madrid', 'Lazio', 'Inter Milan', 'AC Milan'], debutYear: 1991, lastYear: 2009, birthYear: 1973, won: 'lg', aliases: ['Vieri'] },
+  { id: 'mario_mandzukic', name: 'Mario Mandžukić', nationality: 'Croatia', positions: ['striker'], clubs: ['Wolfsburg', 'Bayern Munich', 'Atlético Madrid', 'Juventus', 'AC Milan'], debutYear: 2007, lastYear: 2021, birthYear: 1986, won: 'cl lg', aliases: ['Mandzukic'] },
+  { id: 'edin_dzeko', name: 'Edin Džeko', nationality: 'Bosnia and Herzegovina', positions: ['striker'], clubs: ['Wolfsburg', 'Manchester City', 'Roma', 'Inter Milan', 'Fenerbahçe'], debutYear: 2005, birthYear: 1986, won: 'lg', aliases: ['Dzeko'] },
+  { id: 'olivier_giroud', name: 'Olivier Giroud', nationality: 'France', positions: ['striker'], clubs: ['Arsenal', 'Chelsea', 'AC Milan', 'LAFC'], debutYear: 2005, birthYear: 1986, won: 'cl wc lg', aliases: ['Giroud'] },
+  { id: 'ciro_immobile', name: 'Ciro Immobile', nationality: 'Italy', positions: ['striker'], clubs: ['Juventus', 'Borussia Dortmund', 'Sevilla', 'Lazio', 'Beşiktaş'], debutYear: 2009, birthYear: 1990, won: '', aliases: ['Immobile'] },
+  { id: 'dusan_vlahovic', name: 'Dušan Vlahović', nationality: 'Serbia', positions: ['striker'], clubs: ['Fiorentina', 'Juventus'], debutYear: 2018, birthYear: 2000, won: '', aliases: ['Vlahovic'] },
+  { id: 'alexander_isak', name: 'Alexander Isak', nationality: 'Sweden', positions: ['striker'], clubs: ['Borussia Dortmund', 'Real Sociedad', 'Newcastle United', 'Liverpool'], debutYear: 2016, birthYear: 1999, won: '', aliases: ['Isak'] },
+  { id: 'viktor_gyokeres', name: 'Viktor Gyökeres', nationality: 'Sweden', positions: ['striker', 'forward'], clubs: ['Brighton', 'Sporting CP', 'Arsenal'], debutYear: 2017, birthYear: 1998, won: 'lg', aliases: ['Gyokeres'] },
 ];
 
 /** The full, built player roster — the single source of truth. */
