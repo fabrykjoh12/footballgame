@@ -70,6 +70,26 @@ const SEED: ManagerSeed[] = [
   { id: 'mikel_arteta', name: 'Mikel Arteta', nationality: 'Spain', clubs: ['Arsenal'], aliases: ['Arteta'] },
   { id: 'vicente_del_bosque', name: 'Vicente del Bosque', nationality: 'Spain', clubs: ['Real Madrid'], aliases: ['del Bosque'] },
   { id: 'roberto_di_matteo', name: 'Roberto Di Matteo', nationality: 'Italy', clubs: ['Chelsea', 'Schalke 04', 'Aston Villa'], aliases: ['Di Matteo'] },
+
+  /* ---- batch 2: more dugouts ---- */
+  { id: 'xavi_mgr', name: 'Xavi', nationality: 'Spain', clubs: ['Al Sadd', 'Barcelona'], aliases: ['Xavi Hernandez'] },
+  { id: 'simone_inzaghi', name: 'Simone Inzaghi', nationality: 'Italy', clubs: ['Lazio', 'Inter Milan', 'Al Hilal'], aliases: ['S. Inzaghi'] },
+  { id: 'stefano_pioli', name: 'Stefano Pioli', nationality: 'Italy', clubs: ['Lazio', 'Fiorentina', 'Inter Milan', 'AC Milan', 'Roma'], aliases: ['Pioli'] },
+  { id: 'gian_piero_gasperini', name: 'Gian Piero Gasperini', nationality: 'Italy', clubs: ['Genoa', 'Inter Milan', 'Atalanta', 'Roma'], aliases: ['Gasperini'] },
+  { id: 'luciano_spalletti', name: 'Luciano Spalletti', nationality: 'Italy', clubs: ['Roma', 'Zenit', 'Inter Milan', 'Napoli'], aliases: ['Spalletti'] },
+  { id: 'ronald_koeman', name: 'Ronald Koeman', nationality: 'Netherlands', clubs: ['Ajax', 'Benfica', 'PSV', 'Valencia', 'Southampton', 'Everton', 'Barcelona'], aliases: ['Koeman'] },
+  { id: 'frank_de_boer', name: 'Frank de Boer', nationality: 'Netherlands', clubs: ['Ajax', 'Inter Milan', 'Crystal Palace'], aliases: ['de Boer'] },
+  { id: 'andre_villas_boas', name: 'André Villas-Boas', nationality: 'Portugal', clubs: ['Porto', 'Chelsea', 'Tottenham Hotspur', 'Marseille'], aliases: ['Villas-Boas', 'Villas Boas', 'AVB'] },
+  { id: 'laurent_blanc', name: 'Laurent Blanc', nationality: 'France', clubs: ['Bordeaux', 'Paris Saint-Germain', 'Lyon'], aliases: ['Blanc'] },
+  { id: 'didier_deschamps_mgr', name: 'Didier Deschamps', nationality: 'France', clubs: ['Monaco', 'Juventus', 'Marseille'], aliases: ['Deschamps'] },
+  { id: 'rudi_garcia', name: 'Rudi Garcia', nationality: 'France', clubs: ['Lille', 'Roma', 'Marseille', 'Lyon', 'Napoli', 'Al Nassr'], aliases: ['Garcia'] },
+  { id: 'christophe_galtier', name: 'Christophe Galtier', nationality: 'France', clubs: ['Saint-Étienne', 'Lille', 'Nice', 'Paris Saint-Germain'], aliases: ['Galtier'] },
+  { id: 'roberto_de_zerbi', name: 'Roberto De Zerbi', nationality: 'Italy', clubs: ['Brighton', 'Marseille'], aliases: ['De Zerbi'] },
+  { id: 'nuno_espirito_santo', name: 'Nuno Espírito Santo', nationality: 'Portugal', clubs: ['Valencia', 'Porto', 'Wolverhampton Wanderers', 'Tottenham Hotspur', 'Nottingham Forest'], aliases: ['Nuno'] },
+  { id: 'quique_setien', name: 'Quique Setién', nationality: 'Spain', clubs: ['Las Palmas', 'Real Betis', 'Barcelona'], aliases: ['Setien'] },
+  { id: 'vincenzo_montella', name: 'Vincenzo Montella', nationality: 'Italy', clubs: ['Fiorentina', 'AC Milan', 'Sevilla', 'Roma'], aliases: ['Montella'] },
+  { id: 'graham_potter', name: 'Graham Potter', nationality: 'England', clubs: ['Brighton', 'Chelsea', 'West Ham United'], aliases: ['Potter'] },
+  { id: 'slaven_bilic', name: 'Slaven Bilić', nationality: 'Croatia', clubs: ['West Ham United', 'Beşiktaş'], aliases: ['Bilic'] },
 ];
 
 export const MANAGERS: Manager[] = SEED.map((s) => ({
