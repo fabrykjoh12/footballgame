@@ -19,10 +19,18 @@ Runs** (knockout tournaments), **optional
 sign-in with cross-device progress sync** (Firebase Auth), a
 **friends list with friend codes + invite-to-room** (no dictating codes), an
 **online daily/all-time leaderboard**, **achievements**, **head-to-head records**,
-per-device **question-freshness**, Daily Challenge, local profile/stats, sound,
+per-device **question-freshness**, a **Daily Rival Match**, local profile/stats, sound,
 share-as-image, live commentary, a 0–90' match timeline, **sudden-death stoppage
-time**, a lobby topic filter, deterministic per-team kit colours, a premium UI
+time**, a lobby topic filter, a standalone **Mystery Player Duel** mode (football
+Guess Who; hot-seat + CPU), **user-created club identity**, **cosmetic unlocks**,
+**save export/import**, **first-run onboarding**, an accessibility/settings panel,
+deterministic per-team kit colours, a premium UI
 pass, and **366 unit tests** gating an auto-deploy pipeline.
+
+> **Difficulty (reworked):** Casual = easy+medium (18s clock) · Serious =
+> medium+hard (15s) · **Nightmare = nightmare-tagged questions ONLY + a brutal
+> 9s clock** (so fewer time-gated Who-Am-I clues reveal). Per-mode clocks live in
+> `MODE_DURATION_MS` (`matchModes.ts`) and the lobby applies them on mode switch.
 
 > "Football" always means **European football / soccer**. Never use real club
 > badges or player photos — visuals are gradients, pitch patterns, icons, type.
@@ -146,7 +154,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize, tiebreakers) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
 | Question database (1,177 Qs, 10 types) | `src/data/questions.ts` |
-| Match modes (Casual/Serious/Nightmare) | `src/lib/matchModes.ts` |
+| Match modes + per-mode clock (Casual easy+med/18s · Serious med+hard/15s · Nightmare nightmare-only/9s; `MODE_DURATION_MS`, `durationForMode`) | `src/lib/matchModes.ts` |
 | Daily Rival Match + seeded RNG (deterministic per-day fixture vs a named fictional rival; streak, scoreline, best category, "beat my result" challenge links, tomorrow countdown) | `src/lib/dailyChallenge.ts`, `src/lib/dailyRival.ts`, `src/lib/seededRandom.ts`, `src/components/home/DailyRivalCard.tsx` |
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
 | Career progression layer (pure, derived — no schema change: rival club personalities, designated season rival, board objectives w/ live status, board confidence meter, manager reputation) | `src/lib/careerProgression.ts` |
@@ -157,8 +165,16 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Optional sign-in + cross-device progress sync (Firebase) | `src/context/AuthProvider.tsx`, `src/lib/progress.ts`, `src/lib/firebaseConfig.ts`, `src/services/firebaseBackend.ts`, `src/components/auth/` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |
 | Per-device question-history (recent-repeat avoidance, local) | `src/lib/questionHistory.ts` |
-| Achievements / badges (derived from stats, pure unlock rules) | `src/lib/achievements.ts`, `src/components/home/TrophyCabinet.tsx` |
+| Achievements / badges (derived from stats + match feats, pure unlock rules) | `src/lib/achievements.ts`, `src/components/home/TrophyCabinet.tsx` |
+| Match feats (one-off accomplishments: perfect match, comeback, clean sheet, five-star, hat-trick, win-on-points, nightmare win, stoppage winner; feed achievements) | `src/lib/feats.ts` |
 | Head-to-head record vs each opponent (local) | `src/lib/headToHead.ts` |
+| Recent opponents (real non-bot foes you've faced; one-tap add in Friends) | `src/lib/recentOpponents.ts` |
+| Per-answer speed-vs-opponent insight (result reveal) | `src/lib/answerInsight.ts` |
+| Post-match pundit verdict (broadcast one-liner; pure) | `src/lib/punditry.ts` |
+| Cosmetic unlocks (stadium accent + pitch pattern; derived unlock rules, applied via CSS vars) | `src/lib/cosmetics.ts`, `src/components/cosmetics/` |
+| Save export/import (all `bk_`-prefixed local data → file / backup code; clear-all) | `src/lib/backup.ts`, `src/components/settings/SettingsModal.tsx` |
+| Settings & accessibility (sound, reduced-motion, high-contrast, larger-text; applied as document classes) | `src/lib/settings.ts`, `src/components/settings/` |
+| First-run onboarding (3-step intro; seen-flag, replay from Settings) | `src/lib/onboarding.ts`, `src/components/onboarding/` |
 | Friends list + friend codes + invite-to-room (local-first; Firestore online layer) | `src/lib/friends.ts`, `src/context/FriendsProvider.tsx`, `src/components/friends/` |
 | Online leaderboard (daily + all-time, Firestore; SDK-free wrappers) | `src/lib/leaderboard.ts`, `src/components/home/TrophyCabinet.tsx` |
 | Private friend leagues (Daily-fed season tables; pure standings + Firestore) | `src/lib/leagues.ts`, `src/lib/leaguesLocal.ts`, `src/context/LeaguesProvider.tsx`, `src/components/leagues/` |
@@ -173,7 +189,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Share: result-card model (accolades: perfect/comeback/nightmare/late-winner/daily/promotion/cup-win) + canvas matchday card + copy-paste text (all share image+text drive off the one model) | `src/lib/shareCard.ts`, `src/lib/shareImage.ts`, `src/lib/shareResult.ts` |
 | Realtime connection-state mapping (pure) | `src/services/connectionMapping.ts` |
 | Realtime env detection (SDK-free) | `src/lib/realtimeConfig.ts` |
-| Components | `src/components/{layout,home,lobby,game,career,ui}` |
+| Components | `src/components/{layout,home,lobby,game,career,cup,solo,connections,mystery,club,cosmetics,settings,onboarding,friends,leagues,auth,ui}` |
 | Styling tokens / animations | `tailwind.config.js`, `src/styles/globals.css` |
 
 ## Features built this far
@@ -240,6 +256,69 @@ streaks/stats; the streak bonus only applies then. The match engine derives
   auto-resync on reconnect, lobby-slot release on leave, mid-match
   disconnect/rejoin flags, guest-side countdown rebasing for clock skew.
 
+### Match-feel / retention / identity pass (this is the big recent body of work)
+
+All pure logic in `lib/` with tests; components render snapshots. Each shipped
+as its own PR merged to `main`.
+
+- **Question-as-attack framing** (`attackFraming.ts`) — every answer reads as a
+  Big Chance / Good Attack / Half Chance / Off-the-Woodwork / Shot Saved /
+  Turnover / GOAL (+ Momentum / Late-Pressure), shown on `ResultReveal`. Cosmetic
+  only; `scoring.ts` stays authoritative.
+- **Livelier timeline + commentary** — `matchTimeline.ts` turns each question
+  into goal/chance/save marks (Pressure→Late-drama→Golden-goal styling);
+  `commentary.ts` gained equaliser / late-winner / Nightmare-aware pools.
+- **Richer post-match** (`matchStats.ts`) — possession-style knowledge share,
+  Man of the Match, biggest moment, best/weakest category, shots/chances,
+  `maxDeficit` (comeback detection), timeline replay; surfaced in `FinalResult`
+  along with a **pundit verdict** (`punditry.ts`) and a per-answer **speed
+  insight** (`answerInsight.ts`).
+- **Daily Rival Match** (`dailyRival.ts`) — the Daily is now a named fictional
+  fixture: deterministic rival, fixture label/mood, "beat my result" challenge
+  links, tomorrow countdown, share text; `DailyRivalCard`. `dailyChallenge.ts`
+  records the official scoreline + best category.
+- **Accolade share cards** (`shareCard.ts`) — one model drives both the canvas
+  PNG and the text, with accolades (perfect / comeback / nightmare / late-winner
+  / daily / promotion / cup-win). Career & Cup results gained Share buttons.
+- **User-created club identity** (`clubIdentity.ts`, `components/club/`) — name,
+  short tag, kit colours, stadium, nickname, badge style. `teamName()` is now
+  idempotent for multi-word names so a club name flows verbatim everywhere; the
+  primary colour registers as a kit override (`registerClubKit`). Hydrated at boot
+  in `main.tsx`.
+- **Career board/rivalry layer** (`careerProgression.ts`, all derived — no
+  schema change) — rival club personalities, a designated season rival, board
+  objectives w/ live status, a board-confidence meter, manager reputation;
+  surfaced in `CareerHub` (boardroom card + rivalry-match badge).
+- **Achievements + feats** — `feats.ts` records one-off match accomplishments
+  feeding 9 new feat-driven badges in `achievements.ts`.
+- **Cosmetic unlocks** (`cosmetics.ts`) — earnable stadium accent + pitch pattern
+  applied via CSS vars (`StadiumBackground` reads them); hydrated at boot.
+- **Save export/import** (`backup.ts`) + **Settings & accessibility**
+  (`settings.ts`: sound, reduced-motion, high-contrast, larger-text as document
+  classes) + **first-run onboarding** (`onboarding.ts`), all via a home-screen
+  link / portal modals.
+- **Recent opponents** (`recentOpponents.ts`) + head-to-head shown on friend rows.
+- **Homepage** — leads with a **Play vs CPU** primary CTA, an animated "FULL
+  TIME" matchday preview card, a **Your Club** card, and Cosmetics / Settings
+  links.
+- **Nightmare difficulty rework** — Nightmare draws nightmare-tagged questions
+  only (was hard+nightmare) on a **9s clock**; Casual eased to 18s. Two new
+  nightmare-only batches (`questionsB10.ts`, `questionsB11.ts`) — deep cuts,
+  exact figures, near-miss distractors.
+
+- **Mystery Player Duel** *(standalone mode — own engine, NOT the match engine)* —
+  a football Guess Who. Each side secretly picks any player from a 123-entry
+  metadata database (`data/mysteryPlayers.ts`); players take turns asking yes/no
+  questions (verified = auto-answered from metadata; free = manually answered,
+  logged, never auto-filters) to unmask the opponent; first correct guess wins.
+  Pure engine + helpers in `lib/mysteryPlayer/` (types, questions/answers,
+  candidate filter, commit/lock, Bo-series scoring, seeded CPU, share, storage);
+  UI in `components/mystery/`. House rules (no difficulty system): timer optional,
+  question mode, candidate helper, wrong-guess penalty, single/Bo3/Bo5. Local
+  **hot-seat + CPU** today; engine is service-agnostic so **online 1v1 can be
+  layered on later** (not built). Reached from a home card + the `'mystery'` view
+  in `App.tsx`. License-free (silhouettes/gradients, names only).
+
 ## Design system & UI conventions
 
 - **Game rules live in `lib/`, never in components.** Components read state and
@@ -293,7 +372,14 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-`npm test` runs **366 tests** across 42 files: `scoring` (incl. **`guessAccuracy` +
+`npm test` runs **366 tests** across 40 files. Newer suites from the match-feel /
+identity / Mystery work: `attackFraming`, `matchTimeline`, `matchStats`,
+`answerInsight`, `punditry`, `dailyRival`, `shareCard`, `clubIdentity`,
+`careerProgression`, `feats`, `recentOpponents`, `cosmetics`, `backup`,
+`settings`, `onboarding`, and `mysteryPlayer/*` (verified answers, candidate
+filtering, penalties, skip/timeout, turn switching, Bo3/Bo5, free-question
+logging, commit, win condition, CPU, metadata validation). Core suites:
+`scoring` (incl. **`guessAccuracy` +
 closeness-scaled points** for Guess the Number), `questionPicker` (distribution,
 difficulty, anti-bias shuffle, determinism, topic filter, **history-avoidance**
 that exhausts unseen questions first but stays deterministic when seeded),
@@ -365,6 +451,17 @@ Gotchas:
   topic filter, kit colours, premium UI across all screens, **solo arcade modes**
   (Survival / Time Attack / Gauntlet), **themed Cup Runs**, and a **Connections**
   *(beta)* typed mode, 366 tests + CI.
+- ✅ Done (recent match-feel / retention / identity / mode work — all merged to
+  `main` + auto-deployed): **question-as-attack framing**, livelier
+  **timeline + commentary**, **richer post-match** (knowledge share / MOTM /
+  biggest moment / pundit verdict / speed insight), **Daily Rival Match**,
+  **accolade share cards** (image + text), **user-created club identity**,
+  **career board/rivalry layer**, **feat-based achievements**, **cosmetic
+  unlocks**, **save export/import**, **settings + accessibility panel**,
+  **first-run onboarding**, **recent opponents**, a sharper **homepage**
+  (Play-vs-CPU CTA + animated preview card), the **Nightmare difficulty rework**
+  (nightmare-only + 9s clock) with **1,177 questions**, and the standalone
+  **Mystery Player Duel** mode (hot-seat + CPU, 123-player database).
 - 🧪 **Connections is shipped as BETA.** It works and is unit-tested + browser-
   smoked, but it's flagged Beta in the UI because the `accept` lists are
   hand-curated — a valid but obscure player can read as wrong (softened by the
@@ -402,6 +499,16 @@ Gotchas:
 Concrete, mostly-scoped ideas for a future session (roughly ordered by
 bang-for-buck; none are committed yet — confirm with the owner before building):
 
+- **Mystery Player Duel — online 1v1** — the engine (`lib/mysteryPlayer/`) is
+  pure + service-agnostic and the commit/lock is already there; the remaining
+  work is wiring it through a realtime backend (Ably/Supabase) and device-testing
+  with two players. Today the mode is hot-seat + CPU only.
+- **Difficulty — optional tag re-grade** — the Nightmare *feel* is fixed via
+  mode/clock/content (Option B, shipped). If the owner wants the stored
+  `difficulty` tags themselves to be self-accurate (today's famous "nightmare" →
+  "hard", etc.) that's a larger, judgement-heavy migration constrained by the
+  `guess_year` slot + per-tier pool tests — deferred pending an explicit ask.
+  Clock is tunable in one line (`MODE_DURATION_MS`); currently Nightmare = 9s.
 - **Harden Connections out of beta** — expand the curated `accept` lists and add
   more club pairs; add a **Daily Connections** (one seeded puzzle/day with a
   streak, like the Daily Challenge); optionally a "this should've been accepted"
