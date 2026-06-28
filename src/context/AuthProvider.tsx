@@ -75,6 +75,13 @@ function authErrorMessage(e: unknown): string {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 const PUSH_DEBOUNCE_MS = 1500;
+/**
+ * Hard cap on the "Restoring your progress…" splash. Reconcile is best-effort
+ * (local play is unaffected if it's slow/offline), so the sync must never block
+ * the app for longer than this — e.g. when a Firestore read long-polls instead
+ * of failing fast. The merge still completes in the background if it arrives.
+ */
+const HYDRATE_TIMEOUT_MS = 5000;
 
 type Backend = typeof import('../services/firebaseBackend');
 
@@ -97,6 +104,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (hydratedForRef.current === u.id) return;
     hydratedForRef.current = u.id;
     setHydrating(true);
+    // Never let a slow/hanging remote read keep the splash up — free the UI
+    // after a few seconds and let the merge finish in the background.
+    const safety = setTimeout(() => setHydrating(false), HYDRATE_TIMEOUT_MS);
     try {
       const backend = backendRef.current;
       if (backend) {
@@ -108,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       /* offline / transient — local play is unaffected */
     } finally {
+      clearTimeout(safety);
       setHydrating(false);
     }
   }, []);
