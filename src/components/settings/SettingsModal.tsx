@@ -14,6 +14,7 @@ import {
   describeBackup,
   clearAllLocalData,
 } from '../../lib/backup';
+import { resetOnboarding } from '../../lib/onboarding';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { IconClose, IconCheck, IconShare, IconCopy } from '../ui/icons';
@@ -205,6 +206,17 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             onChange={onFile}
           />
         </Card>
+
+        <button
+          type="button"
+          onClick={() => {
+            resetOnboarding();
+            flash('Tutorial will show next time you open the home screen.');
+          }}
+          className="mb-2 w-full rounded-xl border border-white/10 px-3 py-2.5 text-sm font-semibold text-white/60 transition hover:border-white/25 hover:text-white"
+        >
+          Replay tutorial
+        </button>
 
         <button
           type="button"
