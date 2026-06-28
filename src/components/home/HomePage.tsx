@@ -117,8 +117,9 @@ export function HomePage({
           <span className="text-gradient-pitch">Ball Knowledge</span>
         </h1>
         <p className="mx-auto mt-4 max-w-md text-balance text-white/60">
-          Prove your football IQ against your friends.
+          1v1 football trivia. Score goals with your knowledge.
         </p>
+        <MatchPreviewCard />
       </div>
 
       {/* Your Club */}
@@ -185,6 +186,16 @@ export function HomePage({
             size="lg"
             fullWidth
             disabled={!nameValid || connecting}
+            onClick={() => playDemo(name)}
+          >
+            <IconBolt className="h-4 w-4" /> Play vs CPU
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="lg"
+            fullWidth
+            disabled={!nameValid || connecting}
             onClick={() => createRoom(name)}
           >
             Create Room
@@ -230,20 +241,6 @@ export function HomePage({
             </div>
           )}
 
-          <div className="my-2 flex items-center gap-3 text-[11px] uppercase tracking-widest text-white/30">
-            <span className="h-px flex-1 bg-gradient-to-r from-transparent to-white/15" />
-            or
-            <span className="h-px flex-1 bg-gradient-to-l from-transparent to-white/15" />
-          </div>
-
-          <Button
-            variant="ghost"
-            fullWidth
-            disabled={!nameValid || connecting}
-            onClick={() => playDemo(name)}
-          >
-            Play Local Demo (vs CPU)
-          </Button>
         </div>
 
         {!nameValid && (
@@ -441,6 +438,36 @@ export function HomePage({
       </div>
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       {showCosmetics && <CosmeticsModal onClose={() => setShowCosmetics(false)} />}
+    </div>
+  );
+}
+
+/** A decorative "matchday card" preview shown on the hero. License-free. */
+function MatchPreviewCard() {
+  return (
+    <div className="mx-auto mt-6 w-full max-w-xs animate-rise-in [animation-delay:120ms]">
+      <div className="glass relative overflow-hidden rounded-2xl border border-white/10 p-4 text-center shadow-elev-1">
+        <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-gold">
+          Full time
+        </div>
+        <div className="mt-2 flex items-center justify-center gap-2.5 font-display font-bold">
+          <span className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-pitch" aria-hidden />
+            <span className="text-sm text-white/90">Sara FC</span>
+          </span>
+          <span className="text-xl text-pitch">3–2</span>
+          <span className="flex items-center gap-1.5">
+            <span className="text-sm text-white/90">Jonas United</span>
+            <span className="h-2.5 w-2.5 rounded-full bg-sky-400" aria-hidden />
+          </span>
+        </div>
+        <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-2.5 py-0.5 text-[11px] font-semibold text-gold">
+          ⏱️ 90+2' Late Winner
+        </div>
+        <div className="mt-2 text-[11px] text-white/45">8/10 correct · Best: Transfers</div>
+        {/* Sweeping shine */}
+        <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent motion-safe:animate-[shine_3.2s_ease-in-out_infinite]" />
+      </div>
     </div>
   );
 }
