@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useGame } from '../../context/GameProvider';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { isValidRoomCode, normalizeRoomCode } from '../../lib/roomCode';
@@ -27,36 +27,11 @@ import { TrophyCabinet } from './TrophyCabinet';
 import { LeaguesCard } from '../leagues/LeaguesCard';
 import {
   IconUsers,
-  IconRoute,
-  IconScale,
   IconTrophy,
   IconBolt,
   IconArrowRight,
 } from '../ui/icons';
 import { getDailyConnectionsState, hasPlayedDailyConnectionToday } from '../../lib/dailyConnections';
-
-const FEATURES = [
-  {
-    icon: IconUsers,
-    title: 'Real-time 1v1 duels',
-    desc: 'Share a room code and battle a friend live.',
-  },
-  {
-    icon: IconRoute,
-    title: 'Career path challenges',
-    desc: 'Name the player from their club timeline.',
-  },
-  {
-    icon: IconScale,
-    title: 'Higher or lower',
-    desc: 'Goals, caps, trophies — back your judgement.',
-  },
-  {
-    icon: IconTrophy,
-    title: 'Football-style scoring',
-    desc: 'Points become goals. Win the match, not the quiz.',
-  },
-];
 
 export function HomePage({
   onOpenCareer,
@@ -122,49 +97,81 @@ export function HomePage({
   const codeValid = isValidRoomCode(code);
 
   return (
-    <div className="flex flex-1 flex-col justify-center gap-8 py-6">
+    <div className="flex flex-1 flex-col gap-7 py-6">
       {/* Hero */}
       <div className="text-center animate-fade-in">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
           <IconBolt className="h-3.5 w-3.5 text-pitch" />
           Kahoot × Football Wordle × FIFA trivia
         </div>
-        <h1 className="font-display text-5xl font-bold leading-none tracking-tight sm:text-6xl">
+        <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">
           <span className="text-gradient-pitch">Ball Knowledge</span>
         </h1>
-        <p className="mx-auto mt-4 max-w-md text-balance text-white/60">
+        <p className="mx-auto mt-3 max-w-md text-balance text-white/60">
           1v1 football trivia. Score goals with your knowledge.
         </p>
-        <MatchPreviewCard />
+        {/* First-run teaser: show what a finished match looks like. */}
+        {!club && stats.matchesPlayed === 0 && <MatchPreviewCard />}
       </div>
 
-      {/* Your Club */}
-      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-        {club ? (
-          <div className="flex items-center gap-3">
-            <ClubBadge identity={club} size={52} />
-            <div className="min-w-0 flex-1">
-              <div className="truncate font-display text-lg font-bold">{club.name}</div>
-              <div className="truncate text-xs text-white/55">
-                {club.nickname} · {club.stadium}
+      {/* Manager dashboard — identity + lifetime progress at a glance */}
+      <div className="mx-auto w-full max-w-md animate-fade-in">
+        <Card strong className="overflow-hidden p-0">
+          {/* Header — club identity, or a nudge to create one. */}
+          {club ? (
+            <div className="flex items-center gap-3 p-4">
+              <ClubBadge identity={club} size={52} />
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-display text-lg font-bold">{club.name}</div>
+                <div className="truncate text-xs text-white/55">
+                  {club.nickname} · {club.stadium}
+                </div>
               </div>
+              <Button variant="ghost" size="sm" onClick={() => setEditingClub(true)}>
+                Edit
+              </Button>
             </div>
-            <Button variant="ghost" onClick={() => setEditingClub(true)}>
-              Edit
-            </Button>
-          </div>
-        ) : (
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="text-sm font-semibold">Create your club</div>
-              <div className="text-xs text-white/55">
-                Name, kit colours, badge — used across the whole game.
+          ) : (
+            <div className="flex items-center justify-between gap-3 p-4">
+              <div className="min-w-0">
+                <div className="text-sm font-semibold">Create your club</div>
+                <div className="text-xs text-white/55">
+                  Name, kit colours, badge — used across the whole game.
+                </div>
               </div>
+              <Button size="sm" onClick={() => setEditingClub(true)}>Create</Button>
             </div>
-            <Button onClick={() => setEditingClub(true)}>Create</Button>
-          </div>
-        )}
-      </Card>
+          )}
+
+          {/* Lifetime record strip — shown once any match is played. */}
+          {stats.matchesPlayed > 0 && (
+            <>
+              <div className="grid grid-cols-4 divide-x divide-white/[0.06] border-t border-white/[0.06]">
+                <StatPill value={String(stats.matchesPlayed)} label="Played" />
+                <StatPill value={`${winRate(stats)}%`} label="Win" />
+                <StatPill value={`${lifetimeAccuracy(stats)}%`} label="Acc" />
+                <StatPill value={String(stats.bestStreak)} label="Streak" tone="gold" />
+              </div>
+              <div className="flex items-center justify-between border-t border-white/[0.06] px-4 py-2">
+                <span className="text-[11px] text-white/45">
+                  {stats.lastTitle ? (
+                    <>Last title: <span className="font-semibold text-gold">{stats.lastTitle}</span></>
+                  ) : (
+                    'Win matches to climb your record.'
+                  )}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setStats(resetProfileStats())}
+                  className="text-[11px] text-white/25 hover:text-white/60"
+                >
+                  Reset
+                </button>
+              </div>
+            </>
+          )}
+        </Card>
+      </div>
 
       {editingClub && (
         <ClubIdentityModal
@@ -174,11 +181,12 @@ export function HomePage({
         />
       )}
 
-      {/* Entry card */}
-      <Card
-        strong
-        className="mx-auto w-full max-w-md p-6 animate-rise-in [animation-delay:90ms] sm:p-7"
-      >
+      {/* Quick match — the primary thing to do right now */}
+      <section className="mx-auto w-full max-w-md animate-rise-in [animation-delay:90ms]">
+        <SectionLabel hint={multiplayerAvailable ? 'Live 1v1 ready' : 'vs CPU'}>
+          Quick match
+        </SectionLabel>
+      <Card strong className="p-6 sm:p-7">
         <label
           htmlFor="player-name"
           className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/50"
@@ -286,82 +294,53 @@ export function HomePage({
             : 'Demo mode active — Create/Join play vs a CPU. Add Ably or Supabase keys for live 1v1.'}
         </p>
       </Card>
+      </section>
 
-      {/* Daily Rival Match */}
-      <DailyRivalCard name={name} connecting={connecting} onPlay={playDaily} />
+      {/* Today — the daily reasons to come back */}
+      <section className="mx-auto w-full max-w-md">
+        <SectionLabel hint="Back tomorrow">Today</SectionLabel>
+        <DailyRivalCard name={name} connecting={connecting} onPlay={playDaily} />
+      </section>
 
-      {/* Career Mode */}
-      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-        <div className="mb-2 flex items-center gap-2">
-          <IconTrophy className="h-5 w-5 text-pitch" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-            Career Mode
-          </h2>
-          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
-            Singleplayer
-          </span>
-        </div>
-        {career ? (
-          <p className="text-xs leading-relaxed text-white/55">
-            Season {career.season} in{' '}
-            <span className="font-semibold text-pitch">
-              {divisionByTier(career.tier).name}
-            </span>
-            . Continue your climb to the Premier League.
-          </p>
-        ) : (
-          <p className="text-xs leading-relaxed text-white/55">
-            Start in League Two and manage your club up the pyramid vs the CPU.
-            Difficulty rises as you’re promoted.
-          </p>
-        )}
-        <div className="mt-3">
-          <Button fullWidth onClick={onOpenCareer}>
-            {career ? 'Continue career' : 'Start a career'}{' '}
-            <IconArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </Card>
-
-      {/* Lifetime record (local) */}
-      {stats.matchesPlayed > 0 && (
-        <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-white/70">
-              Your record
-            </h2>
-            <button
-              type="button"
-              onClick={() => setStats(resetProfileStats())}
-              className="text-[11px] text-white/30 hover:text-white/60"
-            >
-              Reset
-            </button>
+      {/* Continue — Career progress */}
+      <section className="mx-auto w-full max-w-md">
+        <SectionLabel hint="Singleplayer">{career ? 'Continue' : 'New challenge'}</SectionLabel>
+        <Card className="p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <IconTrophy className="h-5 w-5 text-pitch" />
+            <h2 className="font-display text-base font-bold">Career Mode</h2>
+            {career && (
+              <span className="ml-auto rounded-full border border-pitch/30 bg-pitch/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-pitch">
+                S{career.season} · {divisionByTier(career.tier).name}
+              </span>
+            )}
           </div>
-          <div className="grid grid-cols-4 gap-2">
-            <ProfileStat value={String(stats.matchesPlayed)} label="Played" />
-            <ProfileStat value={`${winRate(stats)}%`} label="Win rate" />
-            <ProfileStat value={`${lifetimeAccuracy(stats)}%`} label="Accuracy" />
-            <ProfileStat value={String(stats.bestStreak)} label="Streak" />
-          </div>
-          {stats.lastTitle && (
-            <div className="mt-3 text-center text-xs text-white/45">
-              Last title:{' '}
-              <span className="font-semibold text-gold">{stats.lastTitle}</span>
-            </div>
+          {career ? (
+            <p className="text-xs leading-relaxed text-white/55">
+              Season {career.season} in{' '}
+              <span className="font-semibold text-pitch">
+                {divisionByTier(career.tier).name}
+              </span>
+              . Continue your climb to the Premier League.
+            </p>
+          ) : (
+            <p className="text-xs leading-relaxed text-white/55">
+              Start in League Two and manage your club up the pyramid vs the CPU.
+              Difficulty rises as you’re promoted.
+            </p>
           )}
+          <div className="mt-3">
+            <Button fullWidth onClick={onOpenCareer}>
+              {career ? 'Continue career' : 'Start a career'}{' '}
+              <IconArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
         </Card>
-      )}
+      </section>
 
       {/* Game Modes hub — compact grid of every mode */}
-      <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-        <div className="mb-3 flex items-center gap-2">
-          <IconBolt className="h-5 w-5 text-pitch" />
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">Game Modes</h2>
-          <span className="ml-auto rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/45">
-            Pick your challenge
-          </span>
-        </div>
+      <section className="mx-auto w-full max-w-md">
+        <SectionLabel hint="Pick your challenge">Game modes</SectionLabel>
         <div className="grid grid-cols-2 gap-2">
           <ModeTile emoji="🔗" name="Connections" sub="Played for both clubs" tag="Puzzle" tagTone="text-pitch border-pitch/30 bg-pitch/10" onClick={onOpenConnections} />
           <ModeTile
@@ -379,24 +358,13 @@ export function HomePage({
           <ModeTile emoji="🏆" name="Cup Runs" sub="Knockout tournaments" tag="Cup" tagTone="text-gold border-gold/30 bg-gold/10" onClick={onOpenCup} />
           <ModeTile emoji="⚡" name="Arcade" sub="Survival · Time Attack" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenModes} />
         </div>
-      </Card>
+      </section>
 
       {/* Achievements + leaderboard */}
       <TrophyCabinet />
 
       {/* Private friend leagues */}
       <LeaguesCard />
-
-      {/* Feature cards */}
-      <div className="mx-auto grid w-full max-w-2xl grid-cols-2 gap-3 animate-fade-in [animation-delay:200ms]">
-        {FEATURES.map((f) => (
-          <Card key={f.title} className="p-4">
-            <f.icon className="mb-2 h-5 w-5 text-pitch" />
-            <div className="text-sm font-semibold">{f.title}</div>
-            <div className="mt-0.5 text-xs text-white/50">{f.desc}</div>
-          </Card>
-        ))}
-      </div>
 
       {/* Settings, cosmetics & data */}
       <div className="mx-auto flex items-center gap-4 text-xs text-white/40">
@@ -454,13 +422,35 @@ function MatchPreviewCard() {
   );
 }
 
-function ProfileStat({ value, label }: { value: string; label: string }) {
+/** A small dashboard section header: label + hairline + optional hint. */
+function SectionLabel({ children, hint }: { children: ReactNode; hint?: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
-      <div className="nums font-display text-xl font-bold text-pitch">{value}</div>
-      <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/40">
-        {label}
+    <div className="mb-2 flex items-center gap-3">
+      <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-white/55">{children}</h2>
+      <span className="h-px flex-1 bg-white/[0.07]" />
+      {hint && (
+        <span className="text-[10px] font-medium uppercase tracking-wide text-white/35">{hint}</span>
+      )}
+    </div>
+  );
+}
+
+/** A single figure in the manager-dashboard stat strip. */
+function StatPill({
+  value,
+  label,
+  tone = 'pitch',
+}: {
+  value: string;
+  label: string;
+  tone?: 'pitch' | 'gold';
+}) {
+  return (
+    <div className="px-2 py-2.5 text-center">
+      <div className={`nums font-display text-lg font-bold ${tone === 'gold' ? 'text-gold' : 'text-pitch'}`}>
+        {value}
       </div>
+      <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/40">{label}</div>
     </div>
   );
 }
