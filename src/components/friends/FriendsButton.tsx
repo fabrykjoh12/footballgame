@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useFriends, type UserSearchResult } from '../../context/FriendsProvider';
-import { formatFriendCode, isValidFriendCode } from '../../lib/friends';
+import { useGame } from '../../context/GameProvider';
+import { formatFriendCode, isValidFriendCode, type Friend } from '../../lib/friends';
 import { getRecentOpponents } from '../../lib/recentOpponents';
 import { getOpponentRecord, h2hSummary, h2hKey } from '../../lib/headToHead';
 import { Button } from '../ui/Button';
-import { IconUsers, IconClose, IconCheck, IconCopy } from '../ui/icons';
+import { IconUsers, IconClose, IconCheck, IconCopy, IconShare } from '../ui/icons';
 
 /**
  * Header control to manage your friends list. When signed in, search friends
@@ -35,9 +36,37 @@ export function FriendsButton() {
 }
 
 function FriendsModal({ onClose }: { onClose: () => void }) {
-  const { friends, myCode, online, addByName, addByCode, searchUsers, addByUsername, remove } =
+  const { friends, myCode, online, addByName, addByCode, searchUsers, addByUsername, remove, invite } =
     useFriends();
+  const { room, serviceMode } = useGame();
   const [tab, setTab] = useState<'search' | 'code'>('search');
+
+  // You can invite straight to your current match when in a live multiplayer room.
+  const canInvite = serviceMode === 'remote' && !!room;
+  const [invited, setInvited] = useState<Record<string, 'pushed' | 'shared'>>({});
+
+  const onInvite = async (friend: Friend) => {
+    if (!room) return;
+    const payload = await invite(friend, room.roomCode);
+    if (payload.pushed) {
+      setInvited((d) => ({ ...d, [friend.id]: 'pushed' }));
+      return;
+    }
+    // No live channel — share or copy the pre-filled message.
+    const nav = navigator as Navigator & {
+      share?: (data: { title?: string; text?: string; url?: string }) => Promise<void>;
+    };
+    try {
+      if (typeof nav.share === 'function') {
+        await nav.share({ title: 'Ball Knowledge', text: payload.text, url: payload.link });
+      } else {
+        await nav.clipboard.writeText(payload.text);
+      }
+      setInvited((d) => ({ ...d, [friend.id]: 'shared' }));
+    } catch {
+      /* user cancelled the share sheet — leave the button ready to retry */
+    }
+  };
 
   // Username search state
   const [query, setQuery] = useState('');
@@ -146,7 +175,9 @@ function FriendsModal({ onClose }: { onClose: () => void }) {
 
         <h2 className="text-center font-display text-xl font-bold">Friends</h2>
         <p className="mx-auto mt-1 max-w-xs text-center text-sm text-white/55">
-          Add friends to invite them to a match in one tap.
+          {canInvite
+            ? 'Tap Invite next to a friend to bring them into your match.'
+            : 'Add friends to invite them to a match in one tap.'}
         </p>
 
         {/* Your code */}
@@ -360,6 +391,22 @@ function FriendsModal({ onClose }: { onClose: () => void }) {
                       return null;
                     })()}
                   </span>
+                  {canInvite &&
+                    (invited[f.id] ? (
+                      <span className="flex items-center gap-1 px-1 text-xs font-semibold text-pitch">
+                        <IconCheck className="h-3.5 w-3.5" />
+                        {invited[f.id] === 'pushed' ? 'Invited' : 'Shared'}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => void onInvite(f)}
+                        aria-label={`Invite ${f.name} to your match`}
+                        className="answer-press flex items-center gap-1 rounded-lg border border-pitch/30 bg-pitch/10 px-2.5 py-1 text-xs font-semibold text-pitch hover:bg-pitch/20"
+                      >
+                        <IconShare className="h-3.5 w-3.5" /> Invite
+                      </button>
+                    ))}
                   <button
                     type="button"
                     onClick={() => remove(f.id)}
