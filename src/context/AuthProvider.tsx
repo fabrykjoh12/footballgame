@@ -19,6 +19,7 @@ import {
 export interface AuthUser {
   id: string;
   email: string | null;
+  username: string | null;
 }
 
 interface AuthContextValue {
@@ -27,6 +28,8 @@ interface AuthContextValue {
   user: AuthUser | null;
   /** True while restoring a signed-in session's progress on load. */
   hydrating: boolean;
+  /** True when the user is signed in but hasn't chosen a username yet. */
+  needsUsername: boolean;
   /** Send a passwordless sign-in (email) link. */
   signInWithEmail: (email: string) => Promise<AuthResult>;
   /** Email + password sign-in for an existing account. */
@@ -35,6 +38,8 @@ interface AuthContextValue {
   registerWithPassword: (email: string, password: string) => Promise<AuthResult>;
   /** One-tap Google sign-in. */
   signInWithGoogle: () => Promise<AuthResult>;
+  /** Claim a unique username for this account. */
+  setUsername: (username: string) => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }
 
@@ -98,9 +103,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     userRef.current = user;
   }, [user]);
 
-  /** Pull remote progress, merge with local, and reconcile (once per user). */
-  const applySession = useCallback(async (u: AuthUser) => {
-    setUser(u);
+  /** Pull remote progress + username, merge with local, and reconcile (once per user). */
+  const applySession = useCallback(async (u: { id: string; email: string | null }) => {
+    setUser({ ...u, username: null });
     if (hydratedForRef.current === u.id) return;
     hydratedForRef.current = u.id;
     setHydrating(true);
@@ -110,10 +115,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const backend = backendRef.current;
       if (backend) {
-        const remote = await backend.pullProgress(u.id);
+        const [remote, profile] = await Promise.all([
+          backend.pullProgress(u.id),
+          backend.getUserProfile(u.id),
+        ]);
         const { result, shouldPush } = reconcileProgress(readLocalProgress(), remote);
         writeLocalProgress(result);
         if (shouldPush) await backend.pushProgress(u.id, result);
+        setUser({ ...u, username: profile?.username ?? null });
       }
     } catch {
       /* offline / transient — local play is unaffected */
@@ -252,6 +261,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const setUsername = useCallback(async (username: string): Promise<AuthResult> => {
+    const backend = backendRef.current;
+    const u = userRef.current;
+    if (!backend || !u) return { ok: false, error: 'Not signed in.' };
+    const lower = username.toLowerCase().trim();
+    try {
+      const available = await backend.checkUsernameAvailable(lower);
+      if (!available) return { ok: false, error: 'That username is already taken.' };
+      await backend.claimUsername(u.id, lower);
+      setUser((prev) => (prev ? { ...prev, username: lower } : null));
+      return { ok: true };
+    } catch (e) {
+      // Catch race-condition permission errors (someone else claimed it first).
+      const code =
+        e && typeof e === 'object' && 'code' in e ? String((e as { code: unknown }).code) : '';
+      if (code === 'permission-denied') return { ok: false, error: 'That username is already taken.' };
+      return { ok: false, error: e instanceof Error ? e.message : 'Something went wrong.' };
+    }
+  }, []);
+
   const signOut = useCallback(async () => {
     hydratedForRef.current = null;
     try {
@@ -262,25 +291,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  const needsUsername = !!user && !hydrating && user.username === null;
+
   const value = useMemo<AuthContextValue>(
     () => ({
       configured,
       user,
       hydrating,
+      needsUsername,
       signInWithEmail,
       signInWithPassword,
       registerWithPassword,
       signInWithGoogle,
+      setUsername,
       signOut,
     }),
     [
       configured,
       user,
       hydrating,
+      needsUsername,
       signInWithEmail,
       signInWithPassword,
       registerWithPassword,
       signInWithGoogle,
+      setUsername,
       signOut,
     ],
   );

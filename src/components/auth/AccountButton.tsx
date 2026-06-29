@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthProvider';
 import { Button } from '../ui/Button';
 import { IconUser, IconLogout, IconClose, IconCheck } from '../ui/icons';
 
+const USERNAME_RE = /^[a-z0-9_]{3,20}$/;
+
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
 
 /**
@@ -12,12 +14,19 @@ const EMAIL_RE = /^\S+@\S+\.\S+$/;
  * magic-link flow (or account / sign-out when already signed in).
  */
 export function AccountButton() {
-  const { configured, user } = useAuth();
+  const { configured, user, needsUsername } = useAuth();
   const [open, setOpen] = useState(false);
+
+  // Auto-open the username picker the first time after sign-in.
+  useEffect(() => {
+    if (needsUsername) setOpen(true);
+  }, [needsUsername]);
 
   if (!configured) return null;
 
-  const initial = (user?.email?.[0] ?? '?').toUpperCase();
+  const initial = user?.username
+    ? user.username[0].toUpperCase()
+    : (user?.email?.[0] ?? '?').toUpperCase();
 
   return (
     <>
@@ -25,7 +34,7 @@ export function AccountButton() {
         type="button"
         onClick={() => setOpen(true)}
         aria-label={user ? 'Account' : 'Sign in'}
-        title={user ? 'Account' : 'Sign in'}
+        title={user ? `Account${user.username ? ` (@${user.username})` : ''}` : 'Sign in'}
         className="answer-press flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-2.5 py-2 text-white/70 hover:bg-white/10 hover:text-white"
       >
         {user ? (
@@ -36,7 +45,7 @@ export function AccountButton() {
           <IconUser className="h-5 w-5" />
         )}
         <span className="hidden text-xs font-semibold sm:inline">
-          {user ? 'Account' : 'Sign in'}
+          {user ? (user.username ? `@${user.username}` : 'Account') : 'Sign in'}
         </span>
       </button>
 
@@ -48,10 +57,12 @@ export function AccountButton() {
 function AuthModal({ onClose }: { onClose: () => void }) {
   const {
     user,
+    needsUsername,
     signInWithEmail,
     signInWithPassword,
     registerWithPassword,
     signInWithGoogle,
+    setUsername,
     signOut,
   } = useAuth();
   const [email, setEmail] = useState(user?.email ?? '');
@@ -118,12 +129,17 @@ function AuthModal({ onClose }: { onClose: () => void }) {
           <IconClose className="h-4 w-4" />
         </button>
 
-        {user ? (
+        {user && needsUsername ? (
+          <UsernameStep setUsername={setUsername} onClose={onClose} />
+        ) : user ? (
           <div className="text-center">
             <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-pitch/15 text-lg font-bold text-pitch ring-1 ring-pitch/30">
-              {(user.email?.[0] ?? '?').toUpperCase()}
+              {(user.username?.[0] ?? user.email?.[0] ?? '?').toUpperCase()}
             </div>
-            <h2 className="font-display text-xl font-bold">You’re signed in</h2>
+            <h2 className="font-display text-xl font-bold">You're signed in</h2>
+            {user.username && (
+              <p className="mt-1 font-mono text-base font-bold text-pitch">@{user.username}</p>
+            )}
             <p className="mt-1 break-all text-sm text-white/55">{user.email}</p>
             <p className="mt-3 text-xs text-white/45">
               Your Career, stats and daily streak sync automatically across your
@@ -275,6 +291,96 @@ function AuthModal({ onClose }: { onClose: () => void }) {
       </div>
     </div>,
     document.body,
+  );
+}
+
+/** Shown immediately after sign-up (or on next open) when the user has no username yet. */
+function UsernameStep({
+  setUsername,
+  onClose,
+}: {
+  setUsername: (u: string) => Promise<{ ok: boolean; error?: string }>;
+  onClose: () => void;
+}) {
+  const [raw, setRaw] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const normalised = raw.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20);
+  const isValid = USERNAME_RE.test(normalised);
+
+  const submit = async () => {
+    if (!isValid || busy) return;
+    setBusy(true);
+    setError(null);
+    const res = await setUsername(normalised);
+    setBusy(false);
+    if (!res.ok) {
+      setError(res.error ?? 'Something went wrong.');
+      return;
+    }
+    onClose();
+  };
+
+  return (
+    <div>
+      <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full bg-pitch/15 text-pitch ring-1 ring-pitch/30">
+        <IconUser className="h-6 w-6" />
+      </div>
+      <h2 className="text-center font-display text-xl font-bold">Pick your username</h2>
+      <p className="mx-auto mt-1 max-w-xs text-center text-sm text-white/55">
+        This is how friends can find and add you. Choose wisely!
+      </p>
+
+      <div className="mt-5">
+        <label
+          htmlFor="username-pick"
+          className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/50"
+        >
+          Username
+        </label>
+        <input
+          id="username-pick"
+          type="text"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          value={raw}
+          onChange={(e) => {
+            setRaw(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 20));
+            setError(null);
+          }}
+          onKeyDown={(e) => e.key === 'Enter' && void submit()}
+          placeholder="e.g. messi10"
+          className="input-field font-mono text-base"
+        />
+        <p className="mt-1 text-[11px] text-white/35">
+          Letters, numbers, underscores — 3 to 20 characters.
+        </p>
+      </div>
+
+      {error && (
+        <p role="alert" className="mt-2 text-sm text-danger">
+          {error}
+        </p>
+      )}
+
+      <div className="mt-4">
+        <Button
+          fullWidth
+          size="lg"
+          disabled={!isValid || busy}
+          onClick={() => void submit()}
+        >
+          {busy ? 'Checking…' : 'Set username'}
+        </Button>
+      </div>
+
+      <p className="mt-3 text-center text-[11px] text-white/30">
+        You can update your username later from Account settings.
+      </p>
+    </div>
   );
 }
 

@@ -48,6 +48,13 @@ export interface InvitePayload {
   pushed: boolean;
 }
 
+export interface UserSearchResult {
+  uid: string;
+  name: string;
+  username: string;
+  friendCode: string;
+}
+
 interface FriendsContextValue {
   /** Whether the online layer (codes, push invites) is active. */
   online: boolean;
@@ -57,6 +64,10 @@ interface FriendsContextValue {
   addByName: (name: string) => void;
   /** Add a friend by their code; resolves to an account when online. */
   addByCode: (name: string, code: string) => Promise<{ ok: boolean; error?: string }>;
+  /** Search for users by username prefix (online only). */
+  searchUsers: (searchTerm: string) => Promise<UserSearchResult[]>;
+  /** Add a friend directly from a search result (online only). */
+  addByUsername: (result: UserSearchResult) => Promise<{ ok: boolean; error?: string }>;
   remove: (id: string) => void;
   rename: (id: string, name: string) => void;
   /** Build an invite for a friend (and push it live when possible). */
@@ -68,14 +79,15 @@ interface FriendsContextValue {
 
 const FriendsContext = createContext<FriendsContextValue | null>(null);
 
-function displayName(email: string | null): string {
+function displayName(user: { email: string | null; username: string | null } | null): string {
+  if (user?.username) return user.username;
   try {
     const stored = localStorage.getItem('bk_name');
     if (stored && stored.trim()) return stored.trim();
   } catch {
     /* ignore */
   }
-  return email?.split('@')[0] ?? 'Player';
+  return user?.email?.split('@')[0] ?? 'Player';
 }
 
 export function FriendsProvider({ children }: { children: ReactNode }) {
@@ -107,7 +119,7 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
       const backend = await loadBackend();
       if (!backend || !active) return;
       try {
-        await backend.publishProfile(user.id, displayName(user.email), myCode);
+        await backend.publishProfile(user.id, displayName(user), myCode);
       } catch {
         /* ignore */
       }
@@ -135,6 +147,52 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
     addFriendLocal({ name });
     setFriends(getFriends());
   }, []);
+
+  const searchUsers = useCallback(
+    async (searchTerm: string): Promise<UserSearchResult[]> => {
+      if (!online || searchTerm.length < 2) return [];
+      const backend = await loadBackend();
+      if (!backend) return [];
+      try {
+        const results = await backend.searchUsersByUsername(searchTerm);
+        return results
+          .filter((p) => p.username)
+          .map((p) => ({
+            uid: p.uid,
+            name: p.name,
+            username: p.username!,
+            friendCode: p.friendCode,
+          }));
+      } catch {
+        return [];
+      }
+    },
+    [online, loadBackend],
+  );
+
+  const addByUsername = useCallback(
+    async (result: UserSearchResult): Promise<{ ok: boolean; error?: string }> => {
+      if (online && user) {
+        const backend = await loadBackend();
+        if (backend) {
+          try {
+            await backend.addFriendOnline(user.id, {
+              uid: result.uid,
+              name: result.name,
+              username: result.username,
+              friendCode: result.friendCode,
+            });
+          } catch {
+            /* save locally anyway */
+          }
+        }
+      }
+      addFriendLocal({ name: result.username, code: result.friendCode, uid: result.uid });
+      setFriends(getFriends());
+      return { ok: true };
+    },
+    [online, user, loadBackend],
+  );
 
   const addByCode = useCallback(
     async (name: string, code: string): Promise<{ ok: boolean; error?: string }> => {
@@ -194,7 +252,7 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
           try {
             await backend.sendInvite(friend.uid, {
               fromUid: user.id,
-              fromName: displayName(user.email),
+              fromName: displayName(user),
               roomCode,
             });
             pushed = true;
@@ -225,13 +283,15 @@ export function FriendsProvider({ children }: { children: ReactNode }) {
       myCode,
       addByName,
       addByCode,
+      searchUsers,
+      addByUsername,
       remove,
       rename,
       invite,
       incoming,
       dismissInvite,
     }),
-    [online, friends, myCode, addByName, addByCode, remove, rename, invite, incoming, dismissInvite],
+    [online, friends, myCode, addByName, addByCode, searchUsers, addByUsername, remove, rename, invite, incoming, dismissInvite],
   );
 
   return <FriendsContext.Provider value={value}>{children}</FriendsContext.Provider>;

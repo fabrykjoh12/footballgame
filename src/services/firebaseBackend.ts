@@ -202,6 +202,7 @@ export async function pushProgress(
 export interface PublicProfile {
   uid: string;
   name: string;
+  username?: string;
   friendCode: string;
 }
 
@@ -249,8 +250,74 @@ export async function resolveFriendCode(code: string): Promise<PublicProfile | n
   const uid = (map.data() as { uid?: string }).uid;
   if (!uid) return null;
   const prof = await getDoc(doc(ctx.db, 'users', uid));
-  const data = prof.exists() ? (prof.data() as { name?: string; friendCode?: string }) : {};
-  return { uid, name: data.name ?? 'Player', friendCode: data.friendCode ?? code.toUpperCase() };
+  const data = prof.exists() ? (prof.data() as { name?: string; username?: string; friendCode?: string }) : {};
+  return { uid, name: data.name ?? 'Player', username: data.username, friendCode: data.friendCode ?? code.toUpperCase() };
+}
+
+/** Get a user's public profile by their uid. */
+export async function getUserProfile(targetUid: string): Promise<PublicProfile | null> {
+  const ctx = ensure();
+  if (!ctx) return null;
+  const snap = await getDoc(doc(ctx.db, 'users', targetUid));
+  if (!snap.exists()) return null;
+  const data = snap.data() as { name?: string; username?: string; friendCode?: string };
+  return {
+    uid: targetUid,
+    name: data.name ?? data.username ?? 'Player',
+    username: data.username,
+    friendCode: data.friendCode ?? '',
+  };
+}
+
+/** Check if a username is available (not yet claimed by another user). */
+export async function checkUsernameAvailable(username: string): Promise<boolean> {
+  const ctx = ensure();
+  if (!ctx) return false;
+  const snap = await getDoc(doc(ctx.db, 'usernames', username.toLowerCase()));
+  return !snap.exists();
+}
+
+/**
+ * Claim a username for a user. Writes to the `/usernames/{username}` lookup
+ * collection and sets the `username` field on the user's public profile doc.
+ * Security rules prevent overwriting a username that belongs to another uid.
+ */
+export async function claimUsername(uid: string, username: string): Promise<void> {
+  const ctx = ensure();
+  if (!ctx) return;
+  const lower = username.toLowerCase();
+  await setDoc(doc(ctx.db, 'usernames', lower), { uid });
+  await setDoc(doc(ctx.db, 'users', uid), { username: lower, updatedAt: Date.now() }, { merge: true });
+}
+
+/**
+ * Return up to 8 users whose `username` starts with `searchTerm`.
+ * Requires a Firestore single-field index on `users.username` (created
+ * automatically on first write; or add it manually in the console).
+ */
+export async function searchUsersByUsername(searchTerm: string): Promise<PublicProfile[]> {
+  const ctx = ensure();
+  if (!ctx) return [];
+  const lower = searchTerm.toLowerCase();
+  const q = query(
+    collection(ctx.db, 'users'),
+    where('username', '>=', lower),
+    where('username', '<=', lower + ''),
+    fbLimit(8),
+  );
+  const snap = await getDocs(q);
+  const results: PublicProfile[] = [];
+  for (const d of snap.docs) {
+    const data = d.data() as { name?: string; username?: string; friendCode?: string };
+    if (!data.username) continue;
+    results.push({
+      uid: d.id,
+      name: data.name ?? data.username,
+      username: data.username,
+      friendCode: data.friendCode ?? '',
+    });
+  }
+  return results;
 }
 
 /** Save a friend under the signed-in user's friends sub-collection. */

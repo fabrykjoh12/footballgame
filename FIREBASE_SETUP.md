@@ -105,6 +105,15 @@ service cloud.firestore {
       allow write: if signedIn() && request.resource.data.uid == request.auth.uid;
     }
 
+    // Username → uid lookup. Anyone signed-in can read (for search); you may
+    // only CREATE a username entry pointing at your own uid. Update + delete are
+    // forbidden so usernames can't be stolen or released.
+    match /usernames/{username} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
     // Leaderboards — readable by signed-in users; you may only write your row.
     // NOTE: scoring is client-trusted (the host runs the engine), so treat
     // these as casual bragging rights, not cheat-proof rankings.
