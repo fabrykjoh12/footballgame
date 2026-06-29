@@ -25,18 +25,26 @@ time**, a lobby topic filter, a standalone **Mystery Player Duel** mode (footbal
 Guess Who; hot-seat + CPU), **user-created club identity**, **cosmetic unlocks**,
 **save export/import**, **first-run onboarding**, an accessibility/settings panel,
 deterministic per-team kit colours, a premium UI
-pass, and **414 unit tests** gating an auto-deploy pipeline.
+pass, and **433 unit tests** gating an auto-deploy pipeline.
 
-> **Central player database (NEW):** `src/data/players.ts` + `src/data/clubs.ts`
-> + `src/lib/playerDb.ts` — 299 curated players (stable facts: clubs, nationality,
-> position, era, trophies, **birth year**) over a 165-club canonical registry
-> with alias resolution. Many modes read from it: Mystery Player Duel (unified
-> onto it), **Connections** (now database-backed, accepts anyone who played for
-> both clubs — **out of beta**), **Daily Connections**, and **Older or Younger?**
-> (birth-year Higher/Lower). Mystery Player Duel also gained a **manual answer
-> mode** and **online 1v1** (`ablyMysteryService.ts`, host-authoritative + secret
-> redaction — built, needs device testing). Home bundle is code-split (~270 kB;
-> modes + data load on demand).
+> **Central databases (NEW):** `src/data/players.ts` + `src/data/clubs.ts` +
+> `src/data/managers.ts` + `src/lib/playerDb.ts` — **299 curated players** (stable
+> facts: clubs, nationality, position, era, trophies, **birth year**) and **62
+> managers**, both over a **165-club canonical registry** with alias resolution.
+> Seven modes read from these: Mystery Player Duel (unified onto it, + **manual
+> answers** + **online 1v1**), **Connections** (database-backed, out of beta, 46
+> puzzles), **Daily Connections**, **Older or Younger?** (birth-year Higher/Lower),
+> **Career Path** (guess the player from their clubs), and **Manager
+> Merry-go-round** (name a manager who managed both clubs).
+>
+> **Home screen is a modes hub:** the old wall of mode cards is now one compact
+> "Game Modes" grid of tiles. The app is **code-split** — home bundle ~273 kB
+> (was 924 kB); every mode + data bank loads on demand.
+>
+> **Realtime hardening:** both Ably services reject spoofed actions (sender must
+> own the claimed player id). Room codes are 5 crypto-random chars. Mystery
+> **online 1v1** (`ablyMysteryService.ts`, host-authoritative + secret redaction +
+> forced manual answers) is **built but needs two-device testing**.
 
 > **Difficulty (reworked):** Casual = easy+medium (18s clock) · Serious =
 > medium+hard (15s) · **Nightmare = nightmare-tagged questions ONLY + a brutal
@@ -57,7 +65,7 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (414 tests across lib/, data/, services/)
+npm test         # vitest run (433 tests across lib/, data/, services/)
 ```
 
 Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). **CI runs the
@@ -168,6 +176,8 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | **Central player database** (299 players, stable facts incl. birthYear) + canonical club registry (165 clubs, alias resolution) + pure query layer (playedForBoth, byNationality/Position/League, careerChain, cluesFor) | `src/data/players.ts`, `src/data/clubs.ts`, `src/lib/playerDb.ts` |
 | Daily Connections (one seeded puzzle/day + solved-day streak) | `src/lib/dailyConnections.ts` (+ `dailyConnection()` in `connections.ts`) |
 | Older or Younger? (birth-year Higher/Lower survival mode) | `src/lib/olderYounger.ts`, `src/components/solo/OlderYoungerGame.tsx` |
+| Career Path (guess the player from their club chain; progressive reveal, typed) | `src/lib/careerPath.ts`, `src/components/solo/CareerPathGame.tsx` |
+| Manager Merry-go-round (name a manager who managed both clubs; typed) + 62-manager dataset | `src/lib/managers.ts`, `src/data/managers.ts`, `src/components/solo/ManagerMerryGoRound.tsx` |
 | Mystery online 1v1 (host-authoritative via Ably; forces manual answers + redacts secrets — built, not device-tested) | `src/services/ablyMysteryService.ts`, `src/components/mystery/MysteryOnlineGame.tsx` |
 | Match modes + per-mode clock (Casual easy+med/18s · Serious med+hard/15s · Nightmare nightmare-only/9s; `MODE_DURATION_MS`, `durationForMode`) | `src/lib/matchModes.ts` |
 | Daily Rival Match + seeded RNG (deterministic per-day fixture vs a named fictional rival; streak, scoreline, best category, "beat my result" challenge links, tomorrow countdown) | `src/lib/dailyChallenge.ts`, `src/lib/dailyRival.ts`, `src/lib/seededRandom.ts`, `src/components/home/DailyRivalCard.tsx` |
@@ -245,7 +255,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
   the headline reveal. Also has a **Daily Connections** (one seeded puzzle/day +
   streak). Self-contained (`lib/connections.ts` +
   `data/connections.ts` + `components/connections/`), mirroring the solo-modes
-  pattern — **no match-engine changes**. 27 curated club-pair puzzles with
+  pattern — **no match-engine changes**. 46 curated club-pair puzzles with
   generous, fact-checked `accept` lists across all four difficulty tiers (men's
   football only). Answers are **typed with forgiving fuzzy matching**
   (`normalizeName` strips accents/case/punctuation; accepts full name, surname,
@@ -392,7 +402,8 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-`npm test` runs **414 tests** across 44 files (incl. `playerDb`, `roomCode`,
+`npm test` runs **433 tests** across 46 files (incl. `playerDb`, `roomCode`,
+`careerPath`, `managers`,
 `dailyConnections`, `olderYounger`, and the Connections DB-augmentation +
 Mystery manual-mode suites). Newer suites from the match-feel /
 identity / Mystery work: `attackFraming`, `matchTimeline`, `matchStats`,
@@ -461,6 +472,16 @@ Gotchas:
 
 ## Status & open items
 
+- ✅ Done (latest session — all merged to `main` + deployed): **central player
+  database** (299 players + 165 clubs + query layer) and **managers dataset**
+  (62); **Connections out of beta** (DB-backed, 46 puzzles) + **Daily
+  Connections**; new modes **Older or Younger?**, **Career Path**, **Manager
+  Merry-go-round**; Mystery Player Duel **manual answer mode** + **online 1v1**
+  (built, needs 2-device test); **home screen modes hub**; **code-splitting**
+  (home 924→273 kB); **room-code hardening** + **realtime anti-spoof**; the
+  Firestore loading-hang fix; a goal-overlay-over-next-question fix; **433 tests**.
+  Open follow-up: wire the new solo modes into achievements/profile stats +
+  share buttons (see roadmap).
 - ✅ Done: 10 mini-games, 1,177 Qs, live Ably 1v1 + hardening (incl. **guest-side
   host-drop detection** → reconnecting/failed instead of a frozen match),
   **Career Mode** (singleplayer league climb), **optional sign-in + cross-device
@@ -472,7 +493,7 @@ Gotchas:
   (image+text), commentary (now an `aria-live` region), timeline, sudden death,
   topic filter, kit colours, premium UI across all screens, **solo arcade modes**
   (Survival / Time Attack / Gauntlet), **themed Cup Runs**, and a **Connections**
-  typed mode, 414 tests + CI.
+  typed mode, 433 tests + CI.
 - ✅ Done (recent match-feel / retention / identity / mode work — all merged to
   `main` + auto-deployed): **question-as-attack framing**, livelier
   **timeline + commentary**, **richer post-match** (knowledge share / MOTM /
@@ -527,10 +548,10 @@ Gotchas:
 Concrete, mostly-scoped ideas for a future session (roughly ordered by
 bang-for-buck; none are committed yet — confirm with the owner before building):
 
-- **Mystery Player Duel — online 1v1** — the engine (`lib/mysteryPlayer/`) is
-  pure + service-agnostic and the commit/lock is already there; the remaining
-  work is wiring it through a realtime backend (Ably/Supabase) and device-testing
-  with two players. Today the mode is hot-seat + CPU only.
+- **Mystery Player Duel — online 1v1** — ✅ BUILT (`ablyMysteryService.ts` +
+  `MysteryOnlineGame.tsx`, host-authoritative, forced manual answers, secret
+  redaction, anti-spoof). Remaining: **device-test with two players** — that's
+  the only thing standing between it and "verified". Hot-seat + CPU unchanged.
 - **Difficulty — optional tag re-grade** — the Nightmare *feel* is fixed via
   mode/clock/content (Option B, shipped). If the owner wants the stored
   `difficulty` tags themselves to be self-accurate (today's famous "nightmare" →
@@ -556,14 +577,22 @@ bang-for-buck; none are committed yet — confirm with the owner before building
   mode needs server-side validation (a thin Cloud Function or Supabase RPC that
   re-derives the score from the answer log). Big lift; only if competitive play
   becomes a goal.
-- **New mini-game ideas that fit the constraints** (10-question, 1v1, men's
-  football, license-free): "Starting XI" (name N players from a famous lineup),
-  "Top Scorer" (rank goal tallies), "Same Number" (players who wore a shirt
-  number), "Manager Merry-go-round" (typed, like Connections but for managers).
-- **Multiplayer tournament bracket** (>2 players in a lobby) — discussed, not
-  built; needs new lobby infra beyond the current 2-slot room. Largest lift here.
-- **Polish** — bundle code-splitting (main chunk is ~720 kB; the build warns),
-  more share-card variety, and accessibility passes on the newest screens.
+- **Wire the new solo modes into progression** (recommended next) — Career Path,
+  Older or Younger?, Managers and Connections each store only a local best; they
+  don't yet feed `achievements`/`profileStats` or a unified "your stats" view.
+  Tying them in (+ share buttons + daily-streak rewards) is the highest-leverage
+  retention work left.
+- **New mini-game ideas still open** ("Starting XI" — name N from a famous lineup;
+  "Top Scorer" — rank goal tallies; "Same Number" — players who wore a shirt
+  number). NOTE: "Older or Younger?", "Career Path" and "Manager Merry-go-round"
+  are now **built**.
+- **Fold Connections into the 1v1 match** as an 11th type — investigated and
+  **deferred**: it changes match length (10→11) + goals balance across Career/Cup/
+  Daily and can't be play-tested cheaply. Only do it with the owner's sign-off.
+- **Multiplayer tournament bracket** (>2 players) — not built; needs new lobby
+  infra beyond the 2-slot room.
+- **Polish** — accessibility passes on the newest screens, more share-card
+  variety. (Bundle code-splitting is **done** — home chunk ~273 kB.)
 
 See `GAME_OVERVIEW.md` for a portable, self-contained summary of the whole game
 (useful for handing to another tool/AI for outside opinions).
