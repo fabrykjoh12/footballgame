@@ -29,7 +29,7 @@ export function Scoreboard({
         <TeamSide player={a} isLocal={a.id === localPlayerId} align="left" identity={idA} />
 
         <div className="flex flex-col items-center px-1">
-          <div className="flex items-center gap-2 font-display text-3xl font-bold sm:text-4xl">
+          <div className="nums flex items-center gap-2 font-display text-3xl font-bold sm:text-4xl">
             <span style={{ color: idA.color }}>
               <AnimatedNumber value={a.goals} />
             </span>
@@ -39,7 +39,7 @@ export function Scoreboard({
             </span>
           </div>
           {questionNumber != null && totalQuestions != null && (
-            <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40">
+            <div className="nums mt-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40">
               Q {questionNumber}/{totalQuestions}
             </div>
           )}
@@ -108,7 +108,7 @@ function TeamSide({
           right ? 'justify-end' : 'justify-start',
         ].join(' ')}
       >
-        <span className="font-mono">
+        <span className="nums font-mono">
           <AnimatedNumber value={player.score} /> pts
         </span>
         {player.streak >= 2 && (

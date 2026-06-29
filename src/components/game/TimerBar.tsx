@@ -18,7 +18,7 @@ export function TimerBar({
         <span
           className={[
             'font-mono text-sm tabular-nums',
-            danger ? 'text-danger' : 'text-white/70',
+            danger ? 'text-danger motion-safe:animate-pulse' : 'text-white/70',
           ].join(' ')}
         >
           +{secondsLeft}s

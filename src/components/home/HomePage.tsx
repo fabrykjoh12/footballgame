@@ -363,19 +363,21 @@ export function HomePage({
           </span>
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <ModeTile emoji="🔗" name="Connections" sub="Played for both clubs" onClick={onOpenConnections} />
+          <ModeTile emoji="🔗" name="Connections" sub="Played for both clubs" tag="Puzzle" tagTone="text-pitch border-pitch/30 bg-pitch/10" onClick={onOpenConnections} />
           <ModeTile
             emoji="📅"
             name="Daily Connections"
             sub={dailyConnDone ? `Done · 🔥 ${dailyConn.streak}` : dailyConn.streak > 0 ? `🔥 ${dailyConn.streak}-day streak` : 'One puzzle a day'}
+            tag={dailyConnDone ? 'Done' : 'Daily'}
+            tagTone={dailyConnDone ? 'text-white/50 border-white/15 bg-white/5' : 'text-gold border-gold/30 bg-gold/10'}
             onClick={onOpenConnectionsDaily}
           />
-          <ModeTile emoji="🧭" name="Career Path" sub="Guess from the clubs" onClick={onOpenCareerPath} />
-          <ModeTile emoji="🎂" name="Older or Younger?" sub="Birth-year Higher/Lower" onClick={onOpenOlderYounger} />
-          <ModeTile emoji="🎩" name="Managers" sub="Managed both clubs" onClick={onOpenManagers} />
-          <ModeTile emoji="🕵️" name="Mystery Duel" sub="Football Guess Who" onClick={onOpenMystery} />
-          <ModeTile emoji="🏆" name="Cup Runs" sub="Knockout tournaments" onClick={onOpenCup} />
-          <ModeTile emoji="⚡" name="Arcade" sub="Survival · Time Attack" onClick={onOpenModes} />
+          <ModeTile emoji="🧭" name="Career Path" sub="Guess from the clubs" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenCareerPath} />
+          <ModeTile emoji="🎂" name="Older or Younger?" sub="Birth-year Higher/Lower" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenOlderYounger} />
+          <ModeTile emoji="🎩" name="Managers" sub="Managed both clubs" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenManagers} />
+          <ModeTile emoji="🕵️" name="Mystery Duel" sub="Football Guess Who" tag="Versus" tagTone="text-sky-300 border-sky-400/30 bg-sky-400/10" onClick={onOpenMystery} />
+          <ModeTile emoji="🏆" name="Cup Runs" sub="Knockout tournaments" tag="Cup" tagTone="text-gold border-gold/30 bg-gold/10" onClick={onOpenCup} />
+          <ModeTile emoji="⚡" name="Arcade" sub="Survival · Time Attack" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenModes} />
         </div>
       </Card>
 
@@ -423,6 +425,9 @@ function MatchPreviewCard() {
   return (
     <div className="mx-auto mt-6 w-full max-w-xs animate-rise-in [animation-delay:120ms]">
       <div className="glass relative overflow-hidden rounded-2xl border border-white/10 p-4 text-center shadow-elev-1">
+        {/* Tactical-board texture behind the scoreline. */}
+        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-40" aria-hidden />
+        <div className="relative">
         <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-gold">
           Full time
         </div>
@@ -431,7 +436,7 @@ function MatchPreviewCard() {
             <span className="h-2.5 w-2.5 rounded-full bg-pitch" aria-hidden />
             <span className="text-sm text-white/90">Sara FC</span>
           </span>
-          <span className="text-xl text-pitch">3–2</span>
+          <span className="nums text-xl text-pitch">3–2</span>
           <span className="flex items-center gap-1.5">
             <span className="text-sm text-white/90">Jonas United</span>
             <span className="h-2.5 w-2.5 rounded-full bg-sky-400" aria-hidden />
@@ -441,6 +446,7 @@ function MatchPreviewCard() {
           ⏱️ 90+2' Late Winner
         </div>
         <div className="mt-2 text-[11px] text-white/45">8/10 correct · Best: Transfers</div>
+        </div>
         {/* Sweeping shine */}
         <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent motion-safe:animate-[shine_3.2s_ease-in-out_infinite]" />
       </div>
@@ -451,7 +457,7 @@ function MatchPreviewCard() {
 function ProfileStat({ value, label }: { value: string; label: string }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
-      <div className="font-display text-xl font-bold text-pitch">{value}</div>
+      <div className="nums font-display text-xl font-bold text-pitch">{value}</div>
       <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/40">
         {label}
       </div>
@@ -464,21 +470,42 @@ function ModeTile({
   emoji,
   name,
   sub,
+  tag,
+  tagTone = 'text-white/60 border-white/15 bg-white/5',
   onClick,
 }: {
   emoji: string;
   name: string;
   sub: string;
+  tag?: string;
+  tagTone?: string;
   onClick: () => void;
 }) {
   return (
     <button
       onClick={onClick}
-      className="flex flex-col items-start gap-1 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left transition hover:border-pitch/40 hover:bg-white/[0.06] answer-press"
+      className="group relative flex flex-col items-start gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left card-hover"
     >
-      <span className="text-xl" aria-hidden>{emoji}</span>
-      <span className="text-sm font-semibold leading-tight text-white/90">{name}</span>
-      <span className="text-[10px] leading-tight text-white/45">{sub}</span>
+      <div className="flex w-full items-start justify-between gap-1">
+        <span
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-pitch/10 text-lg ring-1 ring-inset ring-white/10"
+          aria-hidden
+        >
+          {emoji}
+        </span>
+        {tag && (
+          <span
+            className={`rounded-full border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${tagTone}`}
+          >
+            {tag}
+          </span>
+        )}
+      </div>
+      <div className="min-w-0">
+        <span className="block text-sm font-semibold leading-tight text-white/90">{name}</span>
+        <span className="mt-0.5 block text-[11px] leading-tight text-white/45">{sub}</span>
+      </div>
+      <IconArrowRight className="absolute bottom-3 right-3 h-3.5 w-3.5 text-white/0 transition-colors duration-200 group-hover:text-pitch" />
     </button>
   );
 }

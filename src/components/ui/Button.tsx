@@ -20,8 +20,8 @@ const LIFT = 'motion-safe:enabled:hover:-translate-y-0.5';
 const VARIANTS: Record<Variant, string> = {
   primary: [
     'bg-pitch text-ink-900 font-semibold',
-    'shadow-[0_4px_16px_-2px_rgba(22,255,122,0.40)]',
-    'enabled:hover:bg-pitch-glow enabled:hover:shadow-[0_10px_30px_-6px_rgba(22,255,122,0.60)]',
+    'shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_16px_-2px_rgba(22,255,122,0.40)]',
+    'enabled:hover:bg-pitch-glow enabled:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_30px_-6px_rgba(22,255,122,0.60)]',
     LIFT,
   ].join(' '),
   secondary: [
@@ -38,7 +38,7 @@ const VARIANTS: Record<Variant, string> = {
   ].join(' '),
   gold: [
     'bg-gold text-ink-900 font-bold',
-    'shadow-[0_4px_16px_-2px_rgba(255,210,74,0.45)]',
+    'shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_4px_16px_-2px_rgba(255,210,74,0.45)]',
     'enabled:hover:bg-gold-dark',
     LIFT,
   ].join(' '),

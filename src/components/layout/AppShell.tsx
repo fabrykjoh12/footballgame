@@ -22,7 +22,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="relative flex min-h-[100dvh] flex-col">
       <StadiumBackground />
 
-      <header className="z-10 flex items-center justify-between px-4 py-4 sm:px-6">
+      <header className="z-10 flex items-center justify-between border-b border-white/[0.06] px-4 py-4 sm:px-6">
         <div className="flex items-center gap-2.5">
           <BallMark />
           <div className="leading-none">

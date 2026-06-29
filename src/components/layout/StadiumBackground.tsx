@@ -9,6 +9,10 @@ export function StadiumBackground() {
       {/* Base gradient */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_#101a33_0%,_#080c16_45%,_#05070d_100%)]" />
 
+      {/* Twin stadium floodlight pools at the top corners — broadcast atmosphere. */}
+      <div className="absolute -top-24 left-[12%] h-80 w-80 -translate-x-1/2 rounded-full bg-white/[0.05] blur-[90px]" />
+      <div className="absolute -top-24 right-[12%] h-80 w-80 translate-x-1/2 rounded-full bg-white/[0.05] blur-[90px]" />
+
       {/* Top neon glow — accent colour comes from the selected cosmetic. */}
       <div
         className="absolute -top-40 left-1/2 h-96 w-[120vw] -translate-x-1/2 rounded-full blur-[120px]"
