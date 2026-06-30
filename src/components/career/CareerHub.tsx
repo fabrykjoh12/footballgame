@@ -13,6 +13,11 @@ import {
   computeStandings,
   yourPosition,
   ROUNDS_PER_SEASON,
+  PROMOTION_SPOTS,
+  RELEGATION_SPOTS,
+  TEAMS_PER_DIVISION,
+  TOP_TIER,
+  BOTTOM_TIER,
   type CareerState,
 } from '../../lib/career';
 import {
@@ -64,6 +69,14 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
   const you = table.find((r) => r.team.isYou);
   const seasonOver = career.status !== 'in_season';
 
+  // Promotion / relegation stakes — same rules the league table draws.
+  const showPromotion = career.tier > TOP_TIER;
+  const showRelegation = career.tier < BOTTOM_TIER;
+  const inPromotion = showPromotion && position > 0 && position <= PROMOTION_SPOTS;
+  const inRelegation =
+    showRelegation && position > TEAMS_PER_DIVISION - RELEGATION_SPOTS;
+  const kit = teamIdentity(career.managerName);
+
   const startNext = () => {
     const next = saveCareer(startNextSeason(career));
     setCareer(next);
@@ -95,26 +108,60 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
         </Badge>
       </div>
 
-      {/* Division card */}
-      <Card strong glow className="p-5 text-center animate-rise-in">
-        <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
-          Now managing
-        </div>
-        <div className="mt-1 font-display text-2xl font-bold text-gradient-pitch">
-          {teamName(career.managerName)}
-        </div>
-        <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
-          <IconRoute className="h-4 w-4 text-pitch" />
-          <span className="font-semibold">{division.name}</span>
-        </div>
-        {you && (
-          <div className="mt-4 grid grid-cols-4 gap-2">
-            <MiniStat value={position > 0 ? `${ordinal(position)}` : '—'} label="Position" />
-            <MiniStat value={String(you.points)} label="Points" />
-            <MiniStat value={`${you.won}-${you.drawn}-${you.lost}`} label="W-D-L" />
-            <MiniStat value={`${career.round}/${ROUNDS_PER_SEASON}`} label="Played" />
+      {/* Division card — manager dashboard header */}
+      <Card strong glow className="relative overflow-hidden p-5 text-center animate-rise-in">
+        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
+        <div className="relative">
+          <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
+            Now managing
           </div>
-        )}
+          <div className="mt-2 flex items-center justify-center gap-2.5">
+            <span
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-xl font-display text-base font-black"
+              style={{
+                backgroundColor: kit.soft,
+                color: kit.color,
+                boxShadow: `inset 0 0 0 2px ${kit.ring}`,
+              }}
+              aria-hidden
+            >
+              {career.managerName.charAt(0).toUpperCase()}
+            </span>
+            <span className="font-display text-2xl font-bold text-gradient-pitch">
+              {teamName(career.managerName)}
+            </span>
+          </div>
+          <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm">
+            <IconRoute className="h-4 w-4 text-pitch" />
+            <span className="font-semibold">{division.name}</span>
+          </div>
+          {you && (
+            <>
+              <div className="mt-4 grid grid-cols-4 gap-2">
+                <MiniStat
+                  value={position > 0 ? ordinal(position) : '—'}
+                  label="Position"
+                  tone={inPromotion ? 'pitch' : inRelegation ? 'danger' : 'white'}
+                />
+                <MiniStat value={String(you.points)} label="Points" />
+                <MiniStat value={`${you.won}-${you.drawn}-${you.lost}`} label="W-D-L" />
+                <MiniStat value={`${career.round}/${ROUNDS_PER_SEASON}`} label="Played" />
+              </div>
+              {(inPromotion || inRelegation) && (
+                <div
+                  className={[
+                    'mt-3 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold',
+                    inPromotion
+                      ? 'border-pitch/40 bg-pitch/10 text-pitch'
+                      : 'border-danger/40 bg-danger/10 text-danger',
+                  ].join(' ')}
+                >
+                  {inPromotion ? '⬆️ In the promotion places' : '⬇️ In the relegation zone'}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </Card>
 
       {/* Board: manager reputation, confidence + season objectives */}
@@ -127,14 +174,17 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
         <Card className="p-4">
           <div className="mb-3 flex items-center gap-2">
             <IconClock className="h-5 w-5 text-pitch" />
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
+            <h2 className="nums text-sm font-semibold uppercase tracking-wide text-white/80">
               Next fixture — Round {career.round + 1}
             </h2>
           </div>
-          <div className="mb-4 flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">
-            <ClubChip name={career.managerName} you />
-            <span className="font-display text-lg font-bold text-white/40">vs</span>
-            <ClubChip name={fixture.opponent.name} />
+          <div className="relative mb-4 overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] p-3">
+            <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.4]" aria-hidden />
+            <div className="relative flex items-center justify-center gap-3">
+              <ClubChip name={career.managerName} you />
+              <span className="font-display text-lg font-black italic text-white/30">VS</span>
+              <ClubChip name={fixture.opponent.name} />
+            </div>
           </div>
           {(() => {
             const rival = seasonRival(career);
@@ -189,7 +239,7 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
               >
                 <IconTrophy className="h-4 w-4 text-gold" />
                 <span className="font-semibold text-white/90">{t.label}</span>
-                <span className="ml-auto text-xs text-white/40">Season {t.season}</span>
+                <span className="nums ml-auto text-xs text-white/40">Season {t.season}</span>
               </div>
             ))}
           </div>
@@ -337,7 +387,9 @@ function BoardCard({ career }: { career: CareerState }) {
       <div className="mb-3">
         <div className="mb-1 flex items-center justify-between text-[11px] text-white/50">
           <span>Board confidence</span>
-          <span className="font-semibold text-white/75">{confidence.label}</span>
+          <span className="font-semibold text-white/75">
+            {confidence.label} · <span className="nums">{confidence.value}</span>
+          </span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-white/10">
           <div
@@ -378,10 +430,19 @@ function ObjectiveRow({ objective }: { objective: Objective }) {
   );
 }
 
-function MiniStat({ value, label }: { value: string; label: string }) {
+function MiniStat({
+  value,
+  label,
+  tone = 'pitch',
+}: {
+  value: string;
+  label: string;
+  tone?: 'pitch' | 'danger' | 'white';
+}) {
+  const color = tone === 'danger' ? 'text-danger' : tone === 'white' ? 'text-white' : 'text-pitch';
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
-      <div className="font-display text-lg font-bold text-pitch">{value}</div>
+      <div className={`nums font-display text-lg font-bold ${color}`}>{value}</div>
       <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/40">
         {label}
       </div>
