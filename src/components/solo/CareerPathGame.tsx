@@ -10,6 +10,7 @@ import {
 } from '../../lib/careerPath';
 import type { Player } from '../../lib/playerDb';
 import { play } from '../../lib/sound';
+import { teamIdentity } from '../../lib/teamIdentity';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -103,8 +104,8 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
         <div className="text-5xl" aria-hidden>🧭</div>
         <div>
           <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">Career Path</div>
-          <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">{streak} solved</h1>
-          <p className="mt-1 text-sm text-white/55">{score.toLocaleString()} pts · best streak {best}</p>
+          <h1 className="nums mt-1 font-display text-3xl font-bold text-gradient-pitch">{streak} solved</h1>
+          <p className="nums mt-1 text-sm text-white/55">{score.toLocaleString()} pts · best streak {best}</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -149,32 +150,40 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
       {/* HUD */}
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
-          <span className="font-display text-2xl font-bold text-pitch">{score.toLocaleString()}</span>
+          <span className="nums font-display text-2xl font-bold text-pitch">{score.toLocaleString()}</span>
           <span className="text-[11px] uppercase tracking-wide text-white/40">pts</span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           {streak >= 2 && (
-            <span className="inline-flex items-center gap-1 font-semibold text-gold"><IconBolt className="h-4 w-4" /> {streak}</span>
+            <span className="nums inline-flex items-center gap-1 font-semibold text-gold"><IconBolt className="h-4 w-4" /> {streak}</span>
           )}
-          <span className="text-white/55">Best {best}</span>
+          <span className="nums text-white/55">Best {best}</span>
         </div>
       </Card>
 
       {/* Club chain */}
-      <Card strong className="p-4">
+      <Card strong className="relative overflow-hidden p-4">
+        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
+        <div className="relative">
         <div className="mb-2 text-center text-xs uppercase tracking-wide text-white/40">Which player is this?</div>
         <ol className="flex flex-col gap-1.5">
           {player.clubs.map((club, i) => {
             const shown = showAll || i < revealed;
+            const kit = teamIdentity(club);
             return (
               <li key={i} className="flex items-center gap-2">
-                <span className="w-5 text-right text-xs text-white/30">{i + 1}</span>
+                <span className="nums w-5 text-right text-xs text-white/30">{i + 1}</span>
                 <span
                   className={[
-                    'flex-1 rounded-lg border px-3 py-2 font-display font-bold',
+                    'flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 font-display font-bold',
                     shown ? 'border-white/10 bg-white/[0.05] text-white/90' : 'border-dashed border-white/10 bg-white/[0.02] text-white/25',
                   ].join(' ')}
                 >
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: shown ? kit.color : 'rgba(255,255,255,0.15)' }}
+                    aria-hidden
+                  />
                   {shown ? club : '• • •'}
                 </span>
               </li>
@@ -189,6 +198,7 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
             Reveal next club (−points)
           </button>
         )}
+        </div>
       </Card>
 
       {/* Reveal banner */}

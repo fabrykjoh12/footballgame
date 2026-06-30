@@ -10,6 +10,7 @@ import {
   type OYRound,
 } from '../../lib/olderYounger';
 import { play } from '../../lib/sound';
+import { teamIdentity } from '../../lib/teamIdentity';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -80,7 +81,7 @@ export function OlderYoungerGame({ onExit }: { onExit: () => void }) {
         <div className="text-5xl" aria-hidden>🎂</div>
         <div>
           <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">Older or Younger?</div>
-          <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">{streak} in a row</h1>
+          <h1 className="nums mt-1 font-display text-3xl font-bold text-gradient-pitch">{streak} in a row</h1>
           {isBest && (
             <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm font-semibold text-gold">
               🏆 New best!
@@ -136,10 +137,10 @@ export function OlderYoungerGame({ onExit }: { onExit: () => void }) {
       {/* HUD */}
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
-          <span className="font-display text-2xl font-bold text-pitch">{streak}</span>
+          <span className="nums font-display text-2xl font-bold text-pitch">{streak}</span>
           <span className="text-[11px] uppercase tracking-wide text-white/40">streak</span>
         </div>
-        <span className="text-sm text-white/55">Best {best}</span>
+        <span className="nums text-sm text-white/55">Best {best}</span>
       </Card>
 
       {/* The known player */}
@@ -180,15 +181,25 @@ export function OlderYoungerGame({ onExit }: { onExit: () => void }) {
 }
 
 function PlayerCard({ name, club, year }: { name: string; club: string; year: number | null }) {
+  const kit = teamIdentity(name);
   return (
-    <Card strong className="flex items-center justify-between p-4">
-      <div>
-        <div className="font-display text-lg font-bold">{name}</div>
-        {club && <div className="text-xs text-white/45">{club}</div>}
+    <Card strong className="flex items-center justify-between gap-3 p-4">
+      <div className="flex min-w-0 items-center gap-3">
+        <span
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-xl font-display text-base font-black"
+          style={{ backgroundColor: kit.soft, color: kit.color, boxShadow: `inset 0 0 0 2px ${kit.ring}` }}
+          aria-hidden
+        >
+          {name.charAt(0).toUpperCase()}
+        </span>
+        <div className="min-w-0">
+          <div className="truncate font-display text-lg font-bold">{name}</div>
+          {club && <div className="truncate text-xs text-white/45">{club}</div>}
+        </div>
       </div>
-      <div className="text-right">
+      <div className="shrink-0 text-right">
         <div className="text-[10px] uppercase tracking-wide text-white/40">Born</div>
-        <div className="font-display text-2xl font-bold text-pitch">{year ?? '????'}</div>
+        <div className="nums font-display text-2xl font-bold text-pitch">{year ?? '????'}</div>
       </div>
     </Card>
   );
@@ -197,7 +208,7 @@ function PlayerCard({ name, club, year }: { name: string; club: string; year: nu
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg bg-white/[0.03] p-2 text-center">
-      <div className="font-display text-xl font-bold">{value}</div>
+      <div className="nums font-display text-xl font-bold">{value}</div>
       <div className="text-[10px] uppercase tracking-wide text-white/40">{label}</div>
     </div>
   );

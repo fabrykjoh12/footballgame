@@ -9,6 +9,7 @@ import {
   type ManagerRound,
 } from '../../lib/managers';
 import { play } from '../../lib/sound';
+import { matchIdentities, type TeamIdentity } from '../../lib/teamIdentity';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -88,8 +89,8 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
         <div className="text-5xl" aria-hidden>🎩</div>
         <div>
           <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">Manager Merry-go-round</div>
-          <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">{streak} in a row</h1>
-          <p className="mt-1 text-sm text-white/55">Best streak {best}</p>
+          <h1 className="nums mt-1 font-display text-3xl font-bold text-gradient-pitch">{streak} in a row</h1>
+          <p className="nums mt-1 text-sm text-white/55">Best streak {best}</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -132,19 +133,29 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
       {/* HUD */}
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
-          <span className="font-display text-2xl font-bold text-pitch">{streak}</span>
+          <span className="nums font-display text-2xl font-bold text-pitch">{streak}</span>
           <span className="text-[11px] uppercase tracking-wide text-white/40">streak</span>
         </div>
-        <span className="text-sm text-white/55">Best {best}</span>
+        <span className="nums text-sm text-white/55">Best {best}</span>
       </Card>
 
       {/* The two clubs */}
-      <Card strong className="p-5 text-center">
-        <div className="mb-3 text-xs uppercase tracking-wide text-white/40">Name a manager who managed both</div>
-        <div className="flex items-center justify-center gap-3">
-          <span className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 font-display text-base font-bold text-white/90">{round.clubA}</span>
-          <span className="text-white/30">＋</span>
-          <span className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 font-display text-base font-bold text-white/90">{round.clubB}</span>
+      <Card strong className="relative overflow-hidden p-5 text-center">
+        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
+        <div className="relative">
+          <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-white/45">
+            Name a manager who managed both
+          </div>
+          {(() => {
+            const [idA, idB] = matchIdentities(round.clubA, round.clubB);
+            return (
+              <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-1">
+                <ManagerClubChip name={round.clubA} identity={idA} />
+                <ManagerConnector />
+                <ManagerClubChip name={round.clubB} identity={idB} />
+              </div>
+            );
+          })()}
         </div>
       </Card>
 
@@ -205,6 +216,34 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
           </button>
         </form>
       )}
+    </div>
+  );
+}
+
+function ManagerClubChip({ name, identity }: { name: string; identity: TeamIdentity }) {
+  return (
+    <div className="flex min-w-0 flex-col items-center gap-2">
+      <span
+        className="grid h-12 w-12 shrink-0 place-items-center rounded-xl font-display text-lg font-black"
+        style={{ backgroundColor: identity.soft, color: identity.color, boxShadow: `inset 0 0 0 2px ${identity.ring}` }}
+        aria-hidden
+      >
+        {name.charAt(0).toUpperCase()}
+      </span>
+      <span className="text-balance font-display text-sm font-bold leading-tight text-white/90">{name}</span>
+    </div>
+  );
+}
+
+/** The manager who links the two clubs. */
+function ManagerConnector() {
+  return (
+    <div className="flex items-center pt-3">
+      <span className="h-px w-2 bg-white/15 sm:w-3" aria-hidden />
+      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-pitch/40 bg-pitch/10 text-sm">
+        🎩
+      </span>
+      <span className="h-px w-2 bg-white/15 sm:w-3" aria-hidden />
     </div>
   );
 }
