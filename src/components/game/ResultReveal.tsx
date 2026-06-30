@@ -78,21 +78,22 @@ export function ResultReveal({
   return (
     <div className="flex flex-col gap-4 animate-slide-up">
       {/* Correct answer */}
-      <Card strong className="p-5 text-center">
-        <div className="text-xs uppercase tracking-[0.2em] text-white/40">
-          Correct answer
-        </div>
-        <div className="my-1.5 font-display text-2xl font-bold text-pitch sm:text-3xl">
-          {result.correctAnswer}
-        </div>
+      <Card strong className="relative overflow-hidden p-5 text-center">
+        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
+        <div className="relative">
+          <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.2em] text-pitch">
+            <IconCheck className="h-3.5 w-3.5" /> Correct answer
+          </div>
+          <div className="my-1.5 font-display text-2xl font-bold text-pitch sm:text-3xl">
+            {result.correctAnswer}
+          </div>
 
-        {result.revealValues && (
-          <RevealValues result={result} />
-        )}
+          {result.revealValues && <RevealValues result={result} />}
 
-        <p className="mx-auto mt-2 max-w-prose text-sm text-white/60">
-          {result.explanation}
-        </p>
+          <p className="mx-auto mt-2 max-w-prose text-sm text-white/60">
+            {result.explanation}
+          </p>
+        </div>
       </Card>
 
       {/* Per-player breakdown */}
@@ -128,12 +129,12 @@ export function ResultReveal({
         <Button size="lg" fullWidth onClick={onNext}>
           {isLastQuestion ? 'See Final Result' : 'Next Question'}
           <IconArrowRight className="h-4 w-4" />
-          <span className="ml-1 font-mono text-xs opacity-70">({secondsLeft})</span>
+          <span className="nums ml-1 font-mono text-xs opacity-70">({secondsLeft})</span>
         </Button>
       ) : (
         <div className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3.5 text-sm text-white/55">
           {isLastQuestion ? 'Final whistle approaching…' : 'Next question in'}{' '}
-          <span className="font-mono text-pitch">{secondsLeft}s</span>
+          <span className="nums font-mono text-pitch">{secondsLeft}s</span>
         </div>
       )}
     </div>
@@ -150,11 +151,12 @@ function RevealValues({ result }: { result: QuestionResult }) {
         isCorrect ? 'border-good/50 bg-good/10' : 'border-white/10 bg-white/[0.03]',
       ].join(' ')}
     >
-      <div className="truncate text-xs text-white/55">
-        {name}
+      <div className="flex items-center gap-1 truncate text-xs text-white/55">
+        {isCorrect && <IconCheck className="h-3 w-3 shrink-0 text-good" aria-hidden />}
+        <span className="truncate">{name}</span>
         {isCorrect && <span className="sr-only"> (correct)</span>}
       </div>
-      <div className="font-mono text-lg font-bold">
+      <div className={['nums font-mono text-lg font-bold', isCorrect ? 'text-good' : 'text-white/80'].join(' ')}>
         {value}
         {v.unit ? <span className="ml-1 text-xs font-normal text-white/50">{v.unit}</span> : null}
       </div>
@@ -203,10 +205,15 @@ function PlayerResultCard({
   return (
     <Card
       className={[
-        'p-4',
+        'relative overflow-hidden p-4',
         isCorrect ? 'border-good/30' : 'border-danger/30',
       ].join(' ')}
     >
+      {/* Correctness accent bar — quick scan without relying on colour alone. */}
+      <span
+        aria-hidden
+        className={['absolute inset-y-0 left-0 w-1', isCorrect ? 'bg-good' : 'bg-danger'].join(' ')}
+      />
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="truncate text-sm font-semibold">{label}</span>
         {isYou && <Badge tone="pitch">You</Badge>}
@@ -237,16 +244,20 @@ function PlayerResultCard({
       <div className="mt-3 flex items-baseline gap-1">
         <span
           className={[
-            'font-display text-2xl font-bold',
+            'nums font-display text-2xl font-bold',
             breakdown.total > 0 ? 'text-pitch' : 'text-white/40',
+            result.scoredGoal ? 'motion-safe:animate-goal-pop' : '',
           ].join(' ')}
         >
           +{breakdown.total}
         </span>
         <span className="text-xs text-white/40">pts</span>
+        {result.scoredGoal && (
+          <span className="ml-auto text-base" aria-label="Goal">⚽</span>
+        )}
       </div>
       {breakdown.total > 0 && (breakdown.speedBonus > 0 || breakdown.streakBonus > 0) && (
-        <div className="mt-0.5 text-[11px] text-white/45">
+        <div className="nums mt-0.5 text-[11px] text-white/45">
           {breakdown.base} base
           {breakdown.speedBonus > 0 && ` · +${breakdown.speedBonus} speed`}
           {breakdown.streakBonus > 0 && ` · +${breakdown.streakBonus} streak`}
