@@ -409,6 +409,9 @@ function MysteryRunner({
             ? { askerId: s.pendingVerified.askerId, text: questionLabel(s.pendingVerified.question), onAnswer: (a: FreeAnswer) => answerVerifiedManual(s, a) }
             : null
         : null;
+    // Most recent answered question — surfaced prominently so the answer is
+    // visible the moment a question resolves (not just buried in the log).
+    const lastEntry = s.history[s.history.length - 1];
 
     return (
       <div className="flex flex-col gap-4 py-4 animate-fade-in">
@@ -483,6 +486,22 @@ function MysteryRunner({
                 {candidates.length > 40 && <span className="text-[11px] text-white/40">+{candidates.length - 40} more</span>}
               </div>
             )}
+          </Card>
+        )}
+
+        {/* Latest answer — the result of the question just asked. */}
+        {lastEntry && (
+          <Card strong className="p-3 animate-rise-in">
+            <div className="text-[10px] uppercase tracking-wide text-white/40">Latest answer</div>
+            <div className="mt-0.5 flex items-baseline justify-between gap-2">
+              <span className="min-w-0 truncate text-sm">
+                <span className="text-white/45">{playerById(lastEntry.askerId).name}: </span>
+                <span className="text-white/85">{lastEntry.label}</span>
+              </span>
+              <span className="shrink-0 text-base font-bold">
+                <AnswerTag entry={lastEntry} />
+              </span>
+            </div>
           </Card>
         )}
 
