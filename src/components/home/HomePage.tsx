@@ -18,6 +18,7 @@ import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { DailyRivalCard } from './DailyRivalCard';
 import { StreakRewardCard } from './StreakRewardCard';
+import { QuestsCard } from './QuestsCard';
 import { ClubBadge } from '../club/ClubBadge';
 import { ClubIdentityModal } from '../club/ClubIdentityModal';
 import { SettingsModal } from '../settings/SettingsModal';
@@ -302,6 +303,7 @@ export function HomePage({
         <SectionLabel hint="Back tomorrow">Today</SectionLabel>
         <div className="flex flex-col gap-3">
           <DailyRivalCard name={name} connecting={connecting} onPlay={playDaily} />
+          <QuestsCard />
           <StreakRewardCard />
         </div>
       </section>
