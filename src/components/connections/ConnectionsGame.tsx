@@ -16,6 +16,7 @@ import {
 import { recordDailyConnectionResult } from '../../lib/dailyConnections';
 import { refreshAchievements } from '../../lib/achievements';
 import { useCountdown } from '../../hooks/useCountdown';
+import { matchIdentities, type TeamIdentity } from '../../lib/teamIdentity';
 import { play } from '../../lib/sound';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -62,6 +63,8 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
 
   const puzzle: Connection | undefined = puzzles[index];
   const qClock = useCountdown(phase === 'question' ? qStartedAt : null, CONNECTIONS_QUESTION_MS, phase === 'question');
+  const [idA, idB] = puzzle ? matchIdentities(puzzle.clubA, puzzle.clubB) : [null, null];
+  const timeLow = phase === 'question' && qClock.fraction < 0.25;
 
   const suggestions = useMemo(
     () => (phase === 'question' ? suggestNames(input) : []),
@@ -153,16 +156,16 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
       {/* HUD */}
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
-          <span className="font-display text-2xl font-bold text-pitch">{score.toLocaleString()}</span>
+          <span className="nums font-display text-2xl font-bold text-pitch">{score.toLocaleString()}</span>
           <span className="text-[11px] uppercase tracking-wide text-white/40">pts</span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           {streak >= 2 && (
-            <span className="inline-flex items-center gap-1 font-semibold text-gold">
+            <span className="nums inline-flex items-center gap-1 font-semibold text-gold">
               <IconBolt className="h-4 w-4" /> {streak}
             </span>
           )}
-          <span className="font-semibold text-white/80">
+          <span className="nums font-semibold text-white/80">
             {Math.min(index + 1, puzzles.length)} / {puzzles.length}
           </span>
         </div>
@@ -171,7 +174,10 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
       {/* Per-puzzle timer */}
       <div className="h-1.5 overflow-hidden rounded-full bg-white/10" aria-hidden>
         <div
-          className="h-full rounded-full bg-pitch transition-[width] duration-100 ease-linear"
+          className={[
+            'h-full rounded-full transition-[width] duration-100 ease-linear',
+            timeLow ? 'bg-danger shadow-[0_0_12px_rgba(255,77,94,0.6)]' : 'bg-pitch',
+          ].join(' ')}
           style={{ width: `${Math.round(qClock.fraction * 100)}%` }}
         />
       </div>
@@ -190,7 +196,7 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
           <div className="flex items-center gap-2">
             {grade.isCorrect ? <IconCheck className="h-4 w-4" /> : <IconClose className="h-4 w-4" />}
             {grade.isCorrect ? (
-              <span>Correct! +{grade.breakdown.total.toLocaleString()}</span>
+              <span className="nums">Correct! +{grade.breakdown.total.toLocaleString()}</span>
             ) : (
               <span>{submitted == null ? 'Out of time' : 'Not quite'}</span>
             )}
@@ -209,15 +215,18 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
         </div>
       )}
 
-      {/* The two clubs */}
-      <Card strong glow className="p-6 text-center animate-rise-in">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/45">
-          Name a player who played for both
-        </p>
-        <div className="mt-3 flex items-center justify-center gap-3">
-          <ClubChip name={puzzle.clubA} />
-          <span className="font-display text-lg font-bold text-pitch">&amp;</span>
-          <ClubChip name={puzzle.clubB} />
+      {/* The two clubs — a connection to solve */}
+      <Card strong glow className="relative overflow-hidden p-6 text-center animate-rise-in">
+        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
+        <div className="relative">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/45">
+            Name a player who played for both
+          </p>
+          <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-start gap-1">
+            <ClubChip name={puzzle.clubA} identity={idA} />
+            <Connector />
+            <ClubChip name={puzzle.clubB} identity={idB} />
+          </div>
         </div>
       </Card>
 
@@ -276,11 +285,34 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
   );
 }
 
-function ClubChip({ name }: { name: string }) {
+function ClubChip({ name, identity }: { name: string; identity: TeamIdentity | null }) {
+  const id = identity ?? { color: '#16ff7a', soft: 'rgba(22,255,122,0.1)', ring: 'rgba(22,255,122,0.3)' };
   return (
-    <span className="rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2 font-display text-base font-bold text-white/90">
-      {name}
-    </span>
+    <div className="flex min-w-0 flex-col items-center gap-2">
+      <span
+        className="grid h-12 w-12 shrink-0 place-items-center rounded-xl font-display text-lg font-black"
+        style={{ backgroundColor: id.soft, color: id.color, boxShadow: `inset 0 0 0 2px ${id.ring}` }}
+        aria-hidden
+      >
+        {name.charAt(0).toUpperCase()}
+      </span>
+      <span className="text-balance font-display text-sm font-bold leading-tight text-white/90">
+        {name}
+      </span>
+    </div>
+  );
+}
+
+/** The mystery player who links the two clubs. */
+function Connector() {
+  return (
+    <div className="flex items-center pt-3">
+      <span className="h-px w-2 bg-white/15 sm:w-3" aria-hidden />
+      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-pitch/40 bg-pitch/10 font-display text-sm font-bold text-pitch">
+        ?
+      </span>
+      <span className="h-px w-2 bg-white/15 sm:w-3" aria-hidden />
+    </div>
   );
 }
 
@@ -299,7 +331,7 @@ function ConnectionsResult({ run, onExit }: { run: FinishedRun | null; onExit: (
           <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">
             {solved ? 'Solved!' : 'Missed today'}
           </h1>
-          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm font-semibold text-gold">
+          <div className="nums mt-2 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm font-semibold text-gold">
             🔥 {streak} day{streak === 1 ? '' : 's'} streak
           </div>
         </div>
@@ -320,7 +352,7 @@ function ConnectionsResult({ run, onExit }: { run: FinishedRun | null; onExit: (
       </div>
       <div>
         <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">Connections — full time</div>
-        <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">
+        <h1 className="nums mt-1 font-display text-3xl font-bold text-gradient-pitch">
           {correct}/{total} correct
         </h1>
         {run?.isBest && (
@@ -348,7 +380,7 @@ function ConnectionsResult({ run, onExit }: { run: FinishedRun | null; onExit: (
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
-      <div className="font-display text-xl font-bold text-pitch">{value}</div>
+      <div className="nums font-display text-xl font-bold text-pitch">{value}</div>
       <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/40">{label}</div>
     </div>
   );
