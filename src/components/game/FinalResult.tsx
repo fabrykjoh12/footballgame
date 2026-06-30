@@ -8,7 +8,7 @@ import { accuracyPercent } from '../../lib/scoring';
 import { getPlayerTitle } from '../../lib/playerTitle';
 import { summarizeMatch, type PlayerMatchStats } from '../../lib/matchStats';
 import { punditVerdict } from '../../lib/punditry';
-import { matchIdentities } from '../../lib/teamIdentity';
+import { matchIdentities, type TeamIdentity } from '../../lib/teamIdentity';
 import { CATEGORY_OPTIONS } from '../../lib/categories';
 import { FULL_TIME, type TimelineMark } from '../../lib/matchTimeline';
 import { buildShareText } from '../../lib/shareResult';
@@ -83,6 +83,7 @@ export function FinalResult() {
   const isDraw = winner === null;
   // Level on goals but a winner exists → it was decided on points.
   const onPoints = !isDraw && a.goals === b.goals;
+  const [idA, idB] = matchIdentities(a.name, b.name);
 
   const verdict = punditVerdict(
     {
@@ -120,59 +121,68 @@ export function FinalResult() {
     <div className="relative flex flex-col gap-4 py-4 animate-fade-in">
       <Confetti celebratory={youWon || isDraw} />
 
-      {/* Headline */}
-      <Card strong glow className="overflow-hidden p-6 text-center animate-rise-in">
-        <div className="mb-2 inline-flex items-center gap-2 text-gold">
-          <IconTrophy className="h-5 w-5" />
-          <span className="text-xs font-bold uppercase tracking-[0.2em]">
-            Full time
-          </span>
-        </div>
+      {/* Headline — broadcast full-time panel */}
+      <Card strong glow className="relative overflow-hidden p-6 text-center animate-rise-in">
+        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
+        <div className="relative">
+          <div className="mb-4 inline-flex items-center gap-2 text-gold">
+            <IconTrophy className="h-4 w-4" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.3em]">Full time</span>
+          </div>
 
-        <div className="font-display text-2xl font-bold leading-tight sm:text-3xl">
-          <span className={winner?.id === a.id ? 'text-gradient-gold' : 'text-white/80'}>
-            {teamName(a.name)}
-          </span>{' '}
-          <span className="mx-1 text-pitch">
-            {a.goals}–{b.goals}
-          </span>{' '}
-          <span className={winner?.id === b.id ? 'text-gradient-gold' : 'text-white/80'}>
-            {teamName(b.name)}
-          </span>
-        </div>
+          {/* Team — score — team */}
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+            <ResultTeam name={a.name} identity={idA} won={winner?.id === a.id} />
+            <div className="flex flex-col items-center px-1">
+              <div className="nums font-display text-4xl font-black leading-none sm:text-5xl">
+                <span style={{ color: idA.color }}>{a.goals}</span>
+                <span className="mx-1.5 text-white/25">–</span>
+                <span style={{ color: idB.color }}>{b.goals}</span>
+              </div>
+              <div
+                className={[
+                  'nums mt-1.5 font-mono text-xs',
+                  onPoints ? 'font-bold text-pitch' : 'text-white/40',
+                ].join(' ')}
+              >
+                {a.score}–{b.score} pts
+              </div>
+            </div>
+            <ResultTeam name={b.name} identity={idB} won={winner?.id === b.id} />
+          </div>
 
-        <div
-          className={[
-            'mt-1 font-mono text-sm',
-            onPoints ? 'font-semibold text-pitch' : 'text-white/50',
-          ].join(' ')}
-        >
-          {a.score} – {b.score} points
-        </div>
-
-        <div className="mt-4 text-lg font-semibold">
-          {isDraw ? (
-            <span className="text-white/80">🤝 Dead level — it’s a draw!</span>
-          ) : youWon ? (
-            <span className="text-gradient-pitch">
-              🎉 You win{onPoints ? ' on points!' : '!'}
+          {/* Result chip */}
+          <div className="mt-5">
+            <span
+              className={[
+                'inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-bold',
+                isDraw
+                  ? 'border-white/15 bg-white/5 text-white/80'
+                  : youWon
+                    ? 'border-pitch/40 bg-pitch/10 text-pitch'
+                    : 'border-white/15 bg-white/5 text-white/70',
+              ].join(' ')}
+            >
+              {isDraw ? (
+                <>🤝 Dead level — draw</>
+              ) : youWon ? (
+                <>🎉 You win{onPoints ? ' on points' : ''}</>
+              ) : (
+                <>{teamName(winner!.name)} win{onPoints ? ' on points' : 's'}</>
+              )}
             </span>
-          ) : (
-            <span className="text-white/70">
-              {teamName(winner!.name)} win{onPoints ? ' on points' : 's'}
-            </span>
+          </div>
+          {onPoints && (
+            <p className="mt-2 text-xs text-white/45">
+              Goals were level, so the higher points total takes it.
+            </p>
           )}
-        </div>
-        {onPoints && (
-          <p className="mt-1 text-xs text-white/45">
-            Goals were level, so the higher points total takes it.
-          </p>
-        )}
 
-        {/* Pundit's verdict — broadcast flavour. */}
-        <p className="mx-auto mt-3 max-w-prose border-t border-white/10 pt-3 text-sm italic text-white/60">
-          “{verdict}”
-        </p>
+          {/* Pundit's verdict — broadcast flavour. */}
+          <p className="mx-auto mt-4 max-w-prose border-t border-white/10 pt-3 text-sm italic text-white/60">
+            “{verdict}”
+          </p>
+        </div>
       </Card>
 
       {/* Man of the Match + biggest moment */}
@@ -309,6 +319,41 @@ function categoryLabel(c: Category): string {
   return CATEGORY_OPTIONS.find((o) => o.id === c)?.label ?? c;
 }
 
+/** A team's kit-coloured crest + name in the full-time headline. */
+function ResultTeam({
+  name,
+  identity,
+  won,
+}: {
+  name: string;
+  identity: TeamIdentity;
+  won: boolean;
+}) {
+  return (
+    <div className="flex min-w-0 flex-col items-center gap-1.5">
+      <div
+        className="relative grid h-12 w-12 place-items-center rounded-xl font-display text-lg font-black"
+        style={{
+          backgroundColor: identity.soft,
+          color: identity.color,
+          boxShadow: won
+            ? `inset 0 0 0 2px ${identity.color}, 0 0 22px -4px ${identity.color}`
+            : `inset 0 0 0 2px ${identity.ring}`,
+        }}
+      >
+        {name.charAt(0).toUpperCase()}
+        {won && <span className="absolute -top-2.5 text-sm" aria-label="Winner">👑</span>}
+      </div>
+      <div
+        className={['truncate font-display text-sm font-bold leading-tight', won ? '' : 'text-white/80'].join(' ')}
+        style={won ? { color: identity.color } : undefined}
+      >
+        {teamName(name)}
+      </div>
+    </div>
+  );
+}
+
 function StatsCard({
   player,
   stats,
@@ -382,7 +427,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
       <dt className="text-white/45">{label}</dt>
-      <dd className="font-mono font-semibold">{value}</dd>
+      <dd className="nums font-mono font-semibold">{value}</dd>
     </div>
   );
 }
@@ -413,7 +458,7 @@ function MatchHonours({
             {teamName(motm.name)}
             {motm.id === localPlayerId ? ' (You)' : ''}
           </div>
-          <div className="mt-0.5 text-xs text-white/50">
+          <div className="nums mt-0.5 text-xs text-white/50">
             {motm.correctAnswers} correct · {motm.score} pts
           </div>
         </Card>
@@ -448,9 +493,9 @@ function KnowledgeShareBar({
   return (
     <div>
       <div className="mb-1 flex items-center justify-between text-[10px] font-medium uppercase tracking-wide text-white/40">
-        <span>{shareA}% {teamName(a.name)}</span>
+        <span className="nums">{shareA}% {teamName(a.name)}</span>
         <span>Knowledge</span>
-        <span>{teamName(b.name)} {shareB}%</span>
+        <span className="nums">{teamName(b.name)} {shareB}%</span>
       </div>
       <div
         className="flex h-2.5 overflow-hidden rounded-full bg-white/10"
@@ -482,6 +527,8 @@ function TimelineReplay({
         <span>90'</span>
       </div>
       <div className="relative h-2 rounded-full bg-white/10">
+        {/* Half-time tick. */}
+        <span className="absolute left-1/2 top-0 h-2 w-px -translate-x-1/2 bg-white/15" aria-hidden />
         {marks.map((m) => {
           const color = m.side === 'home' ? idA.color : idB.color;
           const left = `${(Math.min(m.minute, FULL_TIME) / FULL_TIME) * 100}%`;
