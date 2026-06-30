@@ -1,6 +1,7 @@
 import { useGame } from '../../context/GameProvider';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { teamName } from '../../lib/teamName';
+import { teamIdentity } from '../../lib/teamIdentity';
 import {
   CUPS,
   getCup,
@@ -8,11 +9,13 @@ import {
   beginCup,
   currentRound,
   roundSettings,
+  type CupDef,
+  type CupStatus,
 } from '../../lib/cup';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { IconBack, IconTrophy, IconArrowRight } from '../ui/icons';
+import { IconBack, IconTrophy, IconArrowRight, IconCheck } from '../ui/icons';
 
 /** Hub for themed Cup Runs: resume an active run, pick a cup, see your trophies. */
 export function CupHub({ onExit }: { onExit: () => void }) {
@@ -74,6 +77,7 @@ export function CupHub({ onExit }: { onExit: () => void }) {
             {activeRound.name} vs{' '}
             <span className="font-semibold text-white/80">{teamName(activeRound.opponent)}</span>
           </p>
+          <CupBracket def={activeDef} roundIndex={active.round} status={active.status} />
           <div className="mt-3">
             <Button fullWidth onClick={resume}>
               Continue run <IconArrowRight className="h-4 w-4" />
@@ -102,6 +106,7 @@ export function CupHub({ onExit }: { onExit: () => void }) {
                     )}
                   </div>
                   <p className="mt-0.5 text-xs leading-relaxed text-white/55">{cup.blurb}</p>
+                  <CupPathPreview def={cup} />
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
                     <Badge tone="muted">{cup.rounds.length} ties</Badge>
                     <Badge tone="muted">Final: {teamName(cup.rounds[cup.rounds.length - 1].opponent)}</Badge>
@@ -129,5 +134,95 @@ export function CupHub({ onExit }: { onExit: () => void }) {
         </p>
       )}
     </div>
+  );
+}
+
+/** A compact kit-dot path of a cup's ties, ending in the trophy. */
+function CupPathPreview({ def }: { def: CupDef }) {
+  return (
+    <div className="mt-1.5 flex flex-wrap items-center gap-1">
+      {def.rounds.map((r, i) => {
+        const kit = teamIdentity(r.opponent);
+        return (
+          <span key={i} className="flex items-center gap-1">
+            <span
+              className="h-2.5 w-2.5 rounded-full"
+              style={{ backgroundColor: kit.color }}
+              title={`${r.name}: ${teamName(r.opponent)}`}
+            />
+            <span className="text-white/20" aria-hidden>›</span>
+          </span>
+        );
+      })}
+      <span className="text-sm" aria-hidden>🏆</span>
+    </div>
+  );
+}
+
+/** The full knockout bracket with progress: done / now / upcoming, then the trophy. */
+function CupBracket({
+  def,
+  roundIndex,
+  status,
+}: {
+  def: CupDef;
+  roundIndex: number;
+  status: CupStatus;
+}) {
+  return (
+    <ol className="mt-3 flex flex-col gap-1.5">
+      {def.rounds.map((r, i) => {
+        const done = status === 'won' || i < roundIndex;
+        const current = status === 'playing' && i === roundIndex;
+        const kit = teamIdentity(r.opponent);
+        return (
+          <li
+            key={i}
+            className={[
+              'flex items-center gap-3 rounded-xl border px-3 py-2 transition-colors',
+              current
+                ? 'border-pitch/50 bg-pitch/[0.08]'
+                : done
+                  ? 'border-white/10 bg-white/[0.02]'
+                  : 'border-white/10 bg-white/[0.02] opacity-60',
+            ].join(' ')}
+          >
+            <span
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-xl font-display text-sm font-black"
+              style={{ backgroundColor: kit.soft, color: kit.color, boxShadow: `inset 0 0 0 2px ${kit.ring}` }}
+              aria-hidden
+            >
+              {r.opponent.charAt(0).toUpperCase()}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] uppercase tracking-wide text-white/40">{r.name}</div>
+              <div className="truncate font-display text-sm font-bold">{teamName(r.opponent)}</div>
+            </div>
+            {current ? (
+              <Badge tone="pitch">Now</Badge>
+            ) : done ? (
+              <span className="text-pitch" aria-label="Won">
+                <IconCheck className="h-4 w-4" />
+              </span>
+            ) : (
+              <span className="text-[10px] uppercase tracking-wide text-white/35">{r.mode}</span>
+            )}
+          </li>
+        );
+      })}
+      {/* Trophy node */}
+      <li
+        className={[
+          'flex items-center gap-3 rounded-xl border px-3 py-2',
+          status === 'won' ? 'border-gold/40 bg-gold/10' : 'border-dashed border-white/12',
+        ].join(' ')}
+      >
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gold/15 text-lg ring-1 ring-gold/30" aria-hidden>
+          🏆
+        </span>
+        <div className="flex-1 font-display text-sm font-bold text-gold">{def.name} trophy</div>
+        {status === 'won' && <Badge tone="gold">Lifted</Badge>}
+      </li>
+    </ol>
   );
 }

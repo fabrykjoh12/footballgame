@@ -3,6 +3,7 @@ import { useGame } from '../../context/GameProvider';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { play } from '../../lib/sound';
 import { teamName } from '../../lib/teamName';
+import { matchIdentities } from '../../lib/teamIdentity';
 import { recordMatchResult } from '../../lib/profileStats';
 import { refreshAchievements } from '../../lib/achievements';
 import { recordMatchFeats } from '../../lib/feats';
@@ -92,43 +93,56 @@ export function CupResult() {
 
   return (
     <div className="flex flex-col gap-4 py-4 animate-fade-in">
-      {/* Scoreline */}
-      <Card strong glow className="overflow-hidden p-6 text-center animate-rise-in">
-        <div className="mb-2 inline-flex items-center gap-2 text-gold">
-          <IconTrophy className="h-5 w-5" />
-          <span className="text-xs font-bold uppercase tracking-[0.2em]">
-            {resolved ? `${resolved.def.name} · ${resolved.playedRound.name}` : 'Full time'}
-          </span>
-        </div>
-        <div className="font-display text-2xl font-bold leading-tight sm:text-3xl">
-          <span className={resolved?.won ? 'text-gradient-gold' : 'text-white/80'}>
-            {teamName(me.name)}
-          </span>{' '}
-          <span className="mx-1 text-pitch">
-            {me.goals}–{opp.goals}
-          </span>{' '}
-          <span className={resolved && !resolved.won ? 'text-gradient-gold' : 'text-white/80'}>
-            {teamName(opp.name)}
-          </span>
-        </div>
+      {/* Scoreline — broadcast cup-tie panel */}
+      <Card strong glow className="relative overflow-hidden p-6 text-center animate-rise-in">
+        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
+        <div className="relative">
+          {status === 'won' && (
+            <div className="mb-1 text-5xl motion-safe:animate-goal-pop" aria-hidden>🏆</div>
+          )}
+          <div className="mb-3 inline-flex items-center gap-2 text-gold">
+            <IconTrophy className="h-4 w-4" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.25em]">
+              {resolved ? `${resolved.def.name} · ${resolved.playedRound.name}` : 'Full time'}
+            </span>
+          </div>
+          {(() => {
+            const [idMe, idOpp] = matchIdentities(me.name, opp.name);
+            return (
+              <div className="font-display text-2xl font-bold leading-tight sm:text-3xl">
+                <span className={resolved?.won ? 'text-gradient-gold' : 'text-white/80'}>
+                  {teamName(me.name)}
+                </span>{' '}
+                <span className="nums mx-1">
+                  <span style={{ color: idMe.color }}>{me.goals}</span>
+                  <span className="text-white/25">–</span>
+                  <span style={{ color: idOpp.color }}>{opp.goals}</span>
+                </span>{' '}
+                <span className={resolved && !resolved.won ? 'text-gradient-gold' : 'text-white/80'}>
+                  {teamName(opp.name)}
+                </span>
+              </div>
+            );
+          })()}
 
-        <div className="mt-4 text-lg font-semibold">
-          {status === 'won' ? (
-            <span className="text-gradient-gold">🏆 Champions! You’ve won the {resolved!.def.name}!</span>
-          ) : status === 'out' ? (
-            <span className="text-white/70">😖 Knocked out in the {resolved!.playedRound.name}.</span>
-          ) : status === 'playing' && nextRound ? (
-            <span className="text-gradient-pitch">✅ Through to the {nextRound.name}!</span>
-          ) : (
-            <span className="text-white/80">Full time.</span>
+          <div className="mt-4 text-lg font-semibold">
+            {status === 'won' ? (
+              <span className="text-gradient-gold">Champions! You’ve won the {resolved!.def.name}!</span>
+            ) : status === 'out' ? (
+              <span className="text-white/70">😖 Knocked out in the {resolved!.playedRound.name}.</span>
+            ) : status === 'playing' && nextRound ? (
+              <span className="text-gradient-pitch">✅ Through to the {nextRound.name}!</span>
+            ) : (
+              <span className="text-white/80">Full time.</span>
+            )}
+          </div>
+
+          {status === 'playing' && nextRound && (
+            <p className="mt-1 text-sm text-white/55">
+              Next up: <span className="font-semibold text-white/80">{teamName(nextRound.opponent)}</span>
+            </p>
           )}
         </div>
-
-        {status === 'playing' && nextRound && (
-          <p className="mt-1 text-sm text-white/55">
-            Next up: <span className="font-semibold text-white/80">{teamName(nextRound.opponent)}</span>
-          </p>
-        )}
       </Card>
 
       {/* Share */}
