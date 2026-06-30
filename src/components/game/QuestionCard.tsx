@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Question } from '../../types/game';
 import { calculateBasePoints } from '../../lib/scoring';
+import { teamIdentity } from '../../lib/teamIdentity';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge, DifficultyBadge } from '../ui/Badge';
@@ -229,7 +230,7 @@ function WhoAmIBody({
         <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">
           Guess the player
         </h2>
-        <Badge tone="gold">up to {potential} pts</Badge>
+        <Badge tone="gold"><span className="nums">up to {potential} pts</span></Badge>
       </div>
       <ul className="space-y-2">
         {question.clues.map((clue, i) => {
@@ -244,7 +245,7 @@ function WhoAmIBody({
                   : 'border-dashed border-white/10 bg-transparent text-white/30',
               ].join(' ')}
             >
-              <span className="mr-2 font-mono text-xs text-pitch/70">
+              <span className="nums mr-2 font-mono text-xs text-pitch/70">
                 {i + 1}
               </span>
               {revealed ? clue : `Clue unlocks at ${i * 5}s…`}
@@ -269,16 +270,24 @@ function CareerPathBody({
       <div className="flex flex-wrap items-center gap-1.5">
         {question.path.map((club, i) => {
           const hidden = club === '???';
+          const kit = hidden ? null : teamIdentity(club);
           return (
             <span key={i} className="flex items-center gap-1.5">
               <span
                 className={[
-                  'rounded-lg border px-3 py-2 text-sm font-medium',
+                  'flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium',
                   hidden
                     ? 'border-dashed border-gold/40 bg-gold/5 text-gold'
                     : 'border-white/10 bg-white/[0.06]',
                 ].join(' ')}
               >
+                {kit && (
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: kit.color }}
+                    aria-hidden
+                  />
+                )}
                 {club}
               </span>
               {i < question.path.length - 1 && (
@@ -305,6 +314,7 @@ function HigherLowerPicker({
 }) {
   const renderOption = (name: string) => {
     const chosen = selectedAnswer === name;
+    const kit = teamIdentity(name);
     return (
       <button
         type="button"
@@ -319,7 +329,11 @@ function HigherLowerPicker({
           disabled && !chosen ? 'opacity-55' : '',
         ].join(' ')}
       >
-        <span className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-lg font-bold">
+        <span
+          className="grid h-10 w-10 place-items-center rounded-full text-lg font-black"
+          style={{ backgroundColor: kit.soft, color: kit.color, boxShadow: `inset 0 0 0 2px ${kit.ring}` }}
+          aria-hidden
+        >
           {name.charAt(0)}
         </span>
         <span className="font-semibold leading-tight">{name}</span>
@@ -365,7 +379,7 @@ function GuessNumberSlider({
   return (
     <div className="flex flex-col gap-4">
       <div className="text-center">
-        <span className="font-display text-4xl font-bold text-pitch tabular-nums">
+        <span className="nums font-display text-4xl font-bold text-pitch tabular-nums">
           {shown}
         </span>
         {question.unit && (
@@ -420,7 +434,7 @@ function GuessYearPicker({
             aria-pressed={chosen}
             aria-label={`Year ${year}`}
             className={[
-              'answer-press flex min-h-[72px] flex-col items-center justify-center rounded-xl border font-mono text-lg font-bold',
+              'answer-press nums flex min-h-[72px] flex-col items-center justify-center rounded-xl border font-mono text-lg font-bold',
               chosen
                 ? 'border-pitch/70 bg-pitch/10 text-pitch ring-2 ring-pitch/40'
                 : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.09]',
@@ -459,7 +473,7 @@ function TransferFeePicker({
             aria-pressed={chosen}
             aria-label={`Fee ${fee}`}
             className={[
-              'answer-press flex min-h-[64px] items-center justify-center rounded-xl border font-mono text-xl font-bold tracking-tight',
+              'answer-press nums flex min-h-[64px] items-center justify-center rounded-xl border font-mono text-xl font-bold tracking-tight',
               chosen
                 ? 'border-pitch/70 bg-pitch/10 text-pitch ring-2 ring-pitch/40'
                 : 'border-white/10 bg-white/[0.04] hover:bg-white/[0.09]',
