@@ -17,6 +17,7 @@ import {
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { DailyRivalCard } from './DailyRivalCard';
+import { StreakRewardCard } from './StreakRewardCard';
 import { ClubBadge } from '../club/ClubBadge';
 import { ClubIdentityModal } from '../club/ClubIdentityModal';
 import { SettingsModal } from '../settings/SettingsModal';
@@ -299,7 +300,10 @@ export function HomePage({
       {/* Today — the daily reasons to come back */}
       <section className="mx-auto w-full max-w-md">
         <SectionLabel hint="Back tomorrow">Today</SectionLabel>
-        <DailyRivalCard name={name} connecting={connecting} onPlay={playDaily} />
+        <div className="flex flex-col gap-3">
+          <DailyRivalCard name={name} connecting={connecting} onPlay={playDaily} />
+          <StreakRewardCard />
+        </div>
       </section>
 
       {/* Continue — Career progress */}

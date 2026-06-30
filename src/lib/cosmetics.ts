@@ -68,11 +68,25 @@ export const ACCENTS: AccentCosmetic[] = [
     unlocked: (c) => c.feats.has('comeback'),
   },
   {
+    id: 'ember',
+    name: 'Streak Ember',
+    hex: '#fb923c',
+    unlockLabel: '3-day Daily streak',
+    unlocked: (c) => c.dailyStreak >= 3,
+  },
+  {
     id: 'violet',
     name: 'Devotee Violet',
     hex: '#a78bfa',
     unlockLabel: '7-day Daily streak',
     unlocked: (c) => c.dailyStreak >= 7,
+  },
+  {
+    id: 'aurora',
+    name: 'Legend Aurora',
+    hex: '#c084fc',
+    unlockLabel: '30-day Daily streak',
+    unlocked: (c) => c.dailyStreak >= 30,
   },
   {
     id: 'amber',
@@ -109,6 +123,12 @@ export const PATTERNS: PatternCosmetic[] = [
     name: 'Pristine Turf',
     unlockLabel: 'Play 5 matches',
     unlocked: (c) => c.matches >= 5,
+  },
+  {
+    id: 'diagonal',
+    name: 'Diagonal Cut',
+    unlockLabel: '14-day Daily streak',
+    unlocked: (c) => c.dailyStreak >= 14,
   },
 ];
 
@@ -193,6 +213,8 @@ export function patternCss(patternId: string, accentHex: string): string {
       return `repeating-radial-gradient(circle at 50% 50%, ${c} 0 1.5px, transparent 1.5px 64px)`;
     case 'check':
       return `repeating-conic-gradient(${c} 0% 25%, transparent 0% 50%) 0 / 80px 80px`;
+    case 'diagonal':
+      return `repeating-linear-gradient(45deg, ${accentHex} 0 2px, transparent 2px 80px)`;
     case 'plain':
       return 'none';
     case 'stripes':
