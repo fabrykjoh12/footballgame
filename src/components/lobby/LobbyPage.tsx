@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useGame } from '../../context/GameProvider';
 import { MATCH_MODE_LIST, durationForMode } from '../../lib/matchModes';
 import { CATEGORY_OPTIONS } from '../../lib/categories';
-import type { Category } from '../../types/game';
+import type { Category, Player } from '../../types/game';
 import { teamName } from '../../lib/teamName';
+import { matchIdentities, type TeamIdentity } from '../../lib/teamIdentity';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
@@ -23,9 +24,18 @@ export function LobbyPage() {
   const [copied, setCopied] = useState<'code' | 'link' | null>(null);
 
   if (!room) return null;
-  const opponent = room.players.find((p) => p.id !== localPlayerId);
+  const remote = serviceMode === 'remote';
   const canStart = room.players.length >= 2;
   const selectedCats = room.settings.categories ?? [];
+
+  // Resolve the matchup by ROLE so both viewers see Host on the left, Guest on
+  // the right (not "me vs them"), like a real fixture graphic.
+  const hostPlayer = room.players.find((p) => p.isHost) ?? null;
+  const guestPlayer = room.players.find((p) => !p.isHost) ?? null;
+  const [idHost, idGuest] = matchIdentities(
+    hostPlayer?.name ?? 'Home',
+    guestPlayer?.name ?? 'Away',
+  );
 
   const toggleCategory = (id: Category) => {
     if (!isHost) return;
@@ -55,55 +65,92 @@ export function LobbyPage() {
         <Button variant="ghost" size="sm" onClick={leaveRoom}>
           <IconBack className="h-4 w-4" /> Leave
         </Button>
-        <Badge tone={serviceMode === 'remote' ? 'pitch' : 'muted'}>
-          {serviceMode === 'remote' ? 'Live multiplayer' : 'Demo vs CPU'}
+        <Badge tone={remote ? 'pitch' : 'muted'}>
+          {remote ? (
+            <>
+              <span className="h-1.5 w-1.5 rounded-full bg-pitch motion-safe:animate-pulse" />
+              Live multiplayer
+            </>
+          ) : (
+            'Demo vs CPU'
+          )}
         </Badge>
       </div>
 
-      {/* Room code */}
-      <Card strong className="p-6 text-center animate-rise-in">
-        <div className="text-xs uppercase tracking-[0.2em] text-white/40">
-          Room code
+      {/* Broadcast matchup card */}
+      <Card strong className="relative overflow-hidden p-5 animate-rise-in">
+        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.35]" aria-hidden />
+        {/* Kit-colour wash from each touchline. */}
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 w-1/3 opacity-60"
+          style={{ background: `linear-gradient(90deg, ${idHost.soft}, transparent)` }}
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 w-1/3 opacity-60"
+          style={{ background: `linear-gradient(270deg, ${idGuest.soft}, transparent)` }}
+          aria-hidden
+        />
+
+        <div className="relative">
+          <div className="mb-4 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
+            Matchday · {canStart ? 'Ready' : 'Team sheet'}
+          </div>
+          <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-2">
+            <TeamColumn
+              player={hostPlayer}
+              identity={idHost}
+              isYou={hostPlayer?.id === localPlayerId}
+              role="Host"
+            />
+            <div className="flex flex-col items-center pt-3">
+              <span className="font-display text-2xl font-black italic text-white/25">VS</span>
+              <span className="mt-1 nums text-[10px] font-semibold uppercase tracking-wide text-white/35">
+                {room.settings.questionCount} Qs
+              </span>
+            </div>
+            {guestPlayer ? (
+              <TeamColumn
+                player={guestPlayer}
+                identity={idGuest}
+                isYou={guestPlayer.id === localPlayerId}
+                role="Guest"
+              />
+            ) : (
+              <WaitingColumn remote={remote} />
+            )}
+          </div>
         </div>
-        <div className="my-2 font-mono text-5xl font-bold tracking-[0.3em] text-gradient-pitch">
-          {room.roomCode}
-        </div>
-        <div className="flex justify-center gap-2">
-          <Button variant="secondary" size="sm" onClick={() => copy('code')}>
-            {copied === 'code' ? <IconCheck className="h-4 w-4 text-pitch" /> : <IconCopy className="h-4 w-4" />}
-            {copied === 'code' ? 'Copied' : 'Copy code'}
-          </Button>
-          <Button variant="secondary" size="sm" onClick={() => copy('link')}>
-            {copied === 'link' ? <IconCheck className="h-4 w-4 text-pitch" /> : <IconShare className="h-4 w-4" />}
-            {copied === 'link' ? 'Copied' : 'Copy link'}
-          </Button>
-        </div>
-        <p className="mt-3 text-xs text-white/40">
-          {serviceMode === 'remote'
-            ? 'Share this code with a friend to join your match.'
-            : 'A CPU opponent will join shortly so you can play right now.'}
-        </p>
       </Card>
 
-      {/* Invite a saved friend (live multiplayer only) */}
-      {serviceMode === 'remote' && <InviteFriends roomCode={room.roomCode} />}
+      {/* Room code — only needed to invite a human (remote). */}
+      {remote && (
+        <div className="lower-third px-4 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-[10px] uppercase tracking-[0.2em] text-white/40">
+                Room code
+              </div>
+              <div className="nums font-mono text-3xl font-bold tracking-[0.25em] text-gradient-pitch">
+                {room.roomCode}
+              </div>
+            </div>
+            <div className="flex shrink-0 flex-col gap-1.5">
+              <Button variant="secondary" size="sm" onClick={() => copy('code')}>
+                {copied === 'code' ? <IconCheck className="h-4 w-4 text-pitch" /> : <IconCopy className="h-4 w-4" />}
+                {copied === 'code' ? 'Copied' : 'Code'}
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => copy('link')}>
+                {copied === 'link' ? <IconCheck className="h-4 w-4 text-pitch" /> : <IconShare className="h-4 w-4" />}
+                {copied === 'link' ? 'Copied' : 'Link'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Players */}
-      <div className="grid grid-cols-2 gap-3">
-        <PlayerSlot
-          name={room.players.find((p) => p.isHost)?.name}
-          isYou={room.players.find((p) => p.isHost)?.id === localPlayerId}
-          host
-        />
-        {opponent || room.players.length >= 2 ? (
-          <PlayerSlot
-            name={(opponent ?? room.players[1])?.name}
-            isYou={(opponent ?? room.players[1])?.id === localPlayerId}
-          />
-        ) : (
-          <WaitingSlot />
-        )}
-      </div>
+      {/* Invite a saved friend (live multiplayer only) */}
+      {remote && <InviteFriends roomCode={room.roomCode} />}
 
       {/* Match settings */}
       <Card className="p-4">
@@ -200,50 +247,79 @@ export function LobbyPage() {
       {/* Start / waiting */}
       {isHost ? (
         <Button size="lg" fullWidth disabled={!canStart} onClick={startMatch}>
-          {canStart ? 'Start Match' : 'Waiting for opponent…'}
+          {canStart ? 'Kick off' : 'Waiting for opponent…'}
         </Button>
       ) : (
         <div className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-4 text-white/60">
           <span className="h-2 w-2 animate-pulse rounded-full bg-pitch" />
-          Waiting for host to start…
+          Waiting for host to kick off…
         </div>
       )}
     </div>
   );
 }
 
-function PlayerSlot({
-  name,
+/** One team in the broadcast matchup: kit-coloured crest, name, role badges. */
+function TeamColumn({
+  player,
+  identity,
   isYou,
-  host = false,
+  role,
 }: {
-  name?: string;
-  isYou?: boolean;
-  host?: boolean;
+  player: Player | null;
+  identity: TeamIdentity;
+  isYou: boolean;
+  role: 'Host' | 'Guest';
 }) {
+  const name = player?.name ?? 'Player';
+  const offline = player && !player.connected;
   return (
-    <Card className="flex flex-col items-center gap-2 p-4 text-center">
-      <div className="grid h-12 w-12 place-items-center rounded-full bg-pitch/15 text-lg font-bold text-pitch ring-1 ring-pitch/30">
-        {(name ?? '?').charAt(0).toUpperCase()}
+    <div className="flex min-w-0 flex-col items-center gap-2 text-center">
+      <div
+        className="grid h-16 w-16 place-items-center rounded-2xl font-display text-2xl font-black"
+        style={{
+          backgroundColor: identity.soft,
+          color: identity.color,
+          boxShadow: `inset 0 0 0 2px ${identity.ring}, 0 0 24px -6px ${identity.ring}`,
+        }}
+      >
+        {name.charAt(0).toUpperCase()}
       </div>
       <div className="min-w-0">
-        <div className="truncate font-semibold">{name ? teamName(name) : 'Player'}</div>
-        <div className="mt-1 flex justify-center gap-1.5">
-          {host && <Badge tone="gold">Host</Badge>}
+        <div className="truncate font-display text-base font-bold leading-tight">
+          {teamName(name)}
+        </div>
+        {/* Kit-colour underline ties the name to the crest. */}
+        <div
+          className="mx-auto mt-1 h-0.5 w-8 rounded-full"
+          style={{ backgroundColor: identity.color }}
+        />
+        <div className="mt-1.5 flex flex-wrap justify-center gap-1">
+          <Badge tone={role === 'Host' ? 'gold' : 'muted'}>{role}</Badge>
           {isYou && <Badge tone="pitch">You</Badge>}
+          {offline && <Badge tone="danger">Offline</Badge>}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }
 
-function WaitingSlot() {
+/** Empty opponent slot while we wait for a player (or the CPU) to arrive. */
+function WaitingColumn({ remote }: { remote: boolean }) {
   return (
-    <Card className="flex flex-col items-center justify-center gap-2 border-dashed p-4 text-center text-white/40">
-      <div className="grid h-12 w-12 place-items-center rounded-full bg-white/5 ring-1 ring-white/10">
-        <IconUsers className="h-5 w-5" />
+    <div className="flex min-w-0 flex-col items-center gap-2 text-center">
+      <div className="grid h-16 w-16 place-items-center rounded-2xl border border-dashed border-white/15 bg-white/[0.03] text-white/30">
+        <IconUsers className="h-6 w-6" />
       </div>
-      <div className="text-sm">Waiting for a player…</div>
-    </Card>
+      <div className="min-w-0">
+        <div className="truncate font-display text-base font-bold leading-tight text-white/45">
+          {remote ? 'Open slot' : 'CPU'}
+        </div>
+        <div className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px] text-white/40">
+          <span className="h-1.5 w-1.5 rounded-full bg-pitch motion-safe:animate-pulse" />
+          {remote ? 'Waiting to join…' : 'Joining…'}
+        </div>
+      </div>
+    </div>
   );
 }
