@@ -104,13 +104,14 @@ export function HomePage({
       <div className="text-center animate-fade-in">
         <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
           <IconBolt className="h-3.5 w-3.5 text-pitch" />
-          Kahoot × Football Wordle × FIFA trivia
+          Ten mini-games · a new fixture every day
         </div>
         <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">
           <span className="text-gradient-pitch">Ball Knowledge</span>
         </h1>
         <p className="mx-auto mt-3 max-w-md text-balance text-white/60">
-          1v1 football trivia. Score goals with your knowledge.
+          Where what you know scores goals. Real 1v1 football duels — ten
+          questions, ninety minutes, one scoreline.
         </p>
         {/* First-run teaser: show what a finished match looks like. */}
         {!club && stats.matchesPlayed === 0 && <MatchPreviewCard />}

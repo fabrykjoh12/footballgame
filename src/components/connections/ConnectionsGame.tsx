@@ -55,6 +55,7 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
   const [input, setInput] = useState('');
   const [submitted, setSubmitted] = useState<string | null>(null);
   const [grade, setGrade] = useState<ConnectionGrade | null>(null);
+  const [reported, setReported] = useState(false);
   const [finished, setFinished] = useState<FinishedRun | null>(null);
 
   const [qStartedAt, setQStartedAt] = useState(() => Date.now());
@@ -111,6 +112,7 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
       setInput('');
       setSubmitted(null);
       setGrade(null);
+      setReported(false);
       setQStartedAt(Date.now());
       setPhase('question');
     }, REVEAL_MS);
@@ -212,6 +214,25 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
             </span>
           </p>
           {puzzle.note && <p className="mt-0.5 text-xs font-normal text-white/50">{puzzle.note}</p>}
+          {/* Accept-lists are hand-curated — give wrong answers a recourse. */}
+          {!grade.isCorrect && submitted && (
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(
+                    `Ball Knowledge — Connections answer report\nPuzzle: ${puzzle.id} (${puzzle.clubA} & ${puzzle.clubB})\nMy answer: ${submitted}`,
+                  );
+                  setReported(true);
+                } catch {
+                  /* clipboard blocked */
+                }
+              }}
+              className="mt-1.5 text-[11px] font-normal text-white/45 underline-offset-2 hover:text-white/75 hover:underline"
+            >
+              {reported ? '✓ Report copied — send it to the dev' : 'Think you were right? Copy a report'}
+            </button>
+          )}
         </div>
       )}
 

@@ -4,6 +4,7 @@ import { GameProvider, useGame } from './context/GameProvider';
 import { FriendsProvider } from './context/FriendsProvider';
 import { LeaguesProvider } from './context/LeaguesProvider';
 import { AppShell } from './components/layout/AppShell';
+import { ErrorBoundary } from './components/layout/ErrorBoundary';
 import { HomePage } from './components/home/HomePage';
 
 // Lazy-load every non-home screen so the initial bundle stays small: the match
@@ -105,16 +106,18 @@ function Screens() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <GameProvider>
-        <FriendsProvider>
-          <LeaguesProvider>
-            <AppShell>
-              <Screens />
-            </AppShell>
-          </LeaguesProvider>
-        </FriendsProvider>
-      </GameProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <GameProvider>
+          <FriendsProvider>
+            <LeaguesProvider>
+              <AppShell>
+                <Screens />
+              </AppShell>
+            </LeaguesProvider>
+          </FriendsProvider>
+        </GameProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

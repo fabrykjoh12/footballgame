@@ -22,6 +22,14 @@ export function AccountButton() {
     if (needsUsername) setOpen(true);
   }, [needsUsername]);
 
+  // Other surfaces (e.g. the leaderboard's "Sign in" CTA) can open this modal
+  // without prop-drilling by dispatching a window event.
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener('bk:open-signin', onOpen);
+    return () => window.removeEventListener('bk:open-signin', onOpen);
+  }, []);
+
   if (!configured) return null;
 
   const initial = user?.username

@@ -14,7 +14,8 @@ import { FULL_TIME, type TimelineMark } from '../../lib/matchTimeline';
 import { buildShareText } from '../../lib/shareResult';
 import { shareResultImage } from '../../lib/shareImage';
 import { recordMatchResult } from '../../lib/profileStats';
-import { recordDailyResult } from '../../lib/dailyChallenge';
+import { recordDailyResult, getDailyState } from '../../lib/dailyChallenge';
+import { milestoneCrossed, type StreakMilestone } from '../../lib/streakRewards';
 import { refreshAchievements } from '../../lib/achievements';
 import { recordMatchFeats } from '../../lib/feats';
 import type { AchievementDef } from '../../lib/achievements';
@@ -32,6 +33,7 @@ export function FinalResult() {
   const { room, localPlayerId, isHost, serviceMode, rematch, leaveRoom } = useGame();
   const { user } = useAuth();
   const [unlocked, setUnlocked] = useState<AchievementDef[]>([]);
+  const [streakUnlock, setStreakUnlock] = useState<StreakMilestone | null>(null);
   const [shared, setShared] = useState(false);
   const [imgState, setImgState] = useState<'idle' | 'working' | 'shared' | 'saved'>(
     'idle',
@@ -59,7 +61,12 @@ export function FinalResult() {
   useEffect(() => {
     if (room?.status !== 'finished') return;
     recordMatchResult(room, localPlayerId);
-    if (room.settings.isDaily) recordDailyResult(room, localPlayerId);
+    if (room.settings.isDaily) {
+      // Celebrate a streak-ladder milestone the moment it's crossed.
+      const prevStreak = getDailyState().streak;
+      recordDailyResult(room, localPlayerId);
+      setStreakUnlock(milestoneCrossed(prevStreak, getDailyState().streak));
+    }
     recordMatchFeats(room, localPlayerId);
     setUnlocked(refreshAchievements());
 
@@ -246,6 +253,21 @@ export function FinalResult() {
           </p>
         );
       })()}
+
+      {/* Streak-reward milestone crossed by today's Daily */}
+      {streakUnlock && (
+        <Card className="border-gold/30 p-4 text-center animate-rise-in">
+          <div className="text-xs font-bold uppercase tracking-[0.2em] text-gold">
+            Streak reward unlocked
+          </div>
+          <p className="mt-2 text-sm text-white/85">
+            <span aria-hidden>{streakUnlock.emoji}</span>{' '}
+            <span className="nums font-semibold text-gold">{streakUnlock.days}-day streak</span>
+            {' — '}
+            {streakUnlock.reward} is now yours. Equip it in Cosmetics.
+          </p>
+        </Card>
+      )}
 
       {/* Newly-unlocked achievements */}
       {unlocked.length > 0 && (

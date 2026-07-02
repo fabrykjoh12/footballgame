@@ -51,6 +51,9 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
 
+      - name: Bundle-size budget (entry chunk must stay code-split)
+        run: node scripts/check-bundle.mjs
+
       - name: Publish to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:

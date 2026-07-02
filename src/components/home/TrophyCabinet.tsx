@@ -175,7 +175,15 @@ function LeaderboardModal({ onClose }: { onClose: () => void }) {
           Online leaderboards aren’t enabled in this build.
         </p>
       ) : entries === null ? (
-        <p className="py-6 text-center text-sm text-white/50">Loading…</p>
+        <div className="flex flex-col gap-1.5 py-1" aria-busy="true" aria-label="Loading leaderboard">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex items-center gap-3 rounded-xl border border-white/10 px-3 py-2">
+              <span className="skeleton h-4 w-6" />
+              <span className="skeleton h-4 flex-1" />
+              <span className="skeleton h-4 w-12" />
+            </div>
+          ))}
+        </div>
       ) : entries.length === 0 ? (
         <p className="py-6 text-center text-sm text-white/50">
           No scores yet. {board.startsWith('daily-') ? 'Play today’s Daily Challenge' : 'Play a match'} to
@@ -206,9 +214,15 @@ function LeaderboardModal({ onClose }: { onClose: () => void }) {
       )}
 
       {configured && !user && (
-        <p className="mt-3 text-center text-[11px] text-white/40">
-          Sign in to appear on the board.
-        </p>
+        <div className="mt-3 text-center">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event('bk:open-signin'))}
+            className="answer-press rounded-lg border border-pitch/30 bg-pitch/10 px-3 py-1.5 text-xs font-semibold text-pitch hover:bg-pitch/20"
+          >
+            Sign in to appear on the board
+          </button>
+        </div>
       )}
     </ModalShell>
   );
