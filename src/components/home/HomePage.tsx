@@ -1,5 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useGame } from '../../context/GameProvider';
+import { useAuth } from '../../context/AuthProvider';
+import { getMyIdentity, formatFriendCode } from '../../lib/friends';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { isValidRoomCode, normalizeRoomCode } from '../../lib/roomCode';
 import {
@@ -95,7 +97,13 @@ export function HomePage({
     }
   }, []);
 
-  const nameValid = name.trim().length >= 1;
+  // One identity: with a club, you always play as the club (the input hides);
+  // without one, the typed name is used. @username + friend code surface on
+  // the manager strip so all identity signals live in one place.
+  const { user } = useAuth();
+  const [myCode] = useState(() => getMyIdentity().friendCode);
+  const playName = club?.name.trim() ? club.name : name;
+  const nameValid = playName.trim().length >= 1;
   const codeValid = isValidRoomCode(code);
 
   return (
@@ -128,6 +136,10 @@ export function HomePage({
                 <div className="truncate font-display text-lg font-bold">{club.name}</div>
                 <div className="truncate text-xs text-white/55">
                   {club.nickname} · {club.stadium}
+                </div>
+                <div className="truncate text-[11px] text-white/35">
+                  {user?.username ? `@${user.username} · ` : ''}
+                  <span className="font-mono">{formatFriendCode(myCode)}</span>
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => setEditingClub(true)}>
@@ -190,30 +202,49 @@ export function HomePage({
           Quick match
         </SectionLabel>
       <Card strong className="p-6 sm:p-7">
-        <label
-          htmlFor="player-name"
-          className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/50"
-        >
-          Your name
-        </label>
-        <div className="relative mb-6">
-          <IconUsers className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
-          <input
-            id="player-name"
-            value={name}
-            onChange={(e) => setName(e.target.value.slice(0, 18))}
-            placeholder="e.g. Sara"
-            autoComplete="off"
-            className="input-field pl-10 text-base"
-          />
-        </div>
+        {club ? (
+          <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-ink-900/40 px-3.5 py-2.5">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <ClubBadge identity={club} size={30} />
+              <div className="min-w-0">
+                <div className="text-[10px] uppercase tracking-wider text-white/40">
+                  Playing as
+                </div>
+                <div className="truncate text-sm font-semibold">{club.name}</div>
+              </div>
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => setEditingClub(true)}>
+              Edit
+            </Button>
+          </div>
+        ) : (
+          <>
+            <label
+              htmlFor="player-name"
+              className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/50"
+            >
+              Your name
+            </label>
+            <div className="relative mb-6">
+              <IconUsers className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+              <input
+                id="player-name"
+                value={name}
+                onChange={(e) => setName(e.target.value.slice(0, 18))}
+                placeholder="e.g. Sara"
+                autoComplete="off"
+                className="input-field pl-10 text-base"
+              />
+            </div>
+          </>
+        )}
 
         <div className="flex flex-col gap-3">
           <Button
             size="lg"
             fullWidth
             disabled={!nameValid || connecting}
-            onClick={() => playDemo(name)}
+            onClick={() => playDemo(playName)}
           >
             <IconBolt className="h-4 w-4" /> Play vs CPU
           </Button>
@@ -223,7 +254,7 @@ export function HomePage({
             size="lg"
             fullWidth
             disabled={!nameValid || connecting}
-            onClick={() => createRoom(name)}
+            onClick={() => createRoom(playName)}
           >
             Create Room
           </Button>
@@ -260,7 +291,7 @@ export function HomePage({
                 <Button
                   fullWidth
                   disabled={!nameValid || !codeValid || connecting}
-                  onClick={() => joinRoom(code, name)}
+                  onClick={() => joinRoom(code, playName)}
                 >
                   Join
                 </Button>
@@ -270,7 +301,7 @@ export function HomePage({
 
         </div>
 
-        {!nameValid && (
+        {!club && !nameValid && (
           <p className="mt-3 text-center text-xs text-white/40">
             Enter a name to start.
           </p>
@@ -303,7 +334,7 @@ export function HomePage({
       <section className="mx-auto w-full max-w-md">
         <SectionLabel hint="Back tomorrow">Today</SectionLabel>
         <div className="flex flex-col gap-3">
-          <DailyRivalCard name={name} connecting={connecting} onPlay={playDaily} />
+          <DailyRivalCard name={playName} connecting={connecting} onPlay={playDaily} />
           <QuestsCard />
           <StreakRewardCard />
         </div>
@@ -387,7 +418,7 @@ export function HomePage({
       {showOnboarding && (
         <OnboardingOverlay
           onCreateClub={() => setEditingClub(true)}
-          onPlay={() => playDemo(name.trim() || 'You')}
+          onPlay={() => playDemo(playName.trim() || 'You')}
           onClose={() => setShowOnboarding(false)}
         />
       )}
