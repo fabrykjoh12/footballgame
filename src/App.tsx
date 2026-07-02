@@ -1,5 +1,6 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthProvider';
+import { hashToView, viewToHash, type View } from './lib/viewRoute';
 import { GameProvider, useGame } from './context/GameProvider';
 import { FriendsProvider } from './context/FriendsProvider';
 import { LeaguesProvider } from './context/LeaguesProvider';
@@ -24,8 +25,7 @@ const OlderYoungerGame = lazy(() => import('./components/solo/OlderYoungerGame')
 const CareerPathGame = lazy(() => import('./components/solo/CareerPathGame').then((m) => ({ default: m.CareerPathGame })));
 const ManagerMerryGoRound = lazy(() => import('./components/solo/ManagerMerryGoRound').then((m) => ({ default: m.ManagerMerryGoRound })));
 
-/** Top-level singleplayer view when no match is in progress. */
-type View = 'home' | 'career' | 'modes' | 'cup' | 'connections' | 'connectionsDaily' | 'mystery' | 'olderYounger' | 'careerPath' | 'managers';
+// Top-level singleplayer views live in lib/viewRoute (typed + hash-mapped).
 
 /** Brief gate while a signed-in session's progress is restored. */
 function SyncSplash() {
@@ -97,7 +97,29 @@ function activeScreen(
 function Screens() {
   const { room } = useGame();
   const { hydrating } = useAuth();
-  const [view, setView] = useState<View>('home');
+  // The URL hash is the source of truth for the singleplayer view, so the
+  // browser Back button works and every mode is deep-linkable (#career, …).
+  const [view, setViewState] = useState<View>(() =>
+    typeof window === 'undefined' ? 'home' : hashToView(window.location.hash),
+  );
+
+  // Back/forward and any programmatic hash change drive the view.
+  useEffect(() => {
+    const onHash = () => setViewState(hashToView(window.location.hash));
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  const setView = useCallback((v: View) => {
+    if (v === 'home') {
+      // Clear the hash without leaving a dangling '#'. pushState fires no
+      // hashchange event, so sync the state by hand.
+      window.history.pushState(null, '', window.location.pathname + window.location.search);
+      setViewState('home');
+    } else {
+      window.location.hash = viewToHash(v); // fires hashchange → state sync
+    }
+  }, []);
 
   if (hydrating && !room) return <SyncSplash />;
 
