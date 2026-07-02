@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Question } from '../../types/game';
 import { calculateBasePoints } from '../../lib/scoring';
 import { teamIdentity } from '../../lib/teamIdentity';
+import { MINI_GAME_HELP, isFirstEncounter } from '../../lib/miniGameHelp';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge, DifficultyBadge } from '../ui/Badge';
@@ -16,6 +17,7 @@ import {
   IconClock,
   IconCoins,
   IconPitch,
+  IconClose,
 } from '../ui/icons';
 
 const TYPE_META = {
@@ -50,6 +52,20 @@ export function QuestionCard({
 }: QuestionCardProps) {
   const meta = TYPE_META[question.type];
 
+  // Teach-in: auto-shown the first time this device ever meets this mini-game
+  // type (isFirstEncounter is render-stable per question id), re-openable via
+  // the "?" in the header. Fully derived — no effects to fight StrictMode.
+  const firstTime = isFirstEncounter(question.type, question.id);
+  const [helpClosedFor, setHelpClosedFor] = useState<string | null>(null);
+  const [helpOpenedFor, setHelpOpenedFor] = useState<string | null>(null);
+  const help = MINI_GAME_HELP[question.type];
+  const showHelp =
+    helpOpenedFor === question.id || (firstTime && helpClosedFor !== question.id);
+  const dismissHelp = () => {
+    setHelpClosedFor(question.id);
+    setHelpOpenedFor(null);
+  };
+
   return (
     <Card strong className="p-4 sm:p-5 animate-fade-in">
       {/* Header */}
@@ -59,7 +75,40 @@ export function QuestionCard({
         </Badge>
         <DifficultyBadge difficulty={question.difficulty} />
         <Badge tone="muted">{question.category.replace(/_/g, ' ')}</Badge>
+        <button
+          type="button"
+          onClick={() => (showHelp ? dismissHelp() : setHelpOpenedFor(question.id))}
+          aria-label={`How to play ${meta.label}`}
+          aria-expanded={showHelp}
+          className="ml-auto grid h-6 w-6 shrink-0 place-items-center rounded-full border border-white/10 bg-white/5 text-xs font-bold text-white/50 hover:bg-white/10 hover:text-white"
+        >
+          ?
+        </button>
       </div>
+
+      {/* How to play — first encounter of each mini-game type */}
+      {showHelp && help && (
+        <div
+          role="note"
+          className="mb-4 flex items-start gap-2.5 rounded-xl border border-pitch/25 bg-pitch/[0.06] px-3 py-2.5 animate-fade-in"
+        >
+          <span className="text-base" aria-hidden>
+            💡
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm leading-snug text-white/85">{help.rule}</p>
+            <p className="mt-0.5 text-xs leading-snug text-white/50">{help.example}</p>
+          </div>
+          <button
+            type="button"
+            onClick={dismissHelp}
+            aria-label="Dismiss how to play"
+            className="shrink-0 rounded-full p-1 text-white/40 hover:bg-white/10 hover:text-white"
+          >
+            <IconClose className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
 
       {/* Body by type */}
       {question.type === 'who_am_i' && (
