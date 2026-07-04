@@ -22,12 +22,17 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="relative flex min-h-[100dvh] flex-col">
       <StadiumBackground />
 
+      {/* Bright indigo brand bar, à la playfootball.games' top strip. */}
+      <div className="z-10 bg-royal/90 py-2 text-center text-[13px] font-semibold text-white/95 shadow-[0_2px_12px_rgba(91,75,214,0.35)]">
+        <span className="opacity-80">Ball Knowledge</span> — a real-time football IQ duel
+      </div>
+
       <header className="z-10 flex items-center justify-between border-b border-white/[0.06] px-4 py-4 sm:px-6">
         <div className="flex items-center gap-2.5">
           <BallMark />
           <div className="leading-none">
             <div className="font-display text-lg font-bold tracking-tight">
-              Ball <span className="text-pitch">Knowledge</span>
+              Ball <span className="text-royal-glow">Knowledge</span>
             </div>
             <div className="text-[10px] uppercase tracking-[0.2em] text-white/40">
               Football IQ Duel
@@ -84,8 +89,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function BallMark() {
   return (
-    <div className="grid h-9 w-9 place-items-center rounded-xl bg-pitch/15 ring-1 ring-pitch/30 shadow-glow">
-      <svg viewBox="0 0 24 24" className="h-5 w-5 text-pitch" aria-hidden>
+    <div className="grid h-9 w-9 place-items-center rounded-xl bg-royal/25 ring-1 ring-royal-glow/40 shadow-glow">
+      <svg viewBox="0 0 24 24" className="h-5 w-5 text-royal-glow" aria-hidden>
         <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.6" />
         <path
           d="M12 7l2.6 1.9-1 3.1h-3.2l-1-3.1zM12 12.5l3 2.2-1.1 3.3h-3.8L9 14.7z"

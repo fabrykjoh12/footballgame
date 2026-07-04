@@ -15,60 +15,85 @@
 
   body {
     @apply bg-ink-900 text-white font-sans antialiased;
-    /* Lock the dark stadium feel even on overscroll. */
-    background-color: #05070d;
+    /* Deep indigo/purple stage — a soft top glow over a dark base, kept even on
+     * overscroll. */
+    background-color: #140a33;
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(124, 110, 240, 0.22), transparent 60%),
+      radial-gradient(100% 60% at 50% 110%, rgba(91, 75, 214, 0.12), transparent 60%);
+    background-attachment: fixed;
     overscroll-behavior: none;
   }
 
   /* Visible, on-brand focus ring for keyboard users. */
   :focus-visible {
-    @apply outline-none ring-2 ring-pitch ring-offset-2 ring-offset-ink-900;
+    @apply outline-none ring-2 ring-royal ring-offset-2 ring-offset-ink-900;
   }
 
   ::selection {
-    background: rgba(22, 255, 122, 0.3);
+    background: rgba(124, 110, 240, 0.35);
   }
 }
 
 @layer components {
   /*
-   * Glassmorphism surfaces. Depth comes from three layers: a faint top inner
-   * highlight (lit-from-above edge), a tight contact shadow, and a soft ambient
-   * shadow. Kept subtle so the neon green stays the star.
+   * Translucent indigo panels on the purple stage. Flatter than the old
+   * glassmorphism — a hairline top highlight + soft ambient shadow, tinted to
+   * the indigo palette so surfaces read as one material.
    */
   .glass {
-    @apply rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl;
+    @apply rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.05),
-      0 1px 2px rgba(0, 0, 0, 0.35),
-      0 10px 36px rgba(0, 0, 0, 0.45);
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 1px 2px rgba(10, 6, 30, 0.4),
+      0 10px 32px rgba(10, 6, 30, 0.4);
   }
 
   .glass-strong {
-    @apply rounded-3xl border border-white/[0.12] bg-white/[0.06] backdrop-blur-2xl;
+    @apply rounded-3xl border border-white/[0.12] bg-white/[0.07] backdrop-blur-lg;
     background-image: linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0.06),
       rgba(255, 255, 255, 0) 40%
     );
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.09),
-      0 2px 6px rgba(0, 0, 0, 0.4),
-      0 24px 60px rgba(0, 0, 0, 0.55);
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 2px 6px rgba(10, 6, 30, 0.4),
+      0 24px 56px rgba(10, 6, 30, 0.5);
   }
 
-  /* Inputs that sit *inside* a glass card: recessed, integrated, on-brand focus. */
+  /*
+   * The signature playfootball-style surface: a flat WHITE card with dark text,
+   * for list rows / mode tiles / settings rows that sit on the purple stage.
+   * Text inside inherits a dark ink by default; use text-ink-* helpers within.
+   */
+  .card-lite {
+    @apply rounded-2xl border border-black/[0.06] bg-white text-ink-900 shadow-lite;
+  }
+  .card-lite-hover {
+    @apply transition-[transform,box-shadow] duration-200 ease-premium;
+    @apply hover:shadow-lite-hover active:scale-[0.985] motion-safe:hover:-translate-y-0.5;
+  }
+
+  /* Inputs that sit *inside* a glass (dark) card: recessed, on-brand focus. */
   .input-field {
     @apply w-full rounded-xl border border-white/10 bg-ink-900/50 px-4 py-3 text-white;
     @apply outline-none transition-colors duration-200 placeholder:text-white/30;
-    @apply focus:border-pitch/50 focus:bg-ink-900/70;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+    @apply focus:border-royal-glow/60 focus:bg-ink-900/70;
+    box-shadow: inset 0 1px 2px rgba(10, 6, 30, 0.4);
   }
 
-  /* Neon gradient title text. */
+  /* Inputs that sit *inside* a white card-lite: light, dark text. */
+  .input-lite {
+    @apply w-full rounded-xl border border-black/10 bg-black/[0.03] px-4 py-3 text-ink-900;
+    @apply outline-none transition-colors duration-200 placeholder:text-ink-900/35;
+    @apply focus:border-royal/50 focus:bg-white;
+  }
+
+  /* Gradient title text — white → lavender, reads bright on the purple stage. */
   .text-gradient-pitch {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(120deg, #ffffff 0%, #39ff9c 55%, #16ff7a 100%);
+    background-image: linear-gradient(120deg, #ffffff 0%, #cbc2ff 55%, #a99bff 100%);
   }
 
   .text-gradient-gold {
@@ -105,13 +130,13 @@
    */
   .card-hover {
     @apply transition-[transform,box-shadow,border-color,background-color] duration-200 ease-premium;
-    @apply hover:border-pitch/40 hover:bg-white/[0.06] active:scale-[0.985];
+    @apply hover:border-royal-glow/50 hover:bg-white/[0.08] active:scale-[0.985];
   }
   .card-hover:hover {
     @apply motion-safe:-translate-y-0.5;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      0 10px 30px -8px rgba(0, 0, 0, 0.6);
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 10px 30px -8px rgba(10, 6, 30, 0.6);
   }
 
   /*
@@ -120,12 +145,12 @@
    */
   .lower-third {
     @apply relative overflow-hidden rounded-xl border border-white/10;
-    background-image: linear-gradient(90deg, rgba(22, 255, 122, 0.1), rgba(10, 15, 28, 0.6) 22%);
+    background-image: linear-gradient(90deg, rgba(124, 110, 240, 0.16), rgba(29, 17, 71, 0.6) 22%);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
   .lower-third::before {
     content: '';
-    @apply absolute inset-y-0 left-0 w-1 bg-pitch;
+    @apply absolute inset-y-0 left-0 w-1 bg-royal;
   }
 }
 
@@ -156,8 +181,8 @@
   /* Faint tactical-board grid texture for hero / result / dashboard panels. */
   .grid-tactical {
     background-image:
-      linear-gradient(rgba(22, 255, 122, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(22, 255, 122, 0.05) 1px, transparent 1px);
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
     background-size: 28px 28px;
   }
 
@@ -273,7 +298,7 @@
 
 .a11y-contrast .glass,
 .a11y-contrast .glass-strong {
-  background-color: rgba(10, 15, 28, 0.92) !important;
+  background-color: rgba(29, 17, 71, 0.94) !important;
   backdrop-filter: none !important;
   border-color: rgba(255, 255, 255, 0.45) !important;
 }

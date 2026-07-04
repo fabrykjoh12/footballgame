@@ -19,17 +19,17 @@ const LIFT = 'motion-safe:enabled:hover:-translate-y-0.5';
 
 const VARIANTS: Record<Variant, string> = {
   primary: [
-    'bg-pitch text-ink-900 font-semibold',
-    'shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_4px_16px_-2px_rgba(22,255,122,0.40)]',
-    'enabled:hover:bg-pitch-glow enabled:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_30px_-6px_rgba(22,255,122,0.60)]',
+    'bg-royal text-white font-semibold',
+    'shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_4px_16px_-2px_rgba(91,75,214,0.5)]',
+    'enabled:hover:bg-royal-soft enabled:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.32),0_10px_30px_-6px_rgba(91,75,214,0.65)]',
     LIFT,
   ].join(' '),
   secondary: [
-    'bg-white/[0.06] text-white font-medium border border-white/12',
-    'enabled:hover:bg-white/[0.1] enabled:hover:border-white/25',
+    'bg-white/[0.08] text-white font-medium border border-white/15',
+    'enabled:hover:bg-white/[0.14] enabled:hover:border-white/30',
     LIFT,
   ].join(' '),
-  ghost: 'bg-transparent text-white/70 enabled:hover:text-white enabled:hover:bg-white/[0.06]',
+  ghost: 'bg-transparent text-white/70 enabled:hover:text-white enabled:hover:bg-white/[0.08]',
   danger: [
     'bg-danger/90 text-white font-semibold',
     'shadow-[0_4px_16px_-2px_rgba(255,77,94,0.40)]',

@@ -4,25 +4,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Ball Knowledge palette — dark stadium + neon pitch green
+        // Ball Knowledge palette — deep indigo/purple stage, white cards,
+        // indigo primary CTA, green kept as a success accent (playfootball.games
+        // family look).
+        royal: {
+          DEFAULT: '#5b4bd6', // indigo — primary CTA ("Play")
+          dark: '#4a3bb8',
+          glow: '#7c6ef0',
+          soft: '#6b5be0',
+        },
         pitch: {
-          DEFAULT: '#16ff7a', // neon pitch green (primary accent)
-          dark: '#0fbf5c',
-          glow: '#39ff9c',
+          DEFAULT: '#16c974', // success / correct accent (grass green)
+          dark: '#0fa85e',
+          glow: '#2ee08c',
         },
         ink: {
-          900: '#05070d', // near-black background base
-          800: '#0a0f1c', // deep navy
-          700: '#0f1626',
-          600: '#16203a',
-          500: '#1e2b4d',
+          // Repurposed as the indigo/purple stage scale — every bg-ink-* now
+          // reads purple, repainting the whole app in one place.
+          900: '#140a33', // deepest — body backdrop
+          800: '#1d1147', // panel base
+          700: '#271a5c',
+          600: '#33236f',
+          500: '#3f2c84',
         },
         gold: {
           DEFAULT: '#ffd24a',
           dark: '#e0b020',
         },
-        danger: '#ff4d5e',
-        good: '#16ff7a',
+        danger: '#ff4d6a',
+        good: '#16c974',
       },
       fontFamily: {
         display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
@@ -30,10 +40,13 @@ export default {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        glow: '0 0 24px rgba(22, 255, 122, 0.35)',
-        'glow-lg': '0 0 60px rgba(22, 255, 122, 0.45)',
+        glow: '0 0 24px rgba(91, 75, 214, 0.45)',
+        'glow-lg': '0 0 60px rgba(91, 75, 214, 0.5)',
         gold: '0 0 28px rgba(255, 210, 74, 0.45)',
         card: '0 10px 40px rgba(0, 0, 0, 0.45)',
+        // Soft drop shadow for the white list-cards on the purple stage.
+        lite: '0 1px 2px rgba(20, 10, 51, 0.10), 0 8px 24px -8px rgba(20, 10, 51, 0.25)',
+        'lite-hover': '0 2px 6px rgba(20, 10, 51, 0.12), 0 14px 34px -8px rgba(20, 10, 51, 0.35)',
         // Elevation scale for consistent depth.
         'elev-1': '0 1px 2px rgba(0,0,0,0.35), 0 4px 12px rgba(0,0,0,0.30)',
         'elev-2': '0 2px 6px rgba(0,0,0,0.40), 0 16px 48px rgba(0,0,0,0.55)',
@@ -44,7 +57,7 @@ export default {
       },
       backgroundImage: {
         'pitch-radial':
-          'radial-gradient(circle at 50% 0%, rgba(22,255,122,0.12), transparent 60%)',
+          'radial-gradient(circle at 50% 0%, rgba(124,110,240,0.18), transparent 60%)',
       },
       keyframes: {
         'fade-in': {
@@ -70,7 +83,7 @@ export default {
         },
         bump: {
           '0%': { transform: 'scale(1)' },
-          '40%': { transform: 'scale(1.35)', color: '#16ff7a' },
+          '40%': { transform: 'scale(1.35)', color: '#16c974' },
           '100%': { transform: 'scale(1)' },
         },
         'goal-pop': {
@@ -80,8 +93,8 @@ export default {
           '100%': { opacity: '1', transform: 'scale(1) rotate(0)' },
         },
         'pulse-glow': {
-          '0%, 100%': { boxShadow: '0 0 18px rgba(22,255,122,0.35)' },
-          '50%': { boxShadow: '0 0 40px rgba(22,255,122,0.7)' },
+          '0%, 100%': { boxShadow: '0 0 18px rgba(91,75,214,0.4)' },
+          '50%': { boxShadow: '0 0 40px rgba(91,75,214,0.75)' },
         },
         'spin-slow': {
           '0%': { transform: 'rotate(0deg)' },

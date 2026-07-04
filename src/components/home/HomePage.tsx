@@ -112,8 +112,8 @@ export function HomePage({
     <div className="flex flex-1 flex-col gap-7 py-6">
       {/* Hero */}
       <div className="text-center animate-fade-in">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/60">
-          <IconBolt className="h-3.5 w-3.5 text-pitch" />
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
+          <IconBolt className="h-3.5 w-3.5 text-royal-glow" />
           Ten mini-games · a new fixture every day
         </div>
         <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">
@@ -381,23 +381,23 @@ export function HomePage({
       {/* Game Modes hub — compact grid of every mode */}
       <section className="mx-auto w-full max-w-md">
         <SectionLabel hint="Pick your challenge">Game modes</SectionLabel>
-        <div className="grid grid-cols-2 gap-2">
-          <ModeTile emoji="🔗" name="Connections" sub="Played for both clubs" tag="Puzzle" tagTone="text-pitch border-pitch/30 bg-pitch/10" onClick={onOpenConnections} />
+        <div className="grid grid-cols-1 gap-2.5">
+          <ModeTile emoji="🔗" name="Connections" sub="Name a player for both clubs" tag="Puzzle" accent="#16c974" onClick={onOpenConnections} />
           <ModeTile
             emoji="📅"
             name="Daily Connections"
-            sub={dailyConnDone ? `Done · 🔥 ${dailyConn.streak}` : dailyConn.streak > 0 ? `🔥 ${dailyConn.streak}-day streak` : 'One puzzle a day'}
+            sub={dailyConnDone ? `Done today · 🔥 ${dailyConn.streak}` : dailyConn.streak > 0 ? `🔥 ${dailyConn.streak}-day streak` : 'One puzzle a day'}
             tag={dailyConnDone ? 'Done' : 'Daily'}
-            tagTone={dailyConnDone ? 'text-white/50 border-white/15 bg-white/5' : 'text-gold border-gold/30 bg-gold/10'}
+            accent="#ffd24a"
             onClick={onOpenConnectionsDaily}
           />
-          <ModeTile emoji="🧭" name="Career Path" sub="Guess from the clubs" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenCareerPath} />
-          <ModeTile emoji="🎂" name="Older or Younger?" sub="Birth-year Higher/Lower" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenOlderYounger} />
-          <ModeTile emoji="🎩" name="Managers" sub="Managed both clubs" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenManagers} />
-          <ModeTile emoji="🕵️" name="Mystery Duel" sub="Football Guess Who" tag="Versus" tagTone="text-sky-300 border-sky-400/30 bg-sky-400/10" onClick={onOpenMystery} />
-          <ModeTile emoji="🔍" name="The Scout" sub="Deduce the secret rule" tag="Versus" tagTone="text-sky-300 border-sky-400/30 bg-sky-400/10" onClick={onOpenScout} />
-          <ModeTile emoji="🏆" name="Cup Runs" sub="Knockout tournaments" tag="Cup" tagTone="text-gold border-gold/30 bg-gold/10" onClick={onOpenCup} />
-          <ModeTile emoji="⚡" name="Arcade" sub="Survival · Time Attack" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenModes} />
+          <ModeTile emoji="🔍" name="The Scout" sub="Deduce the secret rule" tag="Versus" accent="#5b4bd6" onClick={onOpenScout} />
+          <ModeTile emoji="🕵️" name="Mystery Duel" sub="Football Guess Who" tag="Versus" accent="#38bdf8" onClick={onOpenMystery} />
+          <ModeTile emoji="🧭" name="Career Path" sub="Guess the player from their clubs" tag="Solo" accent="#f472b6" onClick={onOpenCareerPath} />
+          <ModeTile emoji="🎂" name="Older or Younger?" sub="Birth-year Higher / Lower" tag="Solo" accent="#fb923c" onClick={onOpenOlderYounger} />
+          <ModeTile emoji="🎩" name="Managers" sub="Name a manager of both clubs" tag="Solo" accent="#a78bfa" onClick={onOpenManagers} />
+          <ModeTile emoji="🏆" name="Cup Runs" sub="Knockout tournaments" tag="Cup" accent="#ffd24a" onClick={onOpenCup} />
+          <ModeTile emoji="⚡" name="Arcade" sub="Survival · Time Attack · Gauntlet" tag="Solo" accent="#2dd4bf" onClick={onOpenModes} />
         </div>
       </section>
 
@@ -496,47 +496,57 @@ function StatPill({
   );
 }
 
-/** A compact tappable tile in the Game Modes grid. */
+/**
+ * A mode row in the Game Modes list — a flat white card with a circular
+ * colour-coded icon badge, bold title, grey subtitle, and an indigo Play
+ * pill on the right (the playfootball.games list-card pattern).
+ */
 function ModeTile({
   emoji,
   name,
   sub,
   tag,
-  tagTone = 'text-white/60 border-white/15 bg-white/5',
+  tagTone,
+  accent = '#5b4bd6',
   onClick,
 }: {
   emoji: string;
   name: string;
   sub: string;
   tag?: string;
+  /** Legacy prop from the old dark tiles — ignored by the white card. */
   tagTone?: string;
+  /** Icon-badge accent colour (hex). */
+  accent?: string;
   onClick: () => void;
 }) {
+  void tagTone;
   return (
     <button
       onClick={onClick}
-      className="group relative flex flex-col items-start gap-2 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-left card-hover"
+      className="card-lite card-lite-hover group flex w-full items-center gap-3 p-3 text-left"
     >
-      <div className="flex w-full items-start justify-between gap-1">
-        <span
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-pitch/10 text-lg ring-1 ring-inset ring-white/10"
-          aria-hidden
-        >
-          {emoji}
-        </span>
-        {tag && (
-          <span
-            className={`rounded-full border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${tagTone}`}
-          >
-            {tag}
-          </span>
-        )}
+      <span
+        className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-xl"
+        style={{ backgroundColor: `${accent}1f`, boxShadow: `inset 0 0 0 1.5px ${accent}55` }}
+        aria-hidden
+      >
+        {emoji}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <span className="truncate text-[15px] font-bold leading-tight text-ink-900">{name}</span>
+          {tag && (
+            <span className="shrink-0 rounded-full bg-royal/12 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-royal">
+              {tag}
+            </span>
+          )}
+        </div>
+        <span className="mt-0.5 block truncate text-xs leading-tight text-ink-900/55">{sub}</span>
       </div>
-      <div className="min-w-0">
-        <span className="block text-sm font-semibold leading-tight text-white/90">{name}</span>
-        <span className="mt-0.5 block text-[11px] leading-tight text-white/45">{sub}</span>
-      </div>
-      <IconArrowRight className="absolute bottom-3 right-3 h-3.5 w-3.5 text-white/0 transition-colors duration-200 group-hover:text-pitch" />
+      <span className="shrink-0 rounded-lg bg-royal px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_2px_10px_-2px_rgba(91,75,214,0.6)] transition-transform duration-200 group-hover:-translate-y-0.5">
+        Play
+      </span>
     </button>
   );
 }

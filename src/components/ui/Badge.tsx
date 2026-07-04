@@ -1,15 +1,16 @@
 import type { ReactNode } from 'react';
 import type { Difficulty } from '../../types/game';
 
-type Tone = 'pitch' | 'gold' | 'white' | 'danger' | 'muted' | 'blue';
+type Tone = 'pitch' | 'gold' | 'white' | 'danger' | 'muted' | 'blue' | 'royal';
 
 const TONES: Record<Tone, string> = {
   pitch: 'bg-pitch/15 text-pitch border-pitch/30',
   gold: 'bg-gold/15 text-gold border-gold/30',
-  white: 'bg-white/10 text-white border-white/20',
+  white: 'bg-white/12 text-white border-white/20',
   danger: 'bg-danger/15 text-danger border-danger/30',
   muted: 'bg-white/5 text-white/60 border-white/10',
   blue: 'bg-sky-400/15 text-sky-300 border-sky-400/30',
+  royal: 'bg-royal/25 text-white border-royal-glow/40',
 };
 
 interface BadgeProps {
