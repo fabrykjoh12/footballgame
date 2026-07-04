@@ -101,6 +101,7 @@ export function GamePage() {
         localPlayerId={localPlayerId}
         questionNumber={Math.min(room.currentQuestionIndex + 1, total)}
         totalQuestions={total}
+        showMeters={status !== 'starting'}
       />
 
       {opponent && !opponent.connected && (

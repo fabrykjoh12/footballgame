@@ -3,12 +3,15 @@ import { teamName } from '../../lib/teamName';
 import { matchIdentities, type TeamIdentity } from '../../lib/teamIdentity';
 import { AnimatedNumber } from '../ui/AnimatedNumber';
 import { IconFlame } from '../ui/icons';
+import { AttackMeter } from '../game/AttackMeter';
 
 interface ScoreboardProps {
   players: Player[];
   localPlayerId: string;
   questionNumber?: number;
   totalQuestions?: number;
+  /** Show the live attack/pressure meters (hidden before kick-off). */
+  showMeters?: boolean;
 }
 
 /** Always-visible match scoreboard: football score + raw points for both. */
@@ -17,6 +20,7 @@ export function Scoreboard({
   localPlayerId,
   questionNumber,
   totalQuestions,
+  showMeters = true,
 }: ScoreboardProps) {
   const [a, b] = players;
   if (!a || !b) return null;
@@ -47,6 +51,13 @@ export function Scoreboard({
 
         <TeamSide player={b} isLocal={b.id === localPlayerId} align="right" identity={idB} />
       </div>
+
+      {showMeters && (
+        <div className="mt-2.5 grid grid-cols-2 gap-3 border-t border-white/[0.06] pt-2.5">
+          <AttackMeter score={a.score} streak={a.streak} identity={idA} align="left" />
+          <AttackMeter score={b.score} streak={b.streak} identity={idB} align="right" />
+        </div>
+      )}
     </div>
   );
 }
