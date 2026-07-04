@@ -7,6 +7,7 @@ import { teamName } from '../../lib/teamName';
 import { accuracyPercent } from '../../lib/scoring';
 import { getPlayerTitle } from '../../lib/playerTitle';
 import { summarizeMatch, type PlayerMatchStats } from '../../lib/matchStats';
+import { buildMatchReport, type MatchReport, type MiniGameDuel } from '../../lib/matchReport';
 import { punditVerdict } from '../../lib/punditry';
 import { matchIdentities, type TeamIdentity } from '../../lib/teamIdentity';
 import { CATEGORY_OPTIONS } from '../../lib/categories';
@@ -49,6 +50,10 @@ export function FinalResult() {
   }, [room]);
 
   const summary = useMemo(() => (room ? summarizeMatch(room) : null), [room]);
+  const report = useMemo(
+    () => (room && summary ? buildMatchReport(room, summary) : null),
+    [room, summary],
+  );
 
   // Final-whistle audio: fanfare if you won, plain whistle otherwise.
   useEffect(() => {
@@ -211,6 +216,9 @@ export function FinalResult() {
         />
       )}
 
+      {/* Mini-game-by-mini-game report + player ratings */}
+      {report && <MiniGameReport report={report} a={a} b={b} />}
+
       {/* Timeline replay */}
       {summary && summary.timeline.length > 0 && (
         <TimelineReplay a={a} b={b} marks={summary.timeline} />
@@ -221,6 +229,7 @@ export function FinalResult() {
         <StatsCard
           player={a}
           stats={summary?.players[a.id]}
+          rating={report?.ratings[a.id]}
           total={total}
           isYou={a.id === localPlayerId}
           isWinner={winner?.id === a.id}
@@ -228,6 +237,7 @@ export function FinalResult() {
         <StatsCard
           player={b}
           stats={summary?.players[b.id]}
+          rating={report?.ratings[b.id]}
           total={total}
           isYou={b.id === localPlayerId}
           isWinner={winner?.id === b.id}
@@ -340,6 +350,79 @@ function categoryLabel(c: Category): string {
   return CATEGORY_OPTIONS.find((o) => o.id === c)?.label ?? c;
 }
 
+/** Colour a 0–10 rating: green (8+), gold (6.5+), neutral, danger (<5). */
+function ratingTone(r: number): string {
+  if (r >= 8) return 'text-pitch';
+  if (r >= 6.5) return 'text-gold';
+  if (r < 5) return 'text-danger';
+  return 'text-white';
+}
+
+/** The mini-game-by-mini-game report: who took each of the ten formats. */
+function MiniGameReport({
+  report,
+  a,
+  b,
+}: {
+  report: MatchReport;
+  a: Player;
+  b: Player;
+}) {
+  const [idA, idB] = matchIdentities(a.name, b.name);
+  const wonA = report.duelsWon[a.id] ?? 0;
+  const wonB = report.duelsWon[b.id] ?? 0;
+
+  return (
+    <Card className="p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <span className="text-[11px] font-bold uppercase tracking-wide text-white/55">Match report</span>
+        <span className="nums text-[11px] text-white/45">
+          Mini-games won <span className="font-bold" style={{ color: idA.color }}>{wonA}</span>
+          <span className="text-white/30">–</span>
+          <span className="font-bold" style={{ color: idB.color }}>{wonB}</span>
+        </span>
+      </div>
+
+      <ul className="flex flex-col divide-y divide-white/[0.06]">
+        {report.duels.map((d) => (
+          <DuelRow key={d.index} duel={d} idA={idA} idB={idB} />
+        ))}
+      </ul>
+
+      <p className="mt-3 text-center text-[11px] text-white/45">
+        {wonA === wonB
+          ? 'Honours even across the ten mini-games.'
+          : `${teamName(wonA > wonB ? a.name : b.name)} took the mini-game count ${Math.max(wonA, wonB)}–${Math.min(wonA, wonB)}.`}
+      </p>
+    </Card>
+  );
+}
+
+function DuelRow({ duel, idA, idB }: { duel: MiniGameDuel; idA: TeamIdentity; idB: TeamIdentity }) {
+  const aWon = duel.winner === 'a';
+  const bWon = duel.winner === 'b';
+  return (
+    <li className="grid grid-cols-[3.5rem_1fr_3.5rem] items-center gap-2 py-2 text-sm">
+      <span
+        className={['nums text-right font-mono', aWon ? 'font-bold' : 'text-white/45'].join(' ')}
+        style={aWon ? { color: idA.color } : undefined}
+      >
+        {duel.aPoints}
+      </span>
+      <span className="flex items-center justify-center gap-1.5 text-center">
+        <span className="truncate text-[13px] font-semibold text-white/80">{duel.label}</span>
+        <span className="nums shrink-0 text-[10px] text-white/35">{duel.minute}'</span>
+      </span>
+      <span
+        className={['nums text-left font-mono', bWon ? 'font-bold' : 'text-white/45'].join(' ')}
+        style={bWon ? { color: idB.color } : undefined}
+      >
+        {duel.bPoints}
+      </span>
+    </li>
+  );
+}
+
 /** A team's kit-coloured crest + name in the full-time headline. */
 function ResultTeam({
   name,
@@ -378,12 +461,14 @@ function ResultTeam({
 function StatsCard({
   player,
   stats,
+  rating,
   total,
   isYou,
   isWinner,
 }: {
   player: Player;
   stats?: PlayerMatchStats;
+  rating?: number;
   total: number;
   isYou: boolean;
   isWinner?: boolean;
@@ -404,6 +489,15 @@ function StatsCard({
         <span className="truncate font-semibold">{teamName(player.name)}</span>
         {isYou && <Badge tone="pitch">You</Badge>}
       </div>
+
+      {rating != null && (
+        <div className="mb-3 flex items-baseline gap-1.5 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+          <span className={['nums font-display text-2xl font-black leading-none', ratingTone(rating)].join(' ')}>
+            {rating.toFixed(1)}
+          </span>
+          <span className="text-[11px] text-white/55">match rating</span>
+        </div>
+      )}
 
       <div className="mb-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
         <div className="text-[11px] text-white/55">Title</div>
