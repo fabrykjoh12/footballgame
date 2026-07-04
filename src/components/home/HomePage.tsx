@@ -47,6 +47,7 @@ export function HomePage({
   onOpenOlderYounger,
   onOpenCareerPath,
   onOpenManagers,
+  onOpenScout,
 }: {
   onOpenCareer: () => void;
   onOpenModes: () => void;
@@ -57,6 +58,7 @@ export function HomePage({
   onOpenOlderYounger: () => void;
   onOpenCareerPath: () => void;
   onOpenManagers: () => void;
+  onOpenScout: () => void;
 }) {
   const {
     createRoom,
@@ -393,6 +395,7 @@ export function HomePage({
           <ModeTile emoji="🎂" name="Older or Younger?" sub="Birth-year Higher/Lower" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenOlderYounger} />
           <ModeTile emoji="🎩" name="Managers" sub="Managed both clubs" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenManagers} />
           <ModeTile emoji="🕵️" name="Mystery Duel" sub="Football Guess Who" tag="Versus" tagTone="text-sky-300 border-sky-400/30 bg-sky-400/10" onClick={onOpenMystery} />
+          <ModeTile emoji="🔍" name="The Scout" sub="Deduce the secret rule" tag="Versus" tagTone="text-sky-300 border-sky-400/30 bg-sky-400/10" onClick={onOpenScout} />
           <ModeTile emoji="🏆" name="Cup Runs" sub="Knockout tournaments" tag="Cup" tagTone="text-gold border-gold/30 bg-gold/10" onClick={onOpenCup} />
           <ModeTile emoji="⚡" name="Arcade" sub="Survival · Time Attack" tag="Solo" tagTone="text-white/60 border-white/15 bg-white/5" onClick={onOpenModes} />
         </div>

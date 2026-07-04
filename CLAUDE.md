@@ -160,7 +160,7 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (460 tests across lib/, data/, services/)
+npm test         # vitest run (496 tests across lib/, data/, services/)
 npm run check:bundle  # fail if the home entry chunk exceeds 300 kB (run after build)
 ```
 
@@ -281,6 +281,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Career Path (guess the player from their club chain; progressive reveal, typed) | `src/lib/careerPath.ts`, `src/components/solo/CareerPathGame.tsx` |
 | Manager Merry-go-round (name a manager who managed both clubs; typed) + 62-manager dataset | `src/lib/managers.ts`, `src/data/managers.ts`, `src/components/solo/ManagerMerryGoRound.tsx` |
 | Mystery online 1v1 (host-authoritative via Ably; forces manual answers + redacts secrets — built, not device-tested) | `src/services/ablyMysteryService.ts`, `src/components/mystery/MysteryOnlineGame.tsx` |
+| **The Scout** (NEW — deduction duel: hide a secret "recruitment rule" from a ~63-rule catalog auto-generated over the player DB with pool-depth guards; probe players for fits / doesn't-fit, accuse to win, a wrong accusation costs a turn; pure engine + info-greedy CPU + seeded daily rule with solved-day streak; vs CPU · hot-seat · daily; views `#scout`/`#daily-scout`, storage `bk_scout_v1`. Turn-based + secretless wire shape, so an Ably online layer can follow the Mystery pattern later) | `src/lib/scout/` (`categories`, `engine`, `cpu`, `daily` — all tested), `src/components/scout/ScoutGame.tsx` |
 | Match modes + per-mode clock (Casual easy+med/18s · Serious med+hard/15s · Nightmare nightmare-only/9s; `MODE_DURATION_MS`, `durationForMode`) | `src/lib/matchModes.ts` |
 | Daily Rival Match + seeded RNG (deterministic per-day fixture vs a named fictional rival; streak, scoreline, best category, "beat my result" challenge links, tomorrow countdown) | `src/lib/dailyChallenge.ts`, `src/lib/dailyRival.ts`, `src/lib/seededRandom.ts`, `src/components/home/DailyRivalCard.tsx` |
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |
@@ -504,7 +505,7 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-`npm test` runs **460 tests** across 50 files (incl. `playerDb`, `roomCode`,
+`npm test` runs **496 tests** across 54 files (incl. the four `scout/*` suites) (incl. `playerDb`, `roomCode`,
 `careerPath`, `managers`,
 `dailyConnections`, `olderYounger`, and the Connections DB-augmentation +
 Mystery manual-mode suites). Newest (this session): `streakRewards` (ladder maths
@@ -724,3 +725,8 @@ See `GAME_OVERVIEW.md` for a portable, self-contained summary of the whole game
   or it reads as see-through when a browser skips the blur.
 - Career fixtures count toward lifetime profile stats too (`CareerResult` calls
   `recordMatchResult`); the per-fixture record is idempotent via a match `sig`.
+- **Two views sharing one component type need distinct `key`s in `App.tsx`**
+  (Connections/Scout plain vs daily): the `daily` prop only seeds initial
+  state, so without a forced remount, hash-switching between the pair
+  silently keeps the old screen. Fixed with explicit keys — keep the pattern
+  for any future paired views.

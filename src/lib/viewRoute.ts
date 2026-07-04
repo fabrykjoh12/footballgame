@@ -21,7 +21,9 @@ export type View =
   | 'mystery'
   | 'olderYounger'
   | 'careerPath'
-  | 'managers';
+  | 'managers'
+  | 'scout'
+  | 'scoutDaily';
 
 /** Kebab-case slugs so shared links read cleanly. Home is the bare URL. */
 const VIEW_TO_SLUG: Record<View, string> = {
@@ -35,6 +37,8 @@ const VIEW_TO_SLUG: Record<View, string> = {
   olderYounger: 'older-younger',
   careerPath: 'career-path',
   managers: 'managers',
+  scout: 'scout',
+  scoutDaily: 'daily-scout',
 };
 
 const SLUG_TO_VIEW: Record<string, View> = Object.fromEntries(

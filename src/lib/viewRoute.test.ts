@@ -11,6 +11,8 @@ const NON_HOME_VIEWS: View[] = [
   'olderYounger',
   'careerPath',
   'managers',
+  'scout',
+  'scoutDaily',
 ];
 
 describe('view ↔ hash mapping', () => {

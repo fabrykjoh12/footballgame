@@ -24,6 +24,7 @@ const MysteryPlayerGame = lazy(() => import('./components/mystery/MysteryPlayerG
 const OlderYoungerGame = lazy(() => import('./components/solo/OlderYoungerGame').then((m) => ({ default: m.OlderYoungerGame })));
 const CareerPathGame = lazy(() => import('./components/solo/CareerPathGame').then((m) => ({ default: m.CareerPathGame })));
 const ManagerMerryGoRound = lazy(() => import('./components/solo/ManagerMerryGoRound').then((m) => ({ default: m.ManagerMerryGoRound })));
+const ScoutGame = lazy(() => import('./components/scout/ScoutGame').then((m) => ({ default: m.ScoutGame })));
 
 // Top-level singleplayer views live in lib/viewRoute (typed + hash-mapped).
 
@@ -72,12 +73,16 @@ function activeScreen(
   if (view === 'career') return <CareerHub onExit={() => setView('home')} />;
   if (view === 'modes') return <GameModesHub onExit={() => setView('home')} />;
   if (view === 'cup') return <CupHub onExit={() => setView('home')} />;
-  if (view === 'connections') return <ConnectionsGame onExit={() => setView('home')} />;
-  if (view === 'connectionsDaily') return <ConnectionsGame daily onExit={() => setView('home')} />;
+  // Distinct keys: the plain and daily views share a component type, and
+  // without a remount the `daily` prop would be ignored (it seeds initial state).
+  if (view === 'connections') return <ConnectionsGame key="connections" onExit={() => setView('home')} />;
+  if (view === 'connectionsDaily') return <ConnectionsGame key="connections-daily" daily onExit={() => setView('home')} />;
   if (view === 'mystery') return <MysteryPlayerGame onExit={() => setView('home')} />;
   if (view === 'olderYounger') return <OlderYoungerGame onExit={() => setView('home')} />;
   if (view === 'careerPath') return <CareerPathGame onExit={() => setView('home')} />;
   if (view === 'managers') return <ManagerMerryGoRound onExit={() => setView('home')} />;
+  if (view === 'scout') return <ScoutGame key="scout" onExit={() => setView('home')} />;
+  if (view === 'scoutDaily') return <ScoutGame key="scout-daily" daily onExit={() => setView('home')} />;
   return (
     <HomePage
       onOpenCareer={() => setView('career')}
@@ -89,6 +94,7 @@ function activeScreen(
       onOpenOlderYounger={() => setView('olderYounger')}
       onOpenCareerPath={() => setView('careerPath')}
       onOpenManagers={() => setView('managers')}
+      onOpenScout={() => setView('scout')}
     />
   );
 }
