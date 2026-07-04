@@ -102,7 +102,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-black/10 bg-white p-5 shadow-elev-2 sm:rounded-2xl"
+        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-white/10 bg-ink-800 p-5 shadow-elev-2 sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
@@ -110,14 +110,14 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
           <button
             onClick={onClose}
             aria-label="Close"
-            className="grid h-8 w-8 place-items-center rounded-lg text-ink-500 hover:bg-black/[0.05] hover:text-ink-900"
+            className="grid h-8 w-8 place-items-center rounded-lg text-white/55 hover:bg-white/[0.05] hover:text-white"
           >
             <IconClose className="h-5 w-5" />
           </button>
         </div>
 
         {/* Accessibility / display */}
-        <h3 className="mb-2 text-xs font-semibold text-ink-500">
+        <h3 className="mb-2 text-xs font-semibold text-white/55">
           Accessibility
         </h3>
         <div className="mb-4 space-y-2">
@@ -148,11 +148,11 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Save management */}
-        <h3 className="mb-2 text-xs font-semibold text-ink-500">
+        <h3 className="mb-2 text-xs font-semibold text-white/55">
           Your save
         </h3>
         <Card className="mb-3 p-3">
-          <p className="mb-2 text-xs text-ink-500">
+          <p className="mb-2 text-xs text-white/55">
             Your progress is stored on this device. Export a backup to keep it
             safe or move it to another device.
           </p>
@@ -160,13 +160,13 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             {items.map((it) => (
               <span
                 key={it.key}
-                className="rounded-full border border-black/10 bg-black/[0.03] px-2 py-0.5 text-[10px] text-ink-500"
+                className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/55"
               >
                 {it.label}
               </span>
             ))}
             {items.length === 0 && (
-              <span className="text-[11px] text-ink-500">Nothing saved yet.</span>
+              <span className="text-[11px] text-white/55">Nothing saved yet.</span>
             )}
           </div>
           <div className="flex gap-2">
@@ -180,7 +180,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
         </Card>
 
         <Card className="mb-3 p-3">
-          <label className="mb-1 block text-xs font-medium text-ink-500">
+          <label className="mb-1 block text-xs font-medium text-white/55">
             Import a backup (paste a code or JSON)
           </label>
           <textarea
@@ -213,7 +213,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             resetOnboarding();
             flash('Tutorial will show next time you open the home screen.');
           }}
-          className="mb-2 w-full rounded-xl border border-black/10 px-3 py-2.5 text-sm font-semibold text-ink-600 transition hover:border-black/20 hover:text-ink-900"
+          className="mb-2 w-full rounded-xl border border-white/10 px-3 py-2.5 text-sm font-semibold text-white/65 transition hover:border-white/15 hover:text-white"
         >
           Replay tutorial
         </button>
@@ -225,7 +225,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             'w-full rounded-xl border px-3 py-2.5 text-sm font-semibold transition',
             confirmClear
               ? 'border-danger/60 bg-danger/15 text-danger'
-              : 'border-black/10 text-ink-500 hover:border-danger/40 hover:text-danger',
+              : 'border-white/10 text-white/55 hover:border-danger/40 hover:text-danger',
           ].join(' ')}
         >
           {confirmClear ? 'Tap again to erase everything' : 'Clear all local data'}
@@ -260,11 +260,11 @@ function Toggle({
       role="switch"
       aria-checked={on}
       onClick={() => onChange(!on)}
-      className="flex w-full items-center justify-between gap-3 rounded-xl border border-black/10 bg-black/[0.03] px-3 py-2.5 text-left"
+      className="flex w-full items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left"
     >
       <span>
         <span className="block text-sm font-semibold">{label}</span>
-        <span className="block text-[11px] text-ink-500">{desc}</span>
+        <span className="block text-[11px] text-white/55">{desc}</span>
       </span>
       <span
         aria-hidden
@@ -275,7 +275,7 @@ function Toggle({
       >
         <span
           className={[
-            'absolute top-0.5 h-5 w-5 rounded-full bg-white transition-[left]',
+            'absolute top-0.5 h-5 w-5 rounded-full bg-ink-800 transition-[left]',
             on ? 'left-[22px]' : 'left-0.5',
           ].join(' ')}
         />

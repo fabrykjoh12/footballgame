@@ -159,7 +159,7 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="nums font-display text-2xl font-bold text-pitch">{score.toLocaleString()}</span>
-          <span className="text-[11px] text-ink-500">pts</span>
+          <span className="text-[11px] text-white/55">pts</span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           {streak >= 2 && (
@@ -167,14 +167,14 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
               <IconBolt className="h-4 w-4" /> {streak}
             </span>
           )}
-          <span className="nums font-semibold text-ink-800">
+          <span className="nums font-semibold text-white/85">
             {Math.min(index + 1, puzzles.length)} / {puzzles.length}
           </span>
         </div>
       </Card>
 
       {/* Per-puzzle timer */}
-      <div className="h-1.5 overflow-hidden rounded-full bg-black/[0.05]" aria-hidden>
+      <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.05]" aria-hidden>
         <div
           className={[
             'h-full rounded-full transition-[width] duration-100 ease-linear',
@@ -203,9 +203,9 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
               <span>{submitted == null ? 'Out of time' : 'Not quite'}</span>
             )}
           </div>
-          <p className="mt-1 font-normal text-ink-700">
+          <p className="mt-1 font-normal text-white/70">
             Accepted:{' '}
-            <span className="font-semibold text-ink-900">
+            <span className="font-semibold text-white">
               {(() => {
                 const all = acceptedPlayersFor(puzzle);
                 const shown = all.slice(0, 8);
@@ -213,7 +213,7 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
               })()}
             </span>
           </p>
-          {puzzle.note && <p className="mt-0.5 text-xs font-normal text-ink-500">{puzzle.note}</p>}
+          {puzzle.note && <p className="mt-0.5 text-xs font-normal text-white/55">{puzzle.note}</p>}
           {/* Accept-lists are hand-curated — give wrong answers a recourse. */}
           {!grade.isCorrect && submitted && (
             <button
@@ -228,7 +228,7 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
                   /* clipboard blocked */
                 }
               }}
-              className="mt-1.5 text-[11px] font-normal text-ink-500 underline-offset-2 hover:text-ink-700 hover:underline"
+              className="mt-1.5 text-[11px] font-normal text-white/55 underline-offset-2 hover:text-white/70 hover:underline"
             >
               {reported ? '✓ Report copied — send it to the dev' : 'Think you were right? Copy a report'}
             </button>
@@ -239,7 +239,7 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
       {/* The two clubs — a connection to solve */}
       <Card strong glow className="relative overflow-hidden p-6 text-center animate-rise-in">
         <div className="relative">
-          <p className="text-xs font-bold text-ink-500">
+          <p className="text-xs font-bold text-white/55">
             Name a player who played for both
           </p>
           <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-start gap-1">
@@ -285,7 +285,7 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
                 type="button"
                 role="option"
                 aria-selected={false}
-                className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs text-ink-700 transition hover:border-pitch/40 hover:text-ink-900 answer-press"
+                className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-white/70 transition hover:border-pitch/40 hover:text-white answer-press"
                 onClick={() => {
                   setInput(name);
                   inputRef.current?.focus();
@@ -298,7 +298,7 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
         )}
       </form>
 
-      <p className="text-center text-[11px] text-ink-400">
+      <p className="text-center text-[11px] text-white/40">
         Surnames are fine — accents and capitals don’t matter.
       </p>
     </div>
@@ -316,7 +316,7 @@ function ClubChip({ name, identity }: { name: string; identity: TeamIdentity | n
       >
         {name.charAt(0).toUpperCase()}
       </span>
-      <span className="text-balance font-display text-sm font-bold leading-tight text-ink-900">
+      <span className="text-balance font-display text-sm font-bold leading-tight text-white">
         {name}
       </span>
     </div>
@@ -347,7 +347,7 @@ function ConnectionsResult({ run, onExit }: { run: FinishedRun | null; onExit: (
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>{solved ? '🔗' : '🫥'}</div>
         <div>
-          <div className="text-xs font-bold text-ink-500">Daily Connections</div>
+          <div className="text-xs font-bold text-white/55">Daily Connections</div>
           <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">
             {solved ? 'Solved!' : 'Missed today'}
           </h1>
@@ -355,7 +355,7 @@ function ConnectionsResult({ run, onExit }: { run: FinishedRun | null; onExit: (
             🔥 {streak} day{streak === 1 ? '' : 's'} streak
           </div>
         </div>
-        <p className="max-w-xs text-sm text-ink-500">
+        <p className="max-w-xs text-sm text-white/55">
           One puzzle a day — come back tomorrow to keep the streak going.
         </p>
         <Button size="lg" onClick={onExit}>
@@ -371,7 +371,7 @@ function ConnectionsResult({ run, onExit }: { run: FinishedRun | null; onExit: (
         🔗
       </div>
       <div>
-        <div className="text-xs font-bold text-ink-500">Connections — full time</div>
+        <div className="text-xs font-bold text-white/55">Connections — full time</div>
         <h1 className="nums mt-1 font-display text-3xl font-bold text-gradient-pitch">
           {correct}/{total} correct
         </h1>
@@ -399,9 +399,9 @@ function ConnectionsResult({ run, onExit }: { run: FinishedRun | null; onExit: (
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-black/10 bg-black/[0.03] p-2 text-center">
+    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
       <div className="nums font-display text-xl font-bold text-pitch">{value}</div>
-      <div className="mt-0.5 text-[11px] text-ink-500">{label}</div>
+      <div className="mt-0.5 text-[11px] text-white/55">{label}</div>
     </div>
   );
 }

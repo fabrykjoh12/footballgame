@@ -88,9 +88,9 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>🎩</div>
         <div>
-          <div className="text-xs font-bold text-ink-500">Manager Merry-go-round</div>
+          <div className="text-xs font-bold text-white/55">Manager Merry-go-round</div>
           <h1 className="nums mt-1 font-display text-3xl font-bold text-gradient-pitch">{streak} in a row</h1>
-          <p className="nums mt-1 text-sm text-ink-500">Best streak {best}</p>
+          <p className="nums mt-1 text-sm text-white/55">Best streak {best}</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -115,7 +115,7 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
   }
 
   if (!round) {
-    return <div className="flex flex-1 items-center justify-center py-20 text-ink-500">No managers available.</div>;
+    return <div className="flex flex-1 items-center justify-center py-20 text-white/55">No managers available.</div>;
   }
 
   const revealing = phase === 'reveal';
@@ -134,15 +134,15 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="nums font-display text-2xl font-bold text-pitch">{streak}</span>
-          <span className="text-[11px] text-ink-500">streak</span>
+          <span className="text-[11px] text-white/55">streak</span>
         </div>
-        <span className="nums text-sm text-ink-500">Best {best}</span>
+        <span className="nums text-sm text-white/55">Best {best}</span>
       </Card>
 
       {/* The two clubs */}
       <Card strong className="relative overflow-hidden p-5 text-center">
         <div className="relative">
-          <div className="mb-4 text-xs font-bold text-ink-500">
+          <div className="mb-4 text-xs font-bold text-white/55">
             Name a manager who managed both
           </div>
           {(() => {
@@ -171,8 +171,8 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
             {lastCorrect ? <IconCheck className="h-4 w-4" /> : <IconClose className="h-4 w-4" />}
             <span>{lastCorrect ? 'Correct!' : 'Nope'}</span>
           </div>
-          <p className="mt-1 font-normal text-ink-600">
-            Accepted: <span className="font-semibold text-ink-900">{answers.join(', ')}</span>
+          <p className="mt-1 font-normal text-white/65">
+            Accepted: <span className="font-semibold text-white">{answers.join(', ')}</span>
           </p>
         </div>
       )}
@@ -202,7 +202,7 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
                   type="button"
                   role="option"
                   aria-selected={false}
-                  className="rounded-full border border-black/10 bg-black/[0.04] px-3 py-1 text-xs text-ink-600 transition hover:border-pitch/40 hover:text-ink-900 answer-press"
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/65 transition hover:border-pitch/40 hover:text-white answer-press"
                   onClick={() => { setInput(name); inputRef.current?.focus(); }}
                 >
                   {name}
@@ -210,7 +210,7 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
               ))}
             </div>
           )}
-          <button type="button" onClick={() => resolve(false)} className="self-center text-[11px] text-ink-400 hover:text-ink-600">
+          <button type="button" onClick={() => resolve(false)} className="self-center text-[11px] text-white/40 hover:text-white/65">
             Give up
           </button>
         </form>
@@ -229,7 +229,7 @@ function ManagerClubChip({ name, identity }: { name: string; identity: TeamIdent
       >
         {name.charAt(0).toUpperCase()}
       </span>
-      <span className="text-balance font-display text-sm font-bold leading-tight text-ink-900">{name}</span>
+      <span className="text-balance font-display text-sm font-bold leading-tight text-white">{name}</span>
     </div>
   );
 }

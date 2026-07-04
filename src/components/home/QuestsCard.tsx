@@ -17,14 +17,14 @@ export function QuestsCard() {
     <Card className="p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <h3 className="text-[15px] font-bold text-ink-900">Daily quests</h3>
+          <h3 className="text-[15px] font-bold text-white">Daily quests</h3>
         </div>
         <span
           className={[
             'nums rounded-full border px-2.5 py-0.5 text-xs font-bold',
             allDone
               ? 'border-pitch/30 bg-pitch/10 text-pitch'
-              : 'border-black/10 bg-black/[0.04] text-ink-600',
+              : 'border-white/10 bg-white/[0.04] text-white/65',
           ].join(' ')}
         >
           {done}/{quests.length}
@@ -39,7 +39,7 @@ export function QuestsCard() {
               <span
                 className={[
                   'grid h-7 w-7 shrink-0 place-items-center rounded-lg text-sm',
-                  complete ? 'bg-pitch/20 text-pitch' : 'bg-black/[0.05]',
+                  complete ? 'bg-pitch/20 text-pitch' : 'bg-white/[0.05]',
                 ].join(' ')}
                 aria-hidden
               >
@@ -49,7 +49,7 @@ export function QuestsCard() {
                 <div
                   className={[
                     'truncate text-sm font-medium',
-                    complete ? 'text-ink-500 line-through' : 'text-ink-800',
+                    complete ? 'text-white/55 line-through' : 'text-white/85',
                   ].join(' ')}
                 >
                   {quest.label}
@@ -64,7 +64,7 @@ export function QuestsCard() {
                 )}
               </div>
               {quest.target > 1 && (
-                <span className="nums shrink-0 text-[11px] font-semibold text-ink-500">
+                <span className="nums shrink-0 text-[11px] font-semibold text-white/55">
                   {current}/{quest.target}
                 </span>
               )}

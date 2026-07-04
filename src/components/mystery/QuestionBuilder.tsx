@@ -51,7 +51,7 @@ export function QuestionBuilder({
       onClick={onClose}
     >
       <div
-        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-black/10 bg-white p-5 shadow-elev-2 sm:rounded-2xl"
+        className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-white/10 bg-ink-800 p-5 shadow-elev-2 sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center justify-between">
@@ -61,7 +61,7 @@ export function QuestionBuilder({
           <button
             onClick={onClose}
             aria-label="Close"
-            className="grid h-8 w-8 place-items-center rounded-lg text-ink-500 hover:bg-black/[0.05] hover:text-ink-900"
+            className="grid h-8 w-8 place-items-center rounded-lg text-white/55 hover:bg-white/[0.05] hover:text-white"
           >
             <IconClose className="h-5 w-5" />
           </button>
@@ -76,7 +76,7 @@ export function QuestionBuilder({
                   setCat(c.id);
                   setSearch('');
                 }}
-                className="rounded-xl border border-black/10 bg-black/[0.03] px-3 py-3 text-left text-sm font-semibold hover:border-pitch/40 hover:bg-pitch/5"
+                className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-3 text-left text-sm font-semibold hover:border-pitch/40 hover:bg-pitch/5"
               >
                 {c.label}
               </button>
@@ -86,7 +86,7 @@ export function QuestionBuilder({
           <>
             <button
               onClick={() => setCat(null)}
-              className="mb-3 inline-flex items-center gap-1.5 text-xs text-ink-500 hover:text-ink-900"
+              className="mb-3 inline-flex items-center gap-1.5 text-xs text-white/55 hover:text-white"
             >
               <IconBack className="h-4 w-4" /> Categories
             </button>
@@ -104,13 +104,13 @@ export function QuestionBuilder({
                 <button
                   key={`${q.kind}:${q.value}`}
                   onClick={() => onAsk(q)}
-                  className="rounded-xl border border-black/10 bg-black/[0.03] px-3 py-2.5 text-left text-sm hover:border-pitch/40 hover:bg-pitch/5"
+                  className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-left text-sm hover:border-pitch/40 hover:bg-pitch/5"
                 >
                   {questionLabel(q)}
                 </button>
               ))}
               {values.length === 0 && (
-                <p className="py-4 text-center text-sm text-ink-500">No matches.</p>
+                <p className="py-4 text-center text-sm text-white/55">No matches.</p>
               )}
             </div>
           </>

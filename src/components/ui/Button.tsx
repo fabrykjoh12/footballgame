@@ -15,16 +15,16 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * colour transition; each variant is a fill or a hairline outline.
  */
 const VARIANTS: Record<Variant, string> = {
-  // Crisp green fill, white text — the one primary action.
-  primary: 'bg-royal text-white font-semibold enabled:hover:bg-royal-dark',
-  // White with a thin border — the clean secondary.
+  // Bright green fill, dark text — the FotMob-style primary action.
+  primary: 'bg-royal text-ink-900 font-semibold enabled:hover:bg-royal-glow',
+  // Dark chip with a subtle border — the secondary.
   secondary: [
-    'bg-white text-ink-900 font-medium border border-black/12',
-    'enabled:hover:bg-black/[0.03] enabled:hover:border-black/20',
+    'bg-white/[0.06] text-white font-medium border border-white/10',
+    'enabled:hover:bg-white/[0.1] enabled:hover:border-white/20',
   ].join(' '),
-  ghost: 'bg-transparent text-ink-600 enabled:hover:text-ink-900 enabled:hover:bg-black/[0.04]',
+  ghost: 'bg-transparent text-white/65 enabled:hover:text-white enabled:hover:bg-white/[0.06]',
   danger: 'bg-danger text-white font-semibold enabled:hover:bg-danger/85',
-  gold: 'bg-gold text-white font-semibold enabled:hover:bg-gold-dark',
+  gold: 'bg-gold text-ink-900 font-semibold enabled:hover:bg-gold-dark',
 };
 
 const SIZES: Record<Size, string> = {

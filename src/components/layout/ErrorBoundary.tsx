@@ -29,13 +29,13 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (!this.state.error) return this.props.children;
     return (
-      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-[#f6f6f5] px-6 text-center text-ink-900">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-ink-900 px-6 text-center text-white">
         <div className="text-5xl" aria-hidden>
           🟥
         </div>
         <div>
           <h1 className="text-2xl font-bold">Straight red card</h1>
-          <p className="mx-auto mt-2 max-w-sm text-sm text-ink-600">
+          <p className="mx-auto mt-2 max-w-sm text-sm text-white/65">
             Something went wrong on our side of the pitch. Reload to restart the
             match — your progress is saved on this device.
           </p>
@@ -47,11 +47,11 @@ export class ErrorBoundary extends Component<Props, State> {
         >
           Reload the app
         </button>
-        <details className="max-w-md text-left text-xs text-ink-500">
-          <summary className="cursor-pointer text-center hover:text-ink-900">
+        <details className="max-w-md text-left text-xs text-white/55">
+          <summary className="cursor-pointer text-center hover:text-white">
             Technical details
           </summary>
-          <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words rounded-lg border border-black/10 bg-white p-3">
+          <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words rounded-lg border border-white/10 bg-ink-800 p-3">
             {String(this.state.error?.stack ?? this.state.error)}
           </pre>
         </details>

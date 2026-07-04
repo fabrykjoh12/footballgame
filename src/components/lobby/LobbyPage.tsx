@@ -103,8 +103,8 @@ export function LobbyPage() {
               role="Host"
             />
             <div className="flex flex-col items-center pt-3">
-              <span className="font-display text-2xl font-black italic text-ink-400">VS</span>
-              <span className="mt-1 nums text-[11px] font-semibold text-ink-400">
+              <span className="font-display text-2xl font-black italic text-white/40">VS</span>
+              <span className="mt-1 nums text-[11px] font-semibold text-white/40">
                 {room.settings.questionCount} Qs
               </span>
             </div>
@@ -127,7 +127,7 @@ export function LobbyPage() {
         <div className="lower-third px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <div className="text-[11px] text-ink-500">
+              <div className="text-[11px] text-white/55">
                 Room code
               </div>
               <div className="nums font-mono text-3xl font-bold tracking-[0.25em] text-gradient-pitch">
@@ -154,11 +154,11 @@ export function LobbyPage() {
       {/* Match settings */}
       <Card className="p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-ink-600">
+          <h2 className="text-sm font-semibold text-white/65">
             Match mode
           </h2>
           {!isHost && (
-            <span className="text-xs text-ink-500">Chosen by host</span>
+            <span className="text-xs text-white/55">Chosen by host</span>
           )}
         </div>
         <div className="flex flex-col gap-2">
@@ -178,7 +178,7 @@ export function LobbyPage() {
                   'answer-press rounded-xl border p-3 text-left transition-colors',
                   selected
                     ? 'border-pitch/60 bg-pitch/10'
-                    : 'border-black/10 bg-black/[0.03] hover:bg-black/[0.03]',
+                    : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.03]',
                   !isHost ? 'cursor-default opacity-90' : '',
                 ].join(' ')}
               >
@@ -190,18 +190,18 @@ export function LobbyPage() {
                     </span>
                   )}
                 </div>
-                <div className="mt-0.5 text-xs text-ink-500">{mode.description}</div>
+                <div className="mt-0.5 text-xs text-white/55">{mode.description}</div>
               </button>
             );
           })}
         </div>
         {/* Topics (soft filter) */}
-        <div className="mt-4 border-t border-black/10 pt-3">
+        <div className="mt-4 border-t border-white/10 pt-3">
           <div className="mb-2 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-ink-600">
+            <h3 className="text-sm font-semibold text-white/65">
               Topics
             </h3>
-            <span className="text-xs text-ink-500">
+            <span className="text-xs text-white/55">
               {selectedCats.length === 0 ? 'All topics' : `${selectedCats.length} selected`}
             </span>
           </div>
@@ -219,7 +219,7 @@ export function LobbyPage() {
                     'answer-press rounded-full border px-3 py-1.5 text-xs font-medium',
                     on
                       ? 'border-pitch/60 bg-pitch/15 text-pitch'
-                      : 'border-black/10 bg-black/[0.03] text-ink-500 hover:bg-black/[0.03]',
+                      : 'border-white/10 bg-white/[0.03] text-white/55 hover:bg-white/[0.03]',
                     !isHost ? 'cursor-default opacity-90' : '',
                   ].join(' ')}
                 >
@@ -229,14 +229,14 @@ export function LobbyPage() {
             })}
           </div>
           {isHost && (
-            <p className="mt-2 text-[11px] leading-relaxed text-ink-400">
+            <p className="mt-2 text-[11px] leading-relaxed text-white/40">
               Leave empty for all topics. Picks lean toward your choices and top up
               if a topic runs short.
             </p>
           )}
         </div>
 
-        <div className="mt-3 flex flex-wrap gap-2 text-ink-500">
+        <div className="mt-3 flex flex-wrap gap-2 text-white/55">
           <Badge tone="muted">{room.settings.questionCount} questions</Badge>
           <Badge tone="muted">{room.settings.questionDurationMs / 1000}s each</Badge>
           <Badge tone="muted">6 mini-games mixed in</Badge>
@@ -249,7 +249,7 @@ export function LobbyPage() {
           {canStart ? 'Kick off' : 'Waiting for opponent…'}
         </Button>
       ) : (
-        <div className="flex items-center justify-center gap-2 rounded-xl border border-black/10 bg-black/[0.04] py-4 text-ink-600">
+        <div className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] py-4 text-white/65">
           <span className="h-2 w-2 animate-pulse rounded-full bg-pitch" />
           Waiting for host to kick off…
         </div>
@@ -307,14 +307,14 @@ function TeamColumn({
 function WaitingColumn({ remote }: { remote: boolean }) {
   return (
     <div className="flex min-w-0 flex-col items-center gap-2 text-center">
-      <div className="grid h-16 w-16 place-items-center rounded-2xl border border-dashed border-black/10 bg-black/[0.03] text-ink-400">
+      <div className="grid h-16 w-16 place-items-center rounded-2xl border border-dashed border-white/10 bg-white/[0.03] text-white/40">
         <IconUsers className="h-6 w-6" />
       </div>
       <div className="min-w-0">
-        <div className="truncate font-display text-base font-bold leading-tight text-ink-500">
+        <div className="truncate font-display text-base font-bold leading-tight text-white/55">
           {remote ? 'Open slot' : 'CPU'}
         </div>
-        <div className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px] text-ink-500">
+        <div className="mt-1.5 flex items-center justify-center gap-1.5 text-[11px] text-white/55">
           <span className="h-1.5 w-1.5 rounded-full bg-pitch motion-safe:animate-pulse" />
           {remote ? 'Waiting to join…' : 'Joining…'}
         </div>

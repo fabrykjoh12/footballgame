@@ -80,7 +80,7 @@ export function QuestionCard({
           onClick={() => (showHelp ? dismissHelp() : setHelpOpenedFor(question.id))}
           aria-label={`How to play ${meta.label}`}
           aria-expanded={showHelp}
-          className="ml-auto grid h-6 w-6 shrink-0 place-items-center rounded-full border border-black/10 bg-black/[0.04] text-xs font-bold text-ink-500 hover:bg-black/[0.05] hover:text-ink-900"
+          className="ml-auto grid h-6 w-6 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-xs font-bold text-white/55 hover:bg-white/[0.05] hover:text-white"
         >
           ?
         </button>
@@ -96,14 +96,14 @@ export function QuestionCard({
             💡
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-sm leading-snug text-ink-800">{help.rule}</p>
-            <p className="mt-0.5 text-xs leading-snug text-ink-500">{help.example}</p>
+            <p className="text-sm leading-snug text-white/85">{help.rule}</p>
+            <p className="mt-0.5 text-xs leading-snug text-white/55">{help.example}</p>
           </div>
           <button
             type="button"
             onClick={dismissHelp}
             aria-label="Dismiss how to play"
-            className="shrink-0 rounded-full p-1 text-ink-500 hover:bg-black/[0.05] hover:text-ink-900"
+            className="shrink-0 rounded-full p-1 text-white/55 hover:bg-white/[0.05] hover:text-white"
           >
             <IconClose className="h-3.5 w-3.5" />
           </button>
@@ -122,7 +122,7 @@ export function QuestionCard({
       )}
       {question.type === 'guess_year' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold text-ink-600">
+          <h2 className="mb-2 text-sm font-semibold text-white/65">
             In which year?
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -132,7 +132,7 @@ export function QuestionCard({
       )}
       {question.type === 'transfer_fee' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold text-ink-600">
+          <h2 className="mb-2 text-sm font-semibold text-white/65">
             What was the fee?
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -142,7 +142,7 @@ export function QuestionCard({
       )}
       {question.type === 'pitch_position' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold text-ink-600">
+          <h2 className="mb-2 text-sm font-semibold text-white/65">
             Where did they play?
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -152,7 +152,7 @@ export function QuestionCard({
       )}
       {question.type === 'odd_one_out' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold text-ink-600">
+          <h2 className="mb-2 text-sm font-semibold text-white/65">
             Odd one out
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -162,7 +162,7 @@ export function QuestionCard({
       )}
       {question.type === 'spot_the_lie' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold text-ink-600">
+          <h2 className="mb-2 text-sm font-semibold text-white/65">
             Spot the lie
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -172,7 +172,7 @@ export function QuestionCard({
       )}
       {question.type === 'guess_the_number' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold text-ink-600">
+          <h2 className="mb-2 text-sm font-semibold text-white/65">
             Guess the number — closest wins
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -243,7 +243,7 @@ export function QuestionCard({
         <span
           className={[
             'flex items-center gap-1.5',
-            opponentAnswered ? 'text-pitch' : 'text-ink-500',
+            opponentAnswered ? 'text-pitch' : 'text-white/55',
           ].join(' ')}
         >
           {opponentAnswered ? (
@@ -258,7 +258,7 @@ export function QuestionCard({
           )}
         </span>
         {hasAnswered && (
-          <span className="text-ink-500">Answer locked — waiting for reveal</span>
+          <span className="text-white/55">Answer locked — waiting for reveal</span>
         )}
       </div>
     </Card>
@@ -276,7 +276,7 @@ function WhoAmIBody({
   return (
     <div className="mb-4">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-ink-600">
+        <h2 className="text-sm font-semibold text-white/65">
           Guess the player
         </h2>
         <Badge tone="gold"><span className="nums">up to {potential} pts</span></Badge>
@@ -290,8 +290,8 @@ function WhoAmIBody({
               className={[
                 'rounded-xl border px-3.5 py-3 text-sm transition-all duration-300',
                 revealed
-                  ? 'border-black/10 bg-black/[0.03] text-ink-900 animate-fade-in'
-                  : 'border-dashed border-black/10 bg-transparent text-ink-400',
+                  ? 'border-white/10 bg-white/[0.03] text-white animate-fade-in'
+                  : 'border-dashed border-white/10 bg-transparent text-white/40',
               ].join(' ')}
             >
               <span className="nums mr-2 font-mono text-xs text-pitch/70">
@@ -313,7 +313,7 @@ function CareerPathBody({
 }) {
   return (
     <div className="mb-4">
-      <h2 className="mb-3 text-sm font-semibold text-ink-600">
+      <h2 className="mb-3 text-sm font-semibold text-white/65">
         Whose career path is this?
       </h2>
       <div className="flex flex-wrap items-center gap-1.5">
@@ -327,7 +327,7 @@ function CareerPathBody({
                   'flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium',
                   hidden
                     ? 'border-dashed border-gold/40 bg-gold/5 text-gold'
-                    : 'border-black/10 bg-black/[0.03]',
+                    : 'border-white/10 bg-white/[0.03]',
                 ].join(' ')}
               >
                 {kit && (
@@ -374,7 +374,7 @@ function HigherLowerPicker({
           'answer-press flex min-h-[120px] flex-col items-center justify-center gap-2 rounded-2xl border p-4 text-center',
           chosen
             ? 'border-pitch/70 bg-pitch/10 ring-2 ring-pitch/40'
-            : 'border-black/10 bg-black/[0.03] hover:bg-black/[0.05]',
+            : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.05]',
           disabled && !chosen ? 'opacity-55' : '',
         ].join(' ')}
       >
@@ -402,7 +402,7 @@ function HigherLowerPicker({
       </p>
       <div className="grid grid-cols-[1fr_auto_1fr] items-stretch gap-2">
         {renderOption(question.leftOption.name)}
-        <div className="flex items-center text-sm font-bold text-ink-500">VS</div>
+        <div className="flex items-center text-sm font-bold text-white/55">VS</div>
         {renderOption(question.rightOption.name)}
       </div>
     </div>
@@ -432,7 +432,7 @@ function GuessNumberSlider({
           {shown}
         </span>
         {question.unit && (
-          <span className="ml-1.5 text-sm text-ink-500">{question.unit}</span>
+          <span className="ml-1.5 text-sm text-white/55">{question.unit}</span>
         )}
       </div>
       <input
@@ -446,7 +446,7 @@ function GuessNumberSlider({
         aria-label="Your guess"
         className="w-full accent-pitch"
       />
-      <div className="flex justify-between text-xs text-ink-500">
+      <div className="flex justify-between text-xs text-white/55">
         <span>{question.min}</span>
         <span>{question.max}</span>
       </div>
@@ -486,7 +486,7 @@ function GuessYearPicker({
               'answer-press nums flex min-h-[72px] flex-col items-center justify-center rounded-xl border font-mono text-lg font-bold',
               chosen
                 ? 'border-pitch/70 bg-pitch/10 text-pitch ring-2 ring-pitch/40'
-                : 'border-black/10 bg-black/[0.03] hover:bg-black/[0.05]',
+                : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.05]',
               disabled && !chosen ? 'opacity-55' : '',
             ].join(' ')}
           >
@@ -525,7 +525,7 @@ function TransferFeePicker({
               'answer-press nums flex min-h-[64px] items-center justify-center rounded-xl border font-mono text-xl font-bold tracking-tight',
               chosen
                 ? 'border-pitch/70 bg-pitch/10 text-pitch ring-2 ring-pitch/40'
-                : 'border-black/10 bg-black/[0.03] hover:bg-black/[0.05]',
+                : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.05]',
               disabled && !chosen ? 'opacity-55' : '',
             ].join(' ')}
           >
@@ -561,8 +561,8 @@ function PitchGrid({
             aria-pressed={chosen}
             className={[
               'answer-press flex w-full items-center justify-center py-4 text-sm font-semibold',
-              i > 0 ? 'border-t border-dashed border-black/10' : '',
-              chosen ? 'bg-pitch/20 text-pitch' : 'text-ink-600 hover:bg-black/[0.04]',
+              i > 0 ? 'border-t border-dashed border-white/10' : '',
+              chosen ? 'bg-pitch/20 text-pitch' : 'text-white/65 hover:bg-white/[0.04]',
               disabled && !chosen ? 'opacity-55' : '',
             ].join(' ')}
           >

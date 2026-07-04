@@ -89,26 +89,26 @@ export function DailyRivalCard({
     <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
       <div className="mb-2 flex items-center gap-2">
         <IconClock className="h-5 w-5 text-gold" />
-        <h2 className="text-[15px] font-bold text-ink-900">Daily rival</h2>
+        <h2 className="text-[15px] font-bold text-white">Daily rival</h2>
         {daily.streak > 0 && (
           <span className="nums ml-auto text-xs font-semibold text-gold">{daily.streak}-day streak</span>
         )}
       </div>
 
       {/* Fixture header */}
-      <div className="rounded-lg border border-black/10 bg-black/[0.03] px-3 py-2.5">
-        <div className="text-xs text-ink-500">{fixture}</div>
+      <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5">
+        <div className="text-xs text-white/55">{fixture}</div>
         <div className="mt-0.5 font-display text-lg font-bold">
           {teamName(name.trim() || 'You')}{' '}
-          <span className="text-ink-500">vs</span>{' '}
+          <span className="text-white/55">vs</span>{' '}
           <span className="text-gold">{teamName(rival)}</span>
         </div>
-        <div className="mt-0.5 text-xs text-ink-500">{mood}</div>
+        <div className="mt-0.5 text-xs text-white/55">{mood}</div>
       </div>
 
       {/* Incoming friend challenge */}
       {incoming && incoming.date === today && (
-        <p className="mt-3 rounded-lg border border-pitch/30 bg-pitch/10 px-3 py-2 text-xs text-ink-700">
+        <p className="mt-3 rounded-lg border border-pitch/30 bg-pitch/10 px-3 py-2 text-xs text-white/70">
           {incoming.by ? `${incoming.by} scored` : 'A friend scored'}{' '}
           <span className="font-bold text-pitch">
             {incoming.goalsFor}–{incoming.goalsAgainst}
@@ -121,7 +121,7 @@ export function DailyRivalCard({
         <>
           <div className="mt-3 flex items-center justify-between gap-2">
             <div>
-              <div className="text-[11px] text-ink-500">Full time</div>
+              <div className="text-[11px] text-white/55">Full time</div>
               <div className="font-display text-2xl font-bold">
                 <span className="text-pitch">
                   {daily.lastGoalsFor}–{daily.lastGoalsAgainst}
@@ -134,14 +134,14 @@ export function DailyRivalCard({
               </div>
             </div>
             <div className="text-right">
-              <div className="text-[11px] text-ink-500">Score</div>
-              <div className="font-mono text-lg font-bold text-ink-800">
+              <div className="text-[11px] text-white/55">Score</div>
+              <div className="font-mono text-lg font-bold text-white/85">
                 {daily.lastScore.toLocaleString()}
               </div>
             </div>
           </div>
 
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-ink-500">
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-white/55">
             {bestCat && <Badge tone="pitch">Best: {bestCat}</Badge>}
             <span>Best ever: {daily.bestScore.toLocaleString()}</span>
             <span className="ml-auto">Next match in {countdown}</span>
@@ -164,7 +164,7 @@ export function DailyRivalCard({
         </>
       ) : (
         <>
-          <p className="mt-3 text-xs leading-relaxed text-ink-500">
+          <p className="mt-3 text-xs leading-relaxed text-white/55">
             The same 10 questions for everyone today — one official attempt.{' '}
             {daily.streak > 0
               ? `Keep your ${daily.streak}-day streak alive!`

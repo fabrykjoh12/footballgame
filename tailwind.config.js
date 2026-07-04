@@ -4,42 +4,42 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Clean & light — off-white page, white cards, near-black text, a single
-        // crisp green accent. `royal` stays the brand-accent token name; `ink`
-        // is the near-black text/dark scale; `bone` maps to light surfaces so the
-        // editorial-era class names keep working while reading light.
+        // FotMob-style dark: near-black stage, dark-grey cards, one bright green
+        // accent. `royal` is the accent token; `ink` is the dark SURFACE scale
+        // (bg/cards/insets). Text uses `text-white/NN`.
         royal: {
-          DEFAULT: '#15a34a', // crisp green — the one accent
-          dark: '#128040',
-          glow: '#22c55e',
-          soft: '#18ab50',
+          DEFAULT: '#2bd576', // bright green accent
+          dark: '#20b863',
+          glow: '#47e58f',
+          soft: '#33cf7f',
         },
         pitch: {
-          DEFAULT: '#15a34a', // success / correct
-          dark: '#128040',
-          glow: '#22c55e',
+          DEFAULT: '#2bd576', // success / correct
+          dark: '#20b863',
+          glow: '#47e58f',
         },
         ink: {
-          // Near-black text + dark-element scale (zinc-like).
-          900: '#18181b',
-          800: '#27272a',
-          700: '#3f3f46',
-          600: '#52525b',
-          500: '#71717a',
+          // Dark surface scale.
+          900: '#0e0e10', // page backdrop
+          800: '#1a1a1d', // card
+          700: '#232327', // inset / raised
+          600: '#2d2d32',
+          500: '#3a3a40',
+          400: '#54545b',
         },
-        // Surface/foreground helpers so `text-bone`/`bg-bone` etc. read light.
+        // Foreground helpers (kept so any lingering bone/* class still reads).
         bone: {
-          DEFAULT: '#18181b', // "primary text" now near-black on light
-          dim: '#52525b', // secondary
-          faint: '#8a8a90', // tertiary / faint
+          DEFAULT: '#f4f4f5',
+          dim: '#a1a1aa',
+          faint: '#71717a',
         },
-        paper: '#ffffff', // card surface
+        paper: '#1a1a1d', // "card" surface (dark)
         gold: {
-          DEFAULT: '#b7791f', // amber (trophies)
-          dark: '#96610f',
+          DEFAULT: '#e0b23c', // amber (trophies)
+          dark: '#c2942a',
         },
-        danger: '#dc2626',
-        good: '#15a34a',
+        danger: '#f05252',
+        good: '#2bd576',
       },
       fontFamily: {
         // Clean sans-serif throughout; mono reserved for codes/figures.

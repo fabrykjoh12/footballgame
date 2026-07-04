@@ -33,13 +33,13 @@ export function Scoreboard({
             <span style={{ color: idA.color }}>
               <AnimatedNumber value={a.goals} />
             </span>
-            <span className="text-ink-400">–</span>
+            <span className="text-white/40">–</span>
             <span style={{ color: idB.color }}>
               <AnimatedNumber value={b.goals} />
             </span>
           </div>
           {questionNumber != null && totalQuestions != null && (
-            <div className="nums mt-0.5 text-[11px] font-medium text-ink-500">
+            <div className="nums mt-0.5 text-[11px] font-medium text-white/55">
               Question {questionNumber}/{totalQuestions}
             </div>
           )}
@@ -72,13 +72,13 @@ function TeamSide({
   );
   const offline = !player.connected && (
     <span
-      className="h-2 w-2 shrink-0 rounded-full bg-black/25"
+      className="h-2 w-2 shrink-0 rounded-full bg-white/25"
       title="Disconnected"
       aria-label="Disconnected"
     />
   );
   const you = isLocal && (
-    <span className="rounded bg-black/[0.05] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-ink-600">
+    <span className="rounded bg-white/[0.05] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white/65">
       You
     </span>
   );
@@ -104,7 +104,7 @@ function TeamSide({
       </div>
       <div
         className={[
-          'mt-0.5 flex items-center gap-2 text-xs text-ink-500',
+          'mt-0.5 flex items-center gap-2 text-xs text-white/55',
           right ? 'justify-end' : 'justify-start',
         ].join(' ')}
       >

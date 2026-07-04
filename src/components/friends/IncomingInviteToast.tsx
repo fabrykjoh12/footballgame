@@ -27,7 +27,7 @@ export function IncomingInviteToast() {
 
   return createPortal(
     <div className="fixed inset-x-0 bottom-4 z-[110] flex justify-center px-4 animate-rise-in">
-      <div className="flex w-full max-w-sm items-center gap-3 rounded-2xl border border-pitch/30 bg-white p-3 shadow-elev-2">
+      <div className="flex w-full max-w-sm items-center gap-3 rounded-2xl border border-pitch/30 bg-ink-800 p-3 shadow-elev-2">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-pitch/15 text-pitch">
           <IconUsers className="h-5 w-5" />
         </span>
@@ -35,7 +35,7 @@ export function IncomingInviteToast() {
           <div className="truncate text-sm font-semibold">
             {invite.fromName} invited you
           </div>
-          <div className="truncate text-xs text-ink-500">
+          <div className="truncate text-xs text-white/55">
             Room {invite.roomCode} · tap join to play
           </div>
         </div>
@@ -46,7 +46,7 @@ export function IncomingInviteToast() {
           type="button"
           onClick={() => dismissInvite(invite.id)}
           aria-label="Dismiss invite"
-          className="rounded-full p-1.5 text-ink-500 hover:bg-black/[0.05] hover:text-ink-900"
+          className="rounded-full p-1.5 text-white/55 hover:bg-white/[0.05] hover:text-white"
         >
           <IconClose className="h-4 w-4" />
         </button>

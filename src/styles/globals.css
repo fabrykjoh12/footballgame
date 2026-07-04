@@ -4,10 +4,9 @@
 
 @layer base {
   :root {
-    color-scheme: light;
-    /* Hairline / border colour — dark-on-light. */
-    --line: rgba(24, 24, 27, 0.1);
-    --line-strong: rgba(24, 24, 27, 0.16);
+    color-scheme: dark;
+    --line: rgba(255, 255, 255, 0.08);
+    --line-strong: rgba(255, 255, 255, 0.12);
   }
 
   html,
@@ -17,61 +16,56 @@
   }
 
   body {
-    @apply text-ink-900 font-sans antialiased;
-    /* Clean off-white page. */
-    background-color: #f6f6f5;
+    @apply bg-ink-900 text-white font-sans antialiased;
+    /* FotMob-style near-black stage. */
+    background-color: #0e0e10;
     overscroll-behavior: none;
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-royal ring-offset-2;
-    --tw-ring-offset-color: #f6f6f5;
+    @apply outline-none ring-2 ring-royal ring-offset-2 ring-offset-ink-900;
   }
 
   ::selection {
-    background: rgba(21, 163, 74, 0.18);
+    background: rgba(43, 213, 118, 0.28);
   }
 }
 
 @layer components {
   /*
-   * White cards on the off-white page, defined by a thin neutral border and a
-   * soft shadow. Two weights: flat and slightly raised.
+   * Dark cards on the near-black stage. Flat, subtle border, minimal shadow —
+   * the FotMob look. Two weights: card and slightly raised.
    */
   .glass {
-    @apply rounded-xl border border-black/[0.07] bg-white;
-    box-shadow: 0 1px 2px rgba(24, 24, 27, 0.04);
+    @apply rounded-xl border border-white/[0.06] bg-ink-800;
   }
 
   .glass-strong {
-    @apply rounded-xl border border-black/[0.08] bg-white;
-    box-shadow: 0 1px 3px rgba(24, 24, 27, 0.06), 0 8px 24px -12px rgba(24, 24, 27, 0.1);
+    @apply rounded-xl border border-white/[0.07] bg-ink-800;
   }
 
   .card-lite {
-    @apply rounded-xl border border-black/[0.07] bg-white text-ink-900;
-    box-shadow: 0 1px 2px rgba(24, 24, 27, 0.04);
+    @apply rounded-xl border border-white/[0.06] bg-ink-800 text-white;
   }
   .card-lite-hover {
-    @apply transition-shadow duration-200 ease-premium;
-    @apply hover:shadow-[0_2px_6px_rgba(24,24,27,0.06),0_12px_28px_-12px_rgba(24,24,27,0.16)];
+    @apply transition-colors duration-200 ease-premium hover:bg-ink-700;
   }
 
-  /* Inputs on a white card: neutral fill, thin border, green focus. */
+  /* Inputs inside a dark card: darker fill, subtle border, green focus. */
   .input-field {
-    @apply w-full rounded-lg border border-black/10 bg-[#f6f6f5] px-4 py-3 text-ink-900;
-    @apply outline-none transition-colors duration-200 placeholder:text-ink-500;
-    @apply focus:border-royal focus:bg-white;
+    @apply w-full rounded-lg border border-white/10 bg-ink-900 px-4 py-3 text-white;
+    @apply outline-none transition-colors duration-200 placeholder:text-white/35;
+    @apply focus:border-royal;
   }
   .input-lite {
-    @apply w-full rounded-lg border border-black/10 bg-[#f6f6f5] px-4 py-3 text-ink-900;
-    @apply outline-none transition-colors duration-200 placeholder:text-ink-500;
-    @apply focus:border-royal focus:bg-white;
+    @apply w-full rounded-lg border border-white/10 bg-ink-900 px-4 py-3 text-white;
+    @apply outline-none transition-colors duration-200 placeholder:text-white/35;
+    @apply focus:border-royal;
   }
 
-  /* Headings are solid near-black. */
+  /* Headings are solid white. */
   .text-gradient-pitch {
-    @apply text-ink-900;
+    @apply text-white;
   }
   .text-gradient-gold {
     @apply text-gold;
@@ -87,18 +81,18 @@
 
   /* Opaque panel for modals. */
   .surface {
-    @apply rounded-xl border border-black/[0.08] bg-white;
-    box-shadow: 0 24px 60px -12px rgba(24, 24, 27, 0.25);
+    @apply rounded-xl border border-white/[0.08] bg-ink-800;
+    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.6);
   }
 
   .card-hover {
     @apply transition-colors duration-200 ease-premium;
-    @apply hover:bg-black/[0.025] active:bg-black/[0.04];
+    @apply hover:bg-white/[0.04] active:bg-white/[0.02];
   }
 
-  /* Stat/scoreline strip — thin border, a green accent bar. */
+  /* Stat/scoreline strip — a green accent bar. */
   .lower-third {
-    @apply relative overflow-hidden rounded-lg border border-black/[0.07] bg-white;
+    @apply relative overflow-hidden rounded-lg border border-white/[0.06] bg-ink-800;
   }
   .lower-third::before {
     content: '';
@@ -133,14 +127,14 @@
   /* Faint grid texture (dark-on-light). */
   .grid-tactical {
     background-image:
-      linear-gradient(rgba(24, 24, 27, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(24, 24, 27, 0.04) 1px, transparent 1px);
+      linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
     background-size: 28px 28px;
   }
 
   /* Loading skeleton — a calm shimmer over a neutral block. */
   .skeleton {
-    @apply rounded-lg bg-black/[0.06];
+    @apply rounded-lg bg-white/[0.06];
     position: relative;
     overflow: hidden;
   }
@@ -152,7 +146,7 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(24, 24, 27, 0.06),
+      rgba(255, 255, 255, 0.06),
       transparent
     );
     animation: shimmer 1.6s ease-in-out infinite;
@@ -243,19 +237,21 @@
   font-size: 118%;
 }
 
-/* High contrast — strengthen text and borders on the light theme. */
+/* High contrast — strengthen text and borders on the dark theme. */
 .a11y-contrast body {
-  color: #000000;
+  color: #ffffff;
 }
 
 .a11y-contrast .glass,
 .a11y-contrast .glass-strong,
 .a11y-contrast .card-lite,
 .a11y-contrast .surface {
-  border-color: rgba(24, 24, 27, 0.4) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
-.a11y-contrast .text-ink-500,
-.a11y-contrast .text-ink-600 {
-  color: #18181b !important;
+.a11y-contrast .text-white\/40,
+.a11y-contrast .text-white\/50,
+.a11y-contrast .text-white\/55,
+.a11y-contrast .text-white\/65 {
+  color: rgba(255, 255, 255, 0.9) !important;
 }

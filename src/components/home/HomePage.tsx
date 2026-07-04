@@ -87,10 +87,10 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
     <div className="flex flex-1 flex-col gap-10 py-8">
       {/* Masthead */}
       <header className="animate-fade-in">
-        <h1 className="text-3xl font-bold tracking-tight text-ink-900 sm:text-4xl">
+        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
           Ball Knowledge
         </h1>
-        <p className="mt-2 max-w-lg text-[15px] leading-relaxed text-ink-600">
+        <p className="mt-2 max-w-lg text-[15px] leading-relaxed text-white/65">
           1v1 football quiz duels. Ten questions become one scoreline — play a
           friend or the CPU.
         </p>
@@ -113,10 +113,10 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
               <ClubBadge identity={club} size={52} />
               <div className="min-w-0 flex-1">
                 <div className="truncate text-lg font-bold">{club.name}</div>
-                <div className="truncate text-xs text-ink-500">
+                <div className="truncate text-xs text-white/55">
                   {club.nickname} · {club.stadium}
                 </div>
-                <div className="truncate text-[11px] text-ink-500">
+                <div className="truncate text-[11px] text-white/55">
                   {user?.username ? `@${user.username} · ` : ''}
                   <span className="font-mono">{formatFriendCode(myCode)}</span>
                 </div>
@@ -129,7 +129,7 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
             <div className="flex items-center justify-between gap-3 p-4">
               <div className="min-w-0">
                 <div className="text-sm font-semibold">Create your club</div>
-                <div className="text-xs text-ink-500">
+                <div className="text-xs text-white/55">
                   Name, kit colours, badge — used across the whole game.
                 </div>
               </div>
@@ -139,8 +139,8 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
 
           {/* Accuracy + last title — the rest lives in the masthead ledger. */}
           {stats.matchesPlayed > 0 && (
-            <div className="flex items-center justify-between border-t-[0.5px] border-black/[0.07] px-4 py-2.5">
-              <span className="font-mono text-[11px] text-ink-600">
+            <div className="flex items-center justify-between border-t-[0.5px] border-white/[0.08] px-4 py-2.5">
+              <span className="font-mono text-[11px] text-white/65">
                 {lifetimeAccuracy(stats)}% accuracy
                 {stats.lastTitle ? (
                   <> · last title <span className="text-gold">{stats.lastTitle}</span></>
@@ -149,7 +149,7 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
               <button
                 type="button"
                 onClick={() => setStats(resetProfileStats())}
-                className="font-mono text-[11px] text-ink-500 hover:text-ink-600"
+                className="font-mono text-[11px] text-white/55 hover:text-white/65"
               >
                 reset
               </button>
@@ -173,11 +173,11 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
         </SectionLabel>
       <Card strong className="p-6 sm:p-7">
         {club ? (
-          <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-black/10 bg-[#f6f6f5] px-3.5 py-2.5">
+          <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-ink-700 px-3.5 py-2.5">
             <div className="flex min-w-0 items-center gap-2.5">
               <ClubBadge identity={club} size={30} />
               <div className="min-w-0">
-                <div className="text-xs text-ink-500">Playing as</div>
+                <div className="text-xs text-white/55">Playing as</div>
                 <div className="truncate text-sm font-semibold">{club.name}</div>
               </div>
             </div>
@@ -189,12 +189,12 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
           <>
             <label
               htmlFor="player-name"
-              className="mb-2 block text-sm font-medium text-ink-600"
+              className="mb-2 block text-sm font-medium text-white/65"
             >
               Your name
             </label>
             <div className="relative mb-6">
-              <IconUsers className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
+              <IconUsers className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
               <input
                 id="player-name"
                 value={name}
@@ -238,7 +238,7 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
               Join Room
             </Button>
           ) : (
-            <div className="flex flex-col gap-2.5 rounded-2xl border border-black/10 bg-[#f6f6f5] p-3 animate-scale-in">
+            <div className="flex flex-col gap-2.5 rounded-2xl border border-white/10 bg-ink-700 p-3 animate-scale-in">
               <input
                 value={code}
                 onChange={(e) => setCode(normalizeRoomCode(e.target.value).slice(0, 8))}
@@ -270,7 +270,7 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
         </div>
 
         {!club && !nameValid && (
-          <p className="mt-3 text-center text-xs text-ink-500">
+          <p className="mt-3 text-center text-xs text-white/55">
             Enter a name to start.
           </p>
         )}
@@ -288,7 +288,7 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
           </p>
         )}
 
-        <p className="mt-4 text-center text-[11px] text-ink-500">
+        <p className="mt-4 text-center text-[11px] text-white/55">
           {multiplayerAvailable
             ? `Real-time multiplayer is enabled (${
                 multiplayerProvider === 'ably' ? 'Ably' : 'Supabase'
@@ -314,15 +314,15 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
         <Card className="p-4">
           <div className="mb-2 flex items-center gap-2">
             <IconTrophy className="h-5 w-5 text-gold" />
-            <h2 className="text-[15px] font-bold text-ink-900">Career mode</h2>
+            <h2 className="text-[15px] font-bold text-white">Career mode</h2>
             {career && (
-              <span className="nums ml-auto rounded-full border border-black/10 bg-black/[0.04] px-2 py-0.5 text-[11px] font-medium text-ink-600">
+              <span className="nums ml-auto rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-white/65">
                 S{career.season} · {divisionByTier(career.tier).name}
               </span>
             )}
           </div>
           {career ? (
-            <p className="text-xs leading-relaxed text-ink-500">
+            <p className="text-xs leading-relaxed text-white/55">
               Season {career.season} in{' '}
               <span className="font-semibold text-pitch">
                 {divisionByTier(career.tier).name}
@@ -330,7 +330,7 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
               . Continue your climb to the Premier League.
             </p>
           ) : (
-            <p className="text-xs leading-relaxed text-ink-500">
+            <p className="text-xs leading-relaxed text-white/55">
               Start in League Two and manage your club up the pyramid vs the CPU.
               Difficulty rises as you’re promoted.
             </p>
@@ -351,11 +351,11 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
       <LeaguesCard />
 
       {/* Settings, cosmetics & data */}
-      <div className="mx-auto flex items-center gap-4 text-xs text-ink-500">
-        <button type="button" onClick={() => setShowCosmetics(true)} className="hover:text-ink-900">
+      <div className="mx-auto flex items-center gap-4 text-xs text-white/55">
+        <button type="button" onClick={() => setShowCosmetics(true)} className="hover:text-white">
           🎨 Cosmetics
         </button>
-        <button type="button" onClick={() => setShowSettings(true)} className="hover:text-ink-900">
+        <button type="button" onClick={() => setShowSettings(true)} className="hover:text-white">
           ⚙ Settings &amp; data
         </button>
       </div>
@@ -377,19 +377,19 @@ function MatchPreviewCard() {
   return (
     <div className="mt-5 w-full max-w-xs animate-fade-in">
       <div className="glass rounded-2xl p-4">
-        <div className="text-xs font-medium text-ink-500">Full time</div>
+        <div className="text-xs font-medium text-white/55">Full time</div>
         <div className="mt-1.5 flex items-center gap-2.5 font-bold">
           <span className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-full bg-danger" aria-hidden />
-            <span className="text-sm text-ink-900">Sara FC</span>
+            <span className="text-sm text-white">Sara FC</span>
           </span>
           <span className="nums text-xl">3–2</span>
           <span className="flex items-center gap-1.5">
-            <span className="text-sm text-ink-900">Jonas United</span>
+            <span className="text-sm text-white">Jonas United</span>
             <span className="h-2.5 w-2.5 rounded-full bg-sky-400" aria-hidden />
           </span>
         </div>
-        <div className="mt-1.5 text-xs text-ink-500">
+        <div className="mt-1.5 text-xs text-white/55">
           Won 90+2&rsquo; · 8/10 correct · best category Transfers
         </div>
       </div>
@@ -404,8 +404,8 @@ function MatchPreviewCard() {
 function SectionLabel({ children, hint }: { children: ReactNode; hint?: string }) {
   return (
     <div className="mb-3 flex items-baseline justify-between gap-3">
-      <h2 className="text-lg font-bold tracking-tight text-ink-900">{children}</h2>
-      {hint && <span className="text-xs text-ink-500">{hint}</span>}
+      <h2 className="text-lg font-bold tracking-tight text-white">{children}</h2>
+      {hint && <span className="text-xs text-white/55">{hint}</span>}
     </div>
   );
 }
@@ -414,8 +414,8 @@ function SectionLabel({ children, hint }: { children: ReactNode; hint?: string }
 function LedgerRow({ k, v }: { k: string; v: string }) {
   return (
     <div className="flex flex-col">
-      <dt className="text-[11px] font-medium uppercase tracking-wide text-ink-500">{k}</dt>
-      <dd className="nums mt-0.5 text-xl font-bold text-ink-900">{v}</dd>
+      <dt className="text-[11px] font-medium uppercase tracking-wide text-white/55">{k}</dt>
+      <dd className="nums mt-0.5 text-xl font-bold text-white">{v}</dd>
     </div>
   );
 }

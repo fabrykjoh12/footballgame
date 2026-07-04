@@ -57,7 +57,7 @@ export function CupHub({ onExit }: { onExit: () => void }) {
         <h1 className="font-display text-3xl font-bold tracking-tight">
           <span className="text-gradient-pitch">Cup Runs</span>
         </h1>
-        <p className="mx-auto mt-2 max-w-sm text-balance text-sm text-ink-500">
+        <p className="mx-auto mt-2 max-w-sm text-balance text-sm text-white/55">
           Themed knockout tournaments vs the CPU. Win every tie to lift the trophy —
           lose one and you’re out.
         </p>
@@ -73,9 +73,9 @@ export function CupHub({ onExit }: { onExit: () => void }) {
             <h2 className="font-display text-lg font-bold">{activeDef.name}</h2>
             <span className="ml-auto text-xs font-semibold text-gold">In progress</span>
           </div>
-          <p className="text-xs text-ink-500">
+          <p className="text-xs text-white/55">
             {activeRound.name} vs{' '}
-            <span className="font-semibold text-ink-800">{teamName(activeRound.opponent)}</span>
+            <span className="font-semibold text-white/85">{teamName(activeRound.opponent)}</span>
           </p>
           <CupBracket def={activeDef} roundIndex={active.round} status={active.status} />
           <div className="mt-3">
@@ -105,7 +105,7 @@ export function CupHub({ onExit }: { onExit: () => void }) {
                       </span>
                     )}
                   </div>
-                  <p className="mt-0.5 text-xs leading-relaxed text-ink-500">{cup.blurb}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-white/55">{cup.blurb}</p>
                   <CupPathPreview def={cup} />
                   <div className="mt-1.5 flex flex-wrap gap-1.5">
                     <Badge tone="muted">{cup.rounds.length} ties</Badge>
@@ -129,7 +129,7 @@ export function CupHub({ onExit }: { onExit: () => void }) {
       </div>
 
       {active && (
-        <p className="text-center text-[11px] text-ink-500">
+        <p className="text-center text-[11px] text-white/55">
           Finish or quit your current run to start a different cup.
         </p>
       )}
@@ -150,7 +150,7 @@ function CupPathPreview({ def }: { def: CupDef }) {
               style={{ backgroundColor: kit.color }}
               title={`${r.name}: ${teamName(r.opponent)}`}
             />
-            <span className="text-ink-400" aria-hidden>›</span>
+            <span className="text-white/40" aria-hidden>›</span>
           </span>
         );
       })}
@@ -183,8 +183,8 @@ function CupBracket({
               current
                 ? 'border-pitch/50 bg-pitch/[0.08]'
                 : done
-                  ? 'border-black/10 bg-black/[0.03]'
-                  : 'border-black/10 bg-black/[0.03] opacity-60',
+                  ? 'border-white/10 bg-white/[0.03]'
+                  : 'border-white/10 bg-white/[0.03] opacity-60',
             ].join(' ')}
           >
             <span
@@ -195,7 +195,7 @@ function CupBracket({
               {r.opponent.charAt(0).toUpperCase()}
             </span>
             <div className="min-w-0 flex-1">
-              <div className="text-[11px] text-ink-500">{r.name}</div>
+              <div className="text-[11px] text-white/55">{r.name}</div>
               <div className="truncate font-display text-sm font-bold">{teamName(r.opponent)}</div>
             </div>
             {current ? (
@@ -205,7 +205,7 @@ function CupBracket({
                 <IconCheck className="h-4 w-4" />
               </span>
             ) : (
-              <span className="text-[11px] text-ink-400">{r.mode}</span>
+              <span className="text-[11px] text-white/40">{r.mode}</span>
             )}
           </li>
         );
@@ -214,7 +214,7 @@ function CupBracket({
       <li
         className={[
           'flex items-center gap-3 rounded-xl border px-3 py-2',
-          status === 'won' ? 'border-gold/40 bg-gold/10' : 'border-dashed border-black/10',
+          status === 'won' ? 'border-gold/40 bg-gold/10' : 'border-dashed border-white/10',
         ].join(' ')}
       >
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gold/15 text-lg ring-1 ring-gold/30" aria-hidden>

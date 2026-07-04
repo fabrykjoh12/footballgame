@@ -40,7 +40,7 @@ export function InviteFriends({ roomCode }: { roomCode: string }) {
 
   return (
     <Card className="p-4">
-      <h2 className="mb-2 text-sm font-semibold text-ink-600">
+      <h2 className="mb-2 text-sm font-semibold text-white/65">
         Invite a friend
       </h2>
       <ul className="flex flex-col gap-1.5">
@@ -49,7 +49,7 @@ export function InviteFriends({ roomCode }: { roomCode: string }) {
           return (
             <li
               key={f.id}
-              className="flex items-center gap-2 rounded-xl border border-black/10 bg-black/[0.03] px-3 py-2"
+              className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2"
             >
               <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-pitch/15 text-sm font-bold text-pitch">
                 {f.name.charAt(0).toUpperCase()}
@@ -71,7 +71,7 @@ export function InviteFriends({ roomCode }: { roomCode: string }) {
           );
         })}
       </ul>
-      <p className="mt-2 text-[11px] leading-relaxed text-ink-400">
+      <p className="mt-2 text-[11px] leading-relaxed text-white/40">
         Online friends get a live pop-up to join. Everyone else gets a ready-to-send
         link — no need to read out the code.
       </p>

@@ -32,7 +32,7 @@ export function CosmeticsModal({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-black/10 bg-white p-5 shadow-elev-2 sm:rounded-2xl"
+        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-white/10 bg-ink-800 p-5 shadow-elev-2 sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-1 flex items-center justify-between">
@@ -40,18 +40,18 @@ export function CosmeticsModal({ onClose }: { onClose: () => void }) {
           <button
             onClick={onClose}
             aria-label="Close"
-            className="grid h-8 w-8 place-items-center rounded-lg text-ink-500 hover:bg-black/[0.05] hover:text-ink-900"
+            className="grid h-8 w-8 place-items-center rounded-lg text-white/55 hover:bg-white/[0.05] hover:text-white"
           >
             <IconClose className="h-5 w-5" />
           </button>
         </div>
-        <p className="mb-4 text-xs text-ink-500">
+        <p className="mb-4 text-xs text-white/55">
           Purely cosmetic — earned by playing. They never affect a match.
         </p>
 
-        <h3 className="mb-2 flex items-center justify-between text-xs font-semibold text-ink-500">
+        <h3 className="mb-2 flex items-center justify-between text-xs font-semibold text-white/55">
           <span>Stadium accent</span>
-          <span className="text-ink-400">
+          <span className="text-white/40">
             {unlockedAccents}/{ACCENTS.length}
           </span>
         </h3>
@@ -68,17 +68,17 @@ export function CosmeticsModal({ onClose }: { onClose: () => void }) {
                 aria-pressed={active}
                 className={[
                   'flex items-center gap-2 rounded-xl border px-3 py-2 text-left transition',
-                  active ? 'border-pitch bg-pitch/10' : 'border-black/10 bg-black/[0.03]',
-                  unlocked ? 'hover:border-black/20' : 'cursor-not-allowed opacity-50',
+                  active ? 'border-pitch bg-pitch/10' : 'border-white/10 bg-white/[0.03]',
+                  unlocked ? 'hover:border-white/15' : 'cursor-not-allowed opacity-50',
                 ].join(' ')}
               >
                 <span
-                  className="h-6 w-6 shrink-0 rounded-full ring-1 ring-black/10"
+                  className="h-6 w-6 shrink-0 rounded-full ring-1 ring-white/10"
                   style={{ backgroundColor: a.hex }}
                 />
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-semibold">{a.name}</span>
-                  <span className="block truncate text-[10px] text-ink-500">
+                  <span className="block truncate text-[10px] text-white/55">
                     {unlocked ? (active ? 'Selected' : 'Tap to use') : `🔒 ${a.unlockLabel}`}
                   </span>
                 </span>
@@ -88,9 +88,9 @@ export function CosmeticsModal({ onClose }: { onClose: () => void }) {
           })}
         </div>
 
-        <h3 className="mb-2 flex items-center justify-between text-xs font-semibold text-ink-500">
+        <h3 className="mb-2 flex items-center justify-between text-xs font-semibold text-white/55">
           <span>Pitch pattern</span>
-          <span className="text-ink-400">
+          <span className="text-white/40">
             {unlockedPatterns}/{PATTERNS.length}
           </span>
         </h3>
@@ -107,12 +107,12 @@ export function CosmeticsModal({ onClose }: { onClose: () => void }) {
                 aria-pressed={active}
                 className={[
                   'rounded-xl border px-3 py-2 text-left transition',
-                  active ? 'border-pitch bg-pitch/10' : 'border-black/10 bg-black/[0.03]',
-                  unlocked ? 'hover:border-black/20' : 'cursor-not-allowed opacity-50',
+                  active ? 'border-pitch bg-pitch/10' : 'border-white/10 bg-white/[0.03]',
+                  unlocked ? 'hover:border-white/15' : 'cursor-not-allowed opacity-50',
                 ].join(' ')}
               >
                 <span className="block text-sm font-semibold">{p.name}</span>
-                <span className="block truncate text-[10px] text-ink-500">
+                <span className="block truncate text-[10px] text-white/55">
                   {unlocked ? (active ? 'Selected' : 'Tap to use') : `🔒 ${p.unlockLabel}`}
                 </span>
               </button>

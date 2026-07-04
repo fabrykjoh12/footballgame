@@ -54,7 +54,7 @@ export function SideNav({
       {NAV.map((group, gi) => (
         <div key={group.heading ?? `g${gi}`} className="flex flex-col gap-0.5">
           {group.heading && (
-            <div className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-ink-500">
+            <div className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-white/55">
               {group.heading}
             </div>
           )}
@@ -69,8 +69,8 @@ export function SideNav({
                 className={[
                   'flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors',
                   active
-                    ? 'bg-royal/10 font-semibold text-royal-dark'
-                    : 'font-medium text-ink-600 hover:bg-black/[0.04] hover:text-ink-900',
+                    ? 'bg-royal/10 font-semibold text-royal'
+                    : 'font-medium text-white/65 hover:bg-white/[0.04] hover:text-white',
                 ].join(' ')}
               >
                 <span className="w-5 shrink-0 text-center text-base leading-none" aria-hidden>

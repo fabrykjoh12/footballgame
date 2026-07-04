@@ -99,7 +99,7 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
         <button
           type="button"
           onClick={onExit}
-          className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-ink-900"
+          className="inline-flex items-center gap-1.5 text-sm text-white/55 hover:text-white"
         >
           <IconBack className="h-4 w-4" /> Home
         </button>
@@ -111,7 +111,7 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
       {/* Division card — manager dashboard header */}
       <Card strong glow className="relative overflow-hidden p-5 text-center animate-rise-in">
         <div className="relative">
-          <div className="text-[11px] font-bold text-ink-500">
+          <div className="text-[11px] font-bold text-white/55">
             Now managing
           </div>
           <div className="mt-2 flex items-center justify-center gap-2.5">
@@ -130,7 +130,7 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
               {teamName(career.managerName)}
             </span>
           </div>
-          <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.04] px-3 py-1 text-sm">
+          <div className="mt-2 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-sm">
             <IconRoute className="h-4 w-4 text-pitch" />
             <span className="font-semibold">{division.name}</span>
           </div>
@@ -173,14 +173,14 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
         <Card className="p-4">
           <div className="mb-3 flex items-center gap-2">
             <IconClock className="h-5 w-5 text-pitch" />
-            <h2 className="nums text-sm font-semibold text-ink-800">
+            <h2 className="nums text-sm font-semibold text-white/85">
               Next fixture — Round {career.round + 1}
             </h2>
           </div>
-          <div className="relative mb-4 overflow-hidden rounded-xl border border-black/10 bg-black/[0.03] p-3">
+          <div className="relative mb-4 overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] p-3">
             <div className="relative flex items-center justify-center gap-3">
               <ClubChip name={career.managerName} you />
-              <span className="font-display text-lg font-black italic text-ink-400">VS</span>
+              <span className="font-display text-lg font-black italic text-white/40">VS</span>
               <ClubChip name={fixture.opponent.name} />
             </div>
           </div>
@@ -189,20 +189,20 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
             const isDerby = rival?.id === fixture.opponent.id;
             const profile = rivalProfile(fixture.opponent, career.seed);
             return (
-              <div className="mb-3 rounded-xl border border-black/10 bg-black/[0.03] px-3 py-2 text-center">
+              <div className="mb-3 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-center">
                 {isDerby && (
                   <Badge tone="danger" className="mb-1.5">
                     🔥 Rivalry match
                   </Badge>
                 )}
-                <div className="text-xs font-semibold text-ink-600">
+                <div className="text-xs font-semibold text-white/65">
                   {profile.playStyle}
                 </div>
-                <div className="mt-0.5 text-[11px] text-ink-500">{profile.personality}</div>
+                <div className="mt-0.5 text-[11px] text-white/55">{profile.personality}</div>
               </div>
             );
           })()}
-          <p className="mb-3 text-center text-xs text-ink-500">
+          <p className="mb-3 text-center text-xs text-white/55">
             {division.mode === 'nightmare'
               ? 'Top-flight football — nightmare questions, fast clock.'
               : division.mode === 'serious'
@@ -217,7 +217,7 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
 
       {/* League table */}
       <Card className="p-4">
-        <h2 className="mb-3 text-sm font-semibold text-ink-600">
+        <h2 className="mb-3 text-sm font-semibold text-white/65">
           {division.name} table
         </h2>
         <LeagueTable state={career} />
@@ -226,7 +226,7 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
       {/* Trophy cabinet */}
       {career.trophies.length > 0 && (
         <Card className="p-4">
-          <h2 className="mb-3 text-sm font-semibold text-ink-600">
+          <h2 className="mb-3 text-sm font-semibold text-white/65">
             Trophy cabinet
           </h2>
           <div className="flex flex-col gap-2">
@@ -236,8 +236,8 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
                 className="flex items-center gap-2 rounded-lg border border-gold/20 bg-gold/[0.06] px-3 py-2 text-sm"
               >
                 <IconTrophy className="h-4 w-4 text-gold" />
-                <span className="font-semibold text-ink-900">{t.label}</span>
-                <span className="nums ml-auto text-xs text-ink-500">Season {t.season}</span>
+                <span className="font-semibold text-white">{t.label}</span>
+                <span className="nums ml-auto text-xs text-white/55">Season {t.season}</span>
               </div>
             ))}
           </div>
@@ -247,7 +247,7 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
       <button
         type="button"
         onClick={abandon}
-        className="mx-auto text-[11px] text-ink-400 hover:text-danger"
+        className="mx-auto text-[11px] text-white/40 hover:text-danger"
       >
         Abandon career & start over
       </button>
@@ -284,7 +284,7 @@ function SeasonSummary({
   return (
     <Card strong glow className="p-5 text-center animate-rise-in">
       <Badge tone={tone === 'muted' ? 'muted' : tone}>Season {career.season} complete</Badge>
-      <p className="mx-auto mt-3 max-w-sm text-balance font-semibold text-ink-900">
+      <p className="mx-auto mt-3 max-w-sm text-balance font-semibold text-white">
         {headline}
       </p>
       <div className="mt-4">
@@ -314,19 +314,19 @@ function NewCareer({
       <button
         type="button"
         onClick={onExit}
-        className="inline-flex items-center gap-1.5 self-start text-sm text-ink-500 hover:text-ink-900"
+        className="inline-flex items-center gap-1.5 self-start text-sm text-white/55 hover:text-white"
       >
         <IconBack className="h-4 w-4" /> Home
       </button>
 
       <div className="text-center">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.04] px-3 py-1 text-xs text-ink-600">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/65">
           <IconTrophy className="h-3.5 w-3.5 text-gold" /> Singleplayer
         </div>
         <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl">
           <span className="text-gradient-pitch">Career Mode</span>
         </h1>
-        <p className="mx-auto mt-3 max-w-md text-balance text-ink-600">
+        <p className="mx-auto mt-3 max-w-md text-balance text-white/65">
           Start in League Two and climb the pyramid season by season. Win your
           fixtures, top the table, earn promotion — and chase the Premier League
           title. The higher you rise, the harder the questions.
@@ -336,7 +336,7 @@ function NewCareer({
       <Card strong className="mx-auto w-full max-w-md p-6 animate-rise-in">
         <label
           htmlFor="career-name"
-          className="mb-2 block text-xs font-semibold text-ink-500"
+          className="mb-2 block text-xs font-semibold text-white/55"
         >
           Manager / club name
         </label>
@@ -349,7 +349,7 @@ function NewCareer({
           className="input-field mb-2 text-base"
         />
         {valid && (
-          <p className="mb-4 text-center text-xs text-ink-500">
+          <p className="mb-4 text-center text-xs text-white/55">
             You’ll manage{' '}
             <span className="font-semibold text-pitch">{teamName(name)}</span>
           </p>
@@ -373,7 +373,7 @@ function BoardCard({ career }: { career: CareerState }) {
   return (
     <Card className="p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold text-ink-600">
+        <h2 className="text-sm font-semibold text-white/65">
           The boardroom
         </h2>
         <Badge tone="gold">
@@ -383,13 +383,13 @@ function BoardCard({ career }: { career: CareerState }) {
 
       {/* Board confidence meter */}
       <div className="mb-3">
-        <div className="mb-1 flex items-center justify-between text-[11px] text-ink-500">
+        <div className="mb-1 flex items-center justify-between text-[11px] text-white/55">
           <span>Board confidence</span>
-          <span className="font-semibold text-ink-700">
+          <span className="font-semibold text-white/70">
             {confidence.label} · <span className="nums">{confidence.value}</span>
           </span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-black/[0.05]">
+        <div className="h-2 overflow-hidden rounded-full bg-white/[0.05]">
           <div
             className={['h-full rounded-full transition-[width] duration-500', meterColor].join(' ')}
             style={{ width: `${confidence.value}%` }}
@@ -416,13 +416,13 @@ function ObjectiveRow({ objective }: { objective: Objective }) {
       ? 'text-pitch'
       : objective.status === 'failed'
         ? 'text-danger'
-        : 'text-ink-600';
+        : 'text-white/65';
   return (
     <div className="flex items-center gap-2 text-sm">
       <span aria-hidden>{icon}</span>
       <span className={['min-w-0 flex-1 truncate', tone].join(' ')}>{objective.label}</span>
       {objective.progress && (
-        <span className="shrink-0 font-mono text-[11px] text-ink-500">{objective.progress}</span>
+        <span className="shrink-0 font-mono text-[11px] text-white/55">{objective.progress}</span>
       )}
     </div>
   );
@@ -437,11 +437,11 @@ function MiniStat({
   label: string;
   tone?: 'pitch' | 'danger' | 'white';
 }) {
-  const color = tone === 'danger' ? 'text-danger' : tone === 'white' ? 'text-ink-900' : 'text-pitch';
+  const color = tone === 'danger' ? 'text-danger' : tone === 'white' ? 'text-white' : 'text-pitch';
   return (
-    <div className="rounded-xl border border-black/10 bg-black/[0.03] p-2 text-center">
+    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
       <div className={`nums font-display text-lg font-bold ${color}`}>{value}</div>
-      <div className="mt-0.5 text-[11px] text-ink-500">
+      <div className="mt-0.5 text-[11px] text-white/55">
         {label}
       </div>
     </div>

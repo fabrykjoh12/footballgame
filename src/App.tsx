@@ -33,8 +33,8 @@ const ScoutGame = lazy(() => import('./components/scout/ScoutGame').then((m) => 
 function SyncSplash() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 py-20 text-center animate-fade-in">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-black/10 border-t-royal" />
-      <p className="text-sm text-ink-500">Restoring your progress…</p>
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-royal" />
+      <p className="text-sm text-white/55">Restoring your progress…</p>
     </div>
   );
 }
@@ -43,7 +43,7 @@ function SyncSplash() {
 function RouteFallback() {
   return (
     <div className="flex flex-1 items-center justify-center py-20" aria-busy="true">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-black/10 border-t-royal" />
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/10 border-t-royal" />
     </div>
   );
 }

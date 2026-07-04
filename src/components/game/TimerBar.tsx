@@ -11,21 +11,21 @@ export function TimerBar({
   const danger = secondsLeft <= 5;
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between text-[11px] text-ink-500">
+      <div className="mb-1 flex items-center justify-between text-[11px] text-white/55">
         <span className="flex items-center gap-1">
           <IconClock className="h-3.5 w-3.5" /> Stoppage time
         </span>
         <span
           className={[
             'font-mono text-sm tabular-nums',
-            danger ? 'text-danger motion-safe:animate-pulse' : 'text-ink-600',
+            danger ? 'text-danger motion-safe:animate-pulse' : 'text-white/65',
           ].join(' ')}
         >
           +{secondsLeft}s
         </span>
       </div>
       <div
-        className="h-2.5 w-full overflow-hidden rounded-full bg-black/[0.05]"
+        className="h-2.5 w-full overflow-hidden rounded-full bg-white/[0.05]"
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}

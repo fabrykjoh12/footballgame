@@ -109,15 +109,15 @@ export function CupResult() {
             const [idMe, idOpp] = matchIdentities(me.name, opp.name);
             return (
               <div className="font-display text-2xl font-bold leading-tight sm:text-3xl">
-                <span className={resolved?.won ? 'text-gradient-gold' : 'text-ink-800'}>
+                <span className={resolved?.won ? 'text-gradient-gold' : 'text-white/85'}>
                   {teamName(me.name)}
                 </span>{' '}
                 <span className="nums mx-1">
                   <span style={{ color: idMe.color }}>{me.goals}</span>
-                  <span className="text-ink-400">–</span>
+                  <span className="text-white/40">–</span>
                   <span style={{ color: idOpp.color }}>{opp.goals}</span>
                 </span>{' '}
-                <span className={resolved && !resolved.won ? 'text-gradient-gold' : 'text-ink-800'}>
+                <span className={resolved && !resolved.won ? 'text-gradient-gold' : 'text-white/85'}>
                   {teamName(opp.name)}
                 </span>
               </div>
@@ -128,17 +128,17 @@ export function CupResult() {
             {status === 'won' ? (
               <span className="text-gradient-gold">Champions! You’ve won the {resolved!.def.name}!</span>
             ) : status === 'out' ? (
-              <span className="text-ink-600">😖 Knocked out in the {resolved!.playedRound.name}.</span>
+              <span className="text-white/65">😖 Knocked out in the {resolved!.playedRound.name}.</span>
             ) : status === 'playing' && nextRound ? (
               <span className="text-gradient-pitch">✅ Through to the {nextRound.name}!</span>
             ) : (
-              <span className="text-ink-800">Full time.</span>
+              <span className="text-white/85">Full time.</span>
             )}
           </div>
 
           {status === 'playing' && nextRound && (
-            <p className="mt-1 text-sm text-ink-500">
-              Next up: <span className="font-semibold text-ink-800">{teamName(nextRound.opponent)}</span>
+            <p className="mt-1 text-sm text-white/55">
+              Next up: <span className="font-semibold text-white/85">{teamName(nextRound.opponent)}</span>
             </p>
           )}
         </div>

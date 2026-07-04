@@ -4,13 +4,13 @@ import type { Difficulty } from '../../types/game';
 type Tone = 'pitch' | 'gold' | 'white' | 'danger' | 'muted' | 'blue' | 'royal';
 
 const TONES: Record<Tone, string> = {
-  pitch: 'text-pitch bg-pitch/10 border-pitch/20',
-  gold: 'text-gold bg-gold/10 border-gold/20',
-  white: 'text-ink-600 bg-black/[0.04] border-black/10',
-  danger: 'text-danger bg-danger/10 border-danger/20',
-  muted: 'text-ink-500 bg-black/[0.03] border-black/[0.08]',
-  blue: 'text-sky-700 bg-sky-500/10 border-sky-500/20',
-  royal: 'text-royal bg-royal/10 border-royal/20',
+  pitch: 'text-pitch bg-pitch/15 border-pitch/25',
+  gold: 'text-gold bg-gold/15 border-gold/25',
+  white: 'text-white/70 bg-white/[0.06] border-white/10',
+  danger: 'text-danger bg-danger/15 border-danger/25',
+  muted: 'text-white/55 bg-white/[0.04] border-white/[0.08]',
+  blue: 'text-sky-300 bg-sky-500/15 border-sky-400/25',
+  royal: 'text-royal bg-royal/15 border-royal/25',
 };
 
 interface BadgeProps {

@@ -86,13 +86,13 @@ export function CareerResult() {
           <span className="text-xs font-bold">Full time</span>
         </div>
         <div className="font-display text-2xl font-bold leading-tight sm:text-3xl">
-          <span className={outcome === 'win' ? 'text-gradient-gold' : 'text-ink-800'}>
+          <span className={outcome === 'win' ? 'text-gradient-gold' : 'text-white/85'}>
             {teamName(me.name)}
           </span>{' '}
           <span className="mx-1 text-pitch">
             {me.goals}–{opp.goals}
           </span>{' '}
-          <span className={outcome === 'loss' ? 'text-gradient-gold' : 'text-ink-800'}>
+          <span className={outcome === 'loss' ? 'text-gradient-gold' : 'text-white/85'}>
             {teamName(opp.name)}
           </span>
         </div>
@@ -100,9 +100,9 @@ export function CareerResult() {
           {outcome === 'win' ? (
             <span className="text-gradient-pitch">🎉 Three points!</span>
           ) : outcome === 'draw' ? (
-            <span className="text-ink-800">🤝 A share of the spoils.</span>
+            <span className="text-white/85">🤝 A share of the spoils.</span>
           ) : (
-            <span className="text-ink-600">😖 Defeat. Regroup for the next one.</span>
+            <span className="text-white/65">😖 Defeat. Regroup for the next one.</span>
           )}
         </div>
         {division && (
@@ -115,7 +115,7 @@ export function CareerResult() {
 
       {career && (
         <Card className="p-4">
-          <h2 className="mb-3 text-sm font-semibold text-ink-600">
+          <h2 className="mb-3 text-sm font-semibold text-white/65">
             Updated table
           </h2>
           <LeagueTable state={career} />
