@@ -11,43 +11,26 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Variants carry their resting + hover + (where relevant) lift styles. Hover
- * lift is gated on `enabled` (no movement when disabled) and `motion-safe`
- * (respects reduced-motion). The shared base owns the press + transition.
+ * Flat editorial variants — no lift, no glow. The shared base owns the press +
+ * colour transition; each variant is a fill or a hairline outline.
  */
-const LIFT = 'motion-safe:enabled:hover:-translate-y-0.5';
-
 const VARIANTS: Record<Variant, string> = {
-  primary: [
-    'bg-royal text-white font-semibold',
-    'shadow-[0_1px_2px_rgba(0,0,0,0.25)]',
-    'enabled:hover:bg-royal-soft',
-    LIFT,
-  ].join(' '),
+  // Sharp vermilion fill for the one primary action — flat, no glow.
+  primary: 'bg-royal text-bone font-semibold enabled:hover:bg-royal-dark',
+  // Hairline-outlined bone — the editorial secondary.
   secondary: [
-    'bg-white/[0.08] text-white font-medium border border-white/15',
-    'enabled:hover:bg-white/[0.14] enabled:hover:border-white/30',
-    LIFT,
+    'bg-transparent text-bone font-medium border-[0.5px] border-bone/30',
+    'enabled:hover:border-bone/60 enabled:hover:bg-bone/[0.04]',
   ].join(' '),
-  ghost: 'bg-transparent text-white/70 enabled:hover:text-white enabled:hover:bg-white/[0.08]',
-  danger: [
-    'bg-danger/90 text-white font-semibold',
-    'shadow-[0_4px_16px_-2px_rgba(255,77,94,0.40)]',
-    'enabled:hover:bg-danger',
-    LIFT,
-  ].join(' '),
-  gold: [
-    'bg-gold text-ink-900 font-bold',
-    'shadow-[inset_0_1px_0_rgba(255,255,255,0.45),0_4px_16px_-2px_rgba(255,210,74,0.45)]',
-    'enabled:hover:bg-gold-dark',
-    LIFT,
-  ].join(' '),
+  ghost: 'bg-transparent text-bone-dim enabled:hover:text-bone enabled:hover:bg-bone/[0.05]',
+  danger: 'bg-danger text-bone font-semibold enabled:hover:bg-danger/85',
+  gold: 'bg-gold text-ink-900 font-bold enabled:hover:bg-gold-dark',
 };
 
 const SIZES: Record<Size, string> = {
-  sm: 'px-3.5 py-1.5 text-sm rounded-lg',
-  md: 'px-5 py-2.5 text-sm rounded-xl',
-  lg: 'px-6 py-3.5 text-base rounded-xl',
+  sm: 'px-3.5 py-1.5 text-sm rounded-md',
+  md: 'px-5 py-2.5 text-sm rounded-md',
+  lg: 'px-6 py-3.5 text-base rounded-md',
 };
 
 export function Button({

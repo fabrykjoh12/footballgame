@@ -40,7 +40,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="relative flex min-h-[100dvh] flex-col">
       <StadiumBackground />
 
-      <header className="z-20 flex items-center justify-between border-b border-white/[0.07] px-4 py-3.5 sm:px-6">
+      <header className="z-20 flex items-center justify-between border-b-[0.5px] border-bone/15 px-4 py-3.5 sm:px-6">
         <div className="flex items-center gap-2.5">
           {showNav && (
             <button
@@ -61,9 +61,13 @@ export function AppShell({ children }: { children: ReactNode }) {
             aria-label="Ball Knowledge home"
           >
             <BallMark />
-            <div className="leading-tight">
-              <div className="font-display text-lg font-bold tracking-tight">Ball Knowledge</div>
-              <div className="hidden text-xs text-white/45 sm:block">Football knowledge duels</div>
+            <div className="leading-none">
+              <div className="font-display text-[22px] font-bold tracking-tight text-bone">
+                Ball Knowledge
+              </div>
+              <div className="mt-1 hidden font-mono text-[10px] uppercase tracking-[0.2em] text-bone-faint sm:block">
+                Football · 1v1 · since &rsquo;25
+              </div>
             </div>
           </button>
         </div>
@@ -109,15 +113,13 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="z-10 mx-auto flex w-full max-w-6xl flex-1">
         {/* Desktop sidebar */}
         {showNav && (
-          <aside className="sticky top-0 hidden h-[calc(100dvh-64px)] w-60 shrink-0 overflow-y-auto border-r border-white/[0.07] px-3 py-5 lg:block">
+          <aside className="sticky top-0 hidden h-[calc(100dvh-65px)] w-60 shrink-0 overflow-y-auto border-r-[0.5px] border-bone/15 py-7 pl-2 pr-4 lg:block">
             <SideNav view={view} onNavigate={go} />
           </aside>
         )}
 
-        <main className="flex min-w-0 flex-1 flex-col px-4 pb-10 sm:px-6">
-          <div className={showNav ? 'mx-auto w-full max-w-3xl' : 'mx-auto w-full max-w-3xl'}>
-            {children}
-          </div>
+        <main className="flex min-w-0 flex-1 flex-col px-4 pb-10 sm:px-8">
+          <div className="mx-auto w-full max-w-3xl">{children}</div>
         </main>
       </div>
 
@@ -131,9 +133,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               onClick={() => setDrawerOpen(false)}
               aria-hidden
             />
-            <div className="absolute inset-y-0 left-0 flex w-72 max-w-[82%] flex-col bg-ink-800 shadow-2xl animate-[fade-in_0.2s_ease-out]">
-              <div className="flex items-center justify-between border-b border-white/[0.07] px-4 py-3.5">
-                <span className="font-display text-base font-bold">Menu</span>
+            <div className="absolute inset-y-0 left-0 flex w-72 max-w-[82%] flex-col border-r-[0.5px] border-bone/15 bg-ink-800 animate-[fade-in_0.2s_ease-out]">
+              <div className="flex items-center justify-between border-b-[0.5px] border-bone/15 px-4 py-3.5">
+                <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-bone-dim">Index</span>
                 <button
                   type="button"
                   onClick={() => setDrawerOpen(false)}
@@ -158,8 +160,8 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function BallMark() {
   return (
-    <div className="grid h-9 w-9 place-items-center rounded-xl bg-royal">
-      <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" aria-hidden>
+    <div className="grid h-9 w-9 place-items-center rounded-sm bg-royal">
+      <svg viewBox="0 0 24 24" className="h-5 w-5 text-bone" aria-hidden>
         <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.6" />
         <path
           d="M12 7l2.6 1.9-1 3.1h-3.2l-1-3.1zM12 12.5l3 2.2-1.1 3.3h-3.8L9 14.7z"

@@ -84,19 +84,35 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
   const codeValid = isValidRoomCode(code);
 
   return (
-    <div className="flex flex-1 flex-col gap-7 py-6">
-      {/* Hero */}
-      <div className="animate-fade-in">
-        <h1 className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
-          Ball Knowledge
-        </h1>
-        <p className="mt-2 max-w-md text-[15px] leading-relaxed text-white/55">
-          1v1 football quiz duels. Ten questions, one scoreline — play a friend
-          or the CPU.
+    <div className="flex flex-1 flex-col gap-10 py-8">
+      {/* Masthead — asymmetric: oversized serif title against a mono ledger. */}
+      <header className="animate-fade-in">
+        <div className="flex flex-col gap-6 border-b-[0.5px] border-bone/15 pb-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="mb-3 font-mono text-[11px] uppercase tracking-[0.25em] text-royal">
+              No. 01 — Football knowledge
+            </div>
+            <h1 className="font-display text-5xl font-bold leading-[0.92] tracking-[-0.02em] text-bone sm:text-6xl">
+              Ball
+              <br />
+              Knowledge
+            </h1>
+          </div>
+          {/* Mono ledger — real numbers, tiny, right-aligned. */}
+          <dl className="flex shrink-0 gap-8 font-mono text-bone sm:flex-col sm:gap-2 sm:text-right">
+            <LedgerRow k="Played" v={String(stats.matchesPlayed)} />
+            <LedgerRow k="Win rate" v={stats.matchesPlayed ? `${winRate(stats)}%` : '—'} />
+            <LedgerRow k="Best streak" v={String(stats.bestStreak)} />
+          </dl>
+        </div>
+        <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-bone-dim">
+          Ten questions become one scoreline. Answer faster and truer than your
+          opponent to turn points into goals — {stats.matchesPlayed > 0
+            ? `you've played ${stats.matchesPlayed} and won ${Math.round((winRate(stats) / 100) * stats.matchesPlayed)}.`
+            : 'first match is against the CPU.'}
         </p>
-        {/* First-run teaser: show what a finished match looks like. */}
         {!club && stats.matchesPlayed === 0 && <MatchPreviewCard />}
-      </div>
+      </header>
 
       {/* Manager dashboard — identity + lifetime progress at a glance */}
       <div className="mx-auto w-full max-w-md animate-fade-in">
@@ -131,32 +147,23 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
             </div>
           )}
 
-          {/* Lifetime record strip — shown once any match is played. */}
+          {/* Accuracy + last title — the rest lives in the masthead ledger. */}
           {stats.matchesPlayed > 0 && (
-            <>
-              <div className="grid grid-cols-4 divide-x divide-white/[0.06] border-t border-white/[0.06]">
-                <StatPill value={String(stats.matchesPlayed)} label="Played" />
-                <StatPill value={`${winRate(stats)}%`} label="Win" />
-                <StatPill value={`${lifetimeAccuracy(stats)}%`} label="Acc" />
-                <StatPill value={String(stats.bestStreak)} label="Streak" tone="gold" />
-              </div>
-              <div className="flex items-center justify-between border-t border-white/[0.06] px-4 py-2">
-                <span className="text-[11px] text-white/45">
-                  {stats.lastTitle ? (
-                    <>Last title: <span className="font-semibold text-gold">{stats.lastTitle}</span></>
-                  ) : (
-                    'Win matches to climb your record.'
-                  )}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setStats(resetProfileStats())}
-                  className="text-[11px] text-white/25 hover:text-white/60"
-                >
-                  Reset
-                </button>
-              </div>
-            </>
+            <div className="flex items-center justify-between border-t-[0.5px] border-bone/12 px-4 py-2.5">
+              <span className="font-mono text-[11px] text-bone-dim">
+                {lifetimeAccuracy(stats)}% accuracy
+                {stats.lastTitle ? (
+                  <> · last title <span className="text-gold">{stats.lastTitle}</span></>
+                ) : null}
+              </span>
+              <button
+                type="button"
+                onClick={() => setStats(resetProfileStats())}
+                className="font-mono text-[11px] text-bone-faint hover:text-bone-dim"
+              >
+                reset
+              </button>
+            </div>
           )}
         </Card>
       </div>
@@ -400,32 +407,27 @@ function MatchPreviewCard() {
   );
 }
 
-/** A small dashboard section header: label + optional hint. */
+/**
+ * Section header — a serif label with a mono index, sat on a hairline rule.
+ * Asymmetric on purpose: heading left, hint right.
+ */
 function SectionLabel({ children, hint }: { children: ReactNode; hint?: string }) {
   return (
-    <div className="mb-3 flex items-baseline justify-between gap-3">
-      <h2 className="text-[15px] font-bold text-white">{children}</h2>
-      {hint && <span className="text-xs text-white/40">{hint}</span>}
+    <div className="mb-4 flex items-baseline justify-between gap-3 border-b-[0.5px] border-bone/12 pb-2">
+      <h2 className="font-display text-xl font-bold tracking-tight text-bone">{children}</h2>
+      {hint && (
+        <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-bone-faint">{hint}</span>
+      )}
     </div>
   );
 }
 
-/** A single figure in the manager-dashboard stat strip. */
-function StatPill({
-  value,
-  label,
-  tone = 'pitch',
-}: {
-  value: string;
-  label: string;
-  tone?: 'pitch' | 'gold';
-}) {
+/** One line of the masthead ledger: tiny mono key, larger tabular value. */
+function LedgerRow({ k, v }: { k: string; v: string }) {
   return (
-    <div className="px-2 py-2.5 text-center">
-      <div className={`nums font-display text-lg font-bold ${tone === 'gold' ? 'text-gold' : 'text-pitch'}`}>
-        {value}
-      </div>
-      <div className="mt-0.5 text-[11px] text-white/45">{label}</div>
+    <div className="flex items-baseline gap-2 sm:justify-end">
+      <dt className="text-[10px] uppercase tracking-[0.15em] text-bone-faint">{k}</dt>
+      <dd className="nums text-lg font-semibold text-bone">{v}</dd>
     </div>
   );
 }

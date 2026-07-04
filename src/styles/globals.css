@@ -5,6 +5,9 @@
 @layer base {
   :root {
     color-scheme: dark;
+    /* Warm hairline — the primary structural device (used instead of shadows). */
+    --line: rgba(233, 227, 212, 0.14);
+    --line-strong: rgba(233, 227, 212, 0.24);
   }
 
   html,
@@ -14,21 +17,19 @@
   }
 
   body {
-    @apply bg-ink-900 text-white font-sans antialiased;
-    /* Neutral graphite stage — a single quiet top-down gradient. */
-    background-color: #101114;
-    background-image: linear-gradient(180deg, #191c21 0%, #141619 40%, #0e0f12 100%);
-    background-attachment: fixed;
+    @apply bg-ink-900 text-bone font-sans antialiased;
+    /* Warm olive-charcoal stage — flat, no glow. */
+    background-color: #16150f;
     overscroll-behavior: none;
   }
 
-  /* Visible, on-brand focus ring for keyboard users. */
+  /* Sharp, high-contrast focus ring (no soft glow). */
   :focus-visible {
     @apply outline-none ring-2 ring-royal ring-offset-2 ring-offset-ink-900;
   }
 
   ::selection {
-    background: rgba(47, 158, 96, 0.32);
+    background: rgba(216, 84, 42, 0.3);
   }
 }
 
@@ -38,52 +39,57 @@
    * glassmorphism — a hairline top highlight + soft ambient shadow, tinted to
    * the indigo palette so surfaces read as one material.
    */
+  /*
+   * Panels are defined by a warm hairline rule, not a shadow. Restrained
+   * corners; two weights (near-flat / slightly stronger edge).
+   */
   .glass {
-    @apply rounded-2xl border border-white/[0.08] bg-[#1c1f24]/80;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    @apply rounded-lg bg-ink-800/70;
+    border: 0.5px solid var(--line);
   }
 
   .glass-strong {
-    @apply rounded-2xl border border-white/[0.1] bg-[#1f2228]/90;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    @apply rounded-lg bg-ink-800;
+    border: 0.5px solid var(--line-strong);
   }
 
-  /*
-   * The signature playfootball-style surface: a flat WHITE card with dark text,
-   * for list rows / mode tiles / settings rows that sit on the purple stage.
-   * Text inside inherits a dark ink by default; use text-ink-* helpers within.
-   */
+  /* A warm off-white "paper" card — used sparingly for contrast pieces. */
   .card-lite {
-    @apply rounded-2xl border border-black/[0.06] bg-white text-ink-900 shadow-lite;
+    @apply rounded-lg bg-paper text-ink-900;
+    border: 0.5px solid rgba(22, 21, 15, 0.14);
   }
   .card-lite-hover {
-    @apply transition-[transform,box-shadow] duration-200 ease-premium;
-    @apply hover:shadow-lite-hover active:scale-[0.985] motion-safe:hover:-translate-y-0.5;
+    @apply transition-transform duration-200 ease-premium active:scale-[0.99];
   }
 
-  /* Inputs that sit *inside* a glass (dark) card: recessed, on-brand focus. */
+  /* Inputs inside a dark panel: recessed, hairline, sharp accent focus. */
   .input-field {
-    @apply w-full rounded-xl border border-white/10 bg-ink-900/50 px-4 py-3 text-white;
-    @apply outline-none transition-colors duration-200 placeholder:text-white/30;
-    @apply focus:border-royal-glow/60 focus:bg-ink-900/70;
-    box-shadow: inset 0 1px 2px rgba(10, 6, 30, 0.4);
+    @apply w-full rounded-md bg-ink-900/60 px-4 py-3 text-bone;
+    @apply outline-none transition-colors duration-200 placeholder:text-bone-faint;
+    @apply focus:border-royal;
+    border: 0.5px solid var(--line-strong);
   }
 
-  /* Inputs that sit *inside* a white card-lite: light, dark text. */
+  /* Inputs inside a paper card: light, dark text. */
   .input-lite {
-    @apply w-full rounded-xl border border-black/10 bg-black/[0.03] px-4 py-3 text-ink-900;
+    @apply w-full rounded-md bg-black/[0.03] px-4 py-3 text-ink-900;
     @apply outline-none transition-colors duration-200 placeholder:text-ink-900/35;
-    @apply focus:border-royal/50 focus:bg-white;
+    @apply focus:border-royal;
+    border: 0.5px solid rgba(22, 21, 15, 0.2);
   }
 
-  /* Headings are solid, confident type now — the old gradient fills read as a
-   * template flourish. Kept as classes so call-sites don't all need touching. */
+  /* Headings are solid bone; the serif display face carries the character. */
   .text-gradient-pitch {
-    @apply text-white;
+    @apply text-bone;
   }
 
   .text-gradient-gold {
     @apply text-gold;
+  }
+
+  /* Hairline rule — the core structural divider. */
+  .hairline {
+    border-color: var(--line);
   }
 
   /* Tap-press feedback for interactive surfaces. */
@@ -97,31 +103,15 @@
    * a lit top edge + ambient shadow, matching the glass language but opaque.
    */
   .surface {
-    @apply rounded-2xl border border-white/[0.12] bg-ink-800;
-    background-image: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.045),
-      rgba(255, 255, 255, 0) 32%
-    );
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      0 2px 6px rgba(0, 0, 0, 0.4),
-      0 24px 60px rgba(0, 0, 0, 0.6);
+    @apply rounded-lg bg-ink-800;
+    border: 0.5px solid var(--line-strong);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
   }
 
-  /*
-   * Premium hover-lift for tappable cards/tiles. GPU-friendly (transform +
-   * border + shadow only); gated on motion-safe so reduced-motion is respected.
-   */
+  /* Hover affordance for tappable rows — a warm wash, no lift or shadow. */
   .card-hover {
-    @apply transition-[transform,box-shadow,border-color,background-color] duration-200 ease-premium;
-    @apply hover:border-royal-glow/50 hover:bg-white/[0.08] active:scale-[0.985];
-  }
-  .card-hover:hover {
-    @apply motion-safe:-translate-y-0.5;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.07),
-      0 10px 30px -8px rgba(10, 6, 30, 0.6);
+    @apply transition-colors duration-200 ease-premium;
+    @apply hover:bg-bone/[0.04] active:bg-bone/[0.02];
   }
 
   /*
@@ -129,13 +119,12 @@
    * stats. A left pitch-green accent bar + a deep gradient body.
    */
   .lower-third {
-    @apply relative overflow-hidden rounded-xl border border-white/10;
-    background-image: linear-gradient(90deg, rgba(47, 158, 96, 0.14), rgba(20, 22, 25, 0.6) 22%);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    @apply relative overflow-hidden rounded-md bg-ink-800/70;
+    border: 0.5px solid var(--line);
   }
   .lower-third::before {
     content: '';
-    @apply absolute inset-y-0 left-0 w-1 bg-royal;
+    @apply absolute inset-y-0 left-0 w-[3px] bg-royal;
   }
 }
 

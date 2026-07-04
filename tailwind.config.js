@@ -4,41 +4,49 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Neutral graphite stage + white cards + a single muted grass-green
-        // accent. Deliberately low-chroma — the old saturated indigo read as a
-        // generic template. `royal` is kept as the token name for the primary
-        // accent (now green) so call-sites don't churn.
+        // Editorial palette — warm olive-charcoal stage, bone paper, a single
+        // sharp vermilion accent. Deliberately organic and warm (not cool slate)
+        // to dodge the generic dark-SaaS look. `royal` stays the token name for
+        // the brand accent (now vermilion) so call-sites don't churn.
         royal: {
-          DEFAULT: '#2f9e60', // primary CTA / accent (muted grass green)
-          dark: '#268551',
-          glow: '#43b675',
-          soft: '#35a869',
+          DEFAULT: '#d8542a', // sharp vermilion — the one accent
+          dark: '#b8431f',
+          glow: '#e9683c',
+          soft: '#e0602f',
         },
         pitch: {
-          DEFAULT: '#2f9e60', // success / correct — same accent family
-          dark: '#268551',
-          glow: '#43b675',
+          DEFAULT: '#7c9b45', // success / correct — muted olive green
+          dark: '#65803a',
+          glow: '#93b158',
         },
         ink: {
-          // Neutral cool-graphite stage scale — every bg-ink-* reads charcoal.
-          900: '#101114', // deepest — body backdrop
-          800: '#181a1e', // panel base
-          700: '#202329',
-          600: '#292d34',
-          500: '#343941',
+          // Warm olive-charcoal stage — every bg-ink-* reads warm, not blue-grey.
+          900: '#16150f', // deepest — body backdrop
+          800: '#1d1c14',
+          700: '#26241a',
+          600: '#302e21',
+          500: '#3d3a2b',
         },
+        bone: {
+          DEFAULT: '#e9e3d4', // warm off-white — primary text
+          dim: '#b3ad9c', // muted warm grey — secondary text
+          faint: '#807b6c', // tertiary
+        },
+        paper: '#efe9db', // warm off-white surface (used sparingly)
         gold: {
-          DEFAULT: '#d9a441', // muted amber (trophies)
-          dark: '#b8862f',
+          DEFAULT: '#c9a34a', // muted brass
+          dark: '#a9853a',
         },
-        danger: '#e05264',
-        good: '#2f9e60',
+        danger: '#c94f3a', // brick red
+        good: '#7c9b45',
       },
       fontFamily: {
-        // Native platform UI fonts — neutral, robust, no webfont fetch.
-        display: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
-        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
-        mono: ['ui-monospace', '"SF Mono"', 'Menlo', 'Consolas', 'monospace'],
+        // Editorial contrast: a serif display against a clean sans body and a
+        // utilitarian mono for metadata/figures. Platform faces — no webfont
+        // fetch, degrades gracefully.
+        display: ['ui-serif', 'Georgia', '"Iowan Old Style"', '"Times New Roman"', 'serif'],
+        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Helvetica', 'Arial', 'sans-serif'],
+        mono: ['ui-monospace', '"SF Mono"', 'Menlo', 'Consolas', '"Liberation Mono"', 'monospace'],
       },
       boxShadow: {
         glow: '0 0 24px rgba(47, 158, 96, 0.4)',
