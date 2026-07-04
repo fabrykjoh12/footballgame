@@ -84,7 +84,7 @@ function activeScreen(
   if (view === 'managers') return <ManagerMerryGoRound onExit={() => setView('home')} />;
   if (view === 'scout') return <ScoutGame key="scout" onExit={() => setView('home')} />;
   if (view === 'scoutDaily') return <ScoutGame key="scout-daily" daily onExit={() => setView('home')} />;
-  return <HomePage onOpenCareer={() => setView('career')} />;
+  return <HomePage />;
 }
 
 /** Routes between screens based on the live room status (and the nav view). */

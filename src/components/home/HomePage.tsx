@@ -1,15 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useGame } from '../../context/GameProvider';
 import { useAuth } from '../../context/AuthProvider';
+import { useNav } from '../../context/NavProvider';
 import { getMyIdentity, formatFriendCode } from '../../lib/friends';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { isValidRoomCode, normalizeRoomCode } from '../../lib/roomCode';
-import {
-  getProfileStats,
-  lifetimeAccuracy,
-  resetProfileStats,
-  winRate,
-} from '../../lib/profileStats';
+import { getProfileStats, winRate } from '../../lib/profileStats';
 import { getCareer, divisionByTier } from '../../lib/career';
 import {
   getClubIdentity,
@@ -19,8 +15,8 @@ import {
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { DailyRivalCard } from './DailyRivalCard';
-import { StreakRewardCard } from './StreakRewardCard';
 import { QuestsCard } from './QuestsCard';
+import { StreakRewardCard } from './StreakRewardCard';
 import { ClubBadge } from '../club/ClubBadge';
 import { ClubIdentityModal } from '../club/ClubIdentityModal';
 import { SettingsModal } from '../settings/SettingsModal';
@@ -29,14 +25,9 @@ import { OnboardingOverlay } from '../onboarding/OnboardingOverlay';
 import { hasOnboarded } from '../../lib/onboarding';
 import { TrophyCabinet } from './TrophyCabinet';
 import { LeaguesCard } from '../leagues/LeaguesCard';
-import {
-  IconUsers,
-  IconTrophy,
-  IconBolt,
-  IconArrowRight,
-} from '../ui/icons';
+import { IconUsers, IconBolt } from '../ui/icons';
 
-export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
+export function HomePage() {
   const {
     createRoom,
     joinRoom,
@@ -47,10 +38,11 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
     multiplayerAvailable,
     multiplayerProvider,
   } = useGame();
+  const { navigate } = useNav();
   const [name, setName] = useLocalStorage('bk_name', '');
   const [showJoin, setShowJoin] = useState(false);
   const [code, setCode] = useState('');
-  const [stats, setStats] = useState(() => getProfileStats());
+  const [stats] = useState(() => getProfileStats());
   const [career] = useState(() => getCareer());
   const [club, setClub] = useState<ClubIdentity | null>(() => getClubIdentity());
   const [editingClub, setEditingClub] = useState(false);
@@ -74,9 +66,6 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
     }
   }, []);
 
-  // One identity: with a club, you always play as the club (the input hides);
-  // without one, the typed name is used. @username + friend code surface on
-  // the manager strip so all identity signals live in one place.
   const { user } = useAuth();
   const [myCode] = useState(() => getMyIdentity().friendCode);
   const playName = club?.name.trim() ? club.name : name;
@@ -84,281 +73,168 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
   const codeValid = isValidRoomCode(code);
 
   return (
-    <div className="flex flex-1 flex-col gap-10 py-8">
-      {/* Masthead */}
+    <div className="flex flex-1 flex-col gap-9 py-7">
+      {/* Header */}
       <header className="animate-fade-in">
-        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-          Ball Knowledge
+        <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+          Football quizzes, games &amp; trivia
         </h1>
-        <p className="mt-2 max-w-lg text-[15px] leading-relaxed text-white/65">
-          1v1 football quiz duels. Ten questions become one scoreline — play a
-          friend or the CPU.
+        <p className="mt-1.5 text-[15px] text-white/55">
+          1v1 duels, daily puzzles and solo challenges. Points become goals.
         </p>
-        {stats.matchesPlayed > 0 && (
-          <dl className="mt-5 flex gap-6">
-            <LedgerRow k="Played" v={String(stats.matchesPlayed)} />
-            <LedgerRow k="Win rate" v={`${winRate(stats)}%`} />
-            <LedgerRow k="Best streak" v={String(stats.bestStreak)} />
-          </dl>
-        )}
-        {!club && stats.matchesPlayed === 0 && <MatchPreviewCard />}
+        {/* Identity + record, on one compact line */}
+        <div className="mt-4 flex flex-wrap items-center gap-2.5">
+          {club ? (
+            <button
+              type="button"
+              onClick={() => setEditingClub(true)}
+              className="flex items-center gap-2 rounded-full border border-white/10 bg-ink-800 py-1 pl-1 pr-3 text-sm hover:bg-ink-700"
+            >
+              <ClubBadge identity={club} size={24} />
+              <span className="font-semibold text-white">{club.name}</span>
+              <span className="text-white/40">·</span>
+              <span className="font-mono text-xs text-white/50">{formatFriendCode(myCode)}</span>
+            </button>
+          ) : (
+            <Button size="sm" variant="secondary" onClick={() => setEditingClub(true)}>
+              + Create your club
+            </Button>
+          )}
+          {stats.matchesPlayed > 0 && (
+            <span className="nums text-xs text-white/45">
+              {stats.matchesPlayed} played · {winRate(stats)}% won · best streak {stats.bestStreak}
+            </span>
+          )}
+          {user?.username && <span className="text-xs text-white/40">@{user.username}</span>}
+        </div>
       </header>
 
-      {/* Manager dashboard — identity + lifetime progress at a glance */}
-      <div className="mx-auto w-full max-w-md animate-fade-in">
-        <Card strong className="overflow-hidden p-0">
-          {/* Header — club identity, or a nudge to create one. */}
-          {club ? (
-            <div className="flex items-center gap-3 p-4">
-              <ClubBadge identity={club} size={52} />
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-lg font-bold">{club.name}</div>
-                <div className="truncate text-xs text-white/55">
-                  {club.nickname} · {club.stadium}
-                </div>
-                <div className="truncate text-[11px] text-white/55">
-                  {user?.username ? `@${user.username} · ` : ''}
-                  <span className="font-mono">{formatFriendCode(myCode)}</span>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" onClick={() => setEditingClub(true)}>
-                Edit
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between gap-3 p-4">
-              <div className="min-w-0">
-                <div className="text-sm font-semibold">Create your club</div>
-                <div className="text-xs text-white/55">
-                  Name, kit colours, badge — used across the whole game.
-                </div>
-              </div>
-              <Button size="sm" onClick={() => setEditingClub(true)}>Create</Button>
-            </div>
-          )}
-
-          {/* Accuracy + last title — the rest lives in the masthead ledger. */}
-          {stats.matchesPlayed > 0 && (
-            <div className="flex items-center justify-between border-t-[0.5px] border-white/[0.08] px-4 py-2.5">
-              <span className="font-mono text-[11px] text-white/65">
-                {lifetimeAccuracy(stats)}% accuracy
-                {stats.lastTitle ? (
-                  <> · last title <span className="text-gold">{stats.lastTitle}</span></>
-                ) : null}
-              </span>
-              <button
-                type="button"
-                onClick={() => setStats(resetProfileStats())}
-                className="font-mono text-[11px] text-white/55 hover:text-white/65"
-              >
-                reset
-              </button>
-            </div>
-          )}
-        </Card>
-      </div>
-
-      {editingClub && (
-        <ClubIdentityModal
-          initial={club}
-          onSave={saveClub}
-          onClose={() => setEditingClub(false)}
-        />
-      )}
-
-      {/* Quick match — the primary thing to do right now */}
-      <section className="mx-auto w-full max-w-md animate-rise-in [animation-delay:90ms]">
-        <SectionLabel hint={multiplayerAvailable ? 'Live 1v1 ready' : 'vs CPU'}>
-          Quick match
-        </SectionLabel>
-      <Card strong className="p-6 sm:p-7">
-        {club ? (
-          <div className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-ink-700 px-3.5 py-2.5">
-            <div className="flex min-w-0 items-center gap-2.5">
-              <ClubBadge identity={club} size={30} />
-              <div className="min-w-0">
-                <div className="text-xs text-white/55">Playing as</div>
-                <div className="truncate text-sm font-semibold">{club.name}</div>
-              </div>
-            </div>
-            <Button variant="ghost" size="sm" onClick={() => setEditingClub(true)}>
-              Edit
-            </Button>
-          </div>
-        ) : (
-          <>
-            <label
-              htmlFor="player-name"
-              className="mb-2 block text-sm font-medium text-white/65"
-            >
-              Your name
-            </label>
-            <div className="relative mb-6">
+      {/* Play — the primary action */}
+      <Section title="Play">
+        <Card className="p-4 sm:p-5">
+          {!club && (
+            <div className="relative mb-3">
               <IconUsers className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
               <input
                 id="player-name"
                 value={name}
                 onChange={(e) => setName(e.target.value.slice(0, 18))}
-                placeholder="e.g. Sara"
+                placeholder="Your name (e.g. Sara)"
                 autoComplete="off"
-                className="input-field pl-10 text-base"
+                aria-label="Your name"
+                className="input-field pl-10"
               />
             </div>
-          </>
-        )}
-
-        <div className="flex flex-col gap-3">
-          <Button
-            size="lg"
-            fullWidth
-            disabled={!nameValid || connecting}
-            onClick={() => playDemo(playName)}
-          >
-            <IconBolt className="h-4 w-4" /> Play vs CPU
-          </Button>
-
-          <Button
-            variant="secondary"
-            size="lg"
-            fullWidth
-            disabled={!nameValid || connecting}
-            onClick={() => createRoom(playName)}
-          >
-            Create Room
-          </Button>
-
-          {!showJoin ? (
-            <Button
-              variant="secondary"
-              size="lg"
-              fullWidth
-              disabled={connecting}
-              onClick={() => setShowJoin(true)}
-            >
-              Join Room
+          )}
+          <div className="grid gap-2.5 sm:grid-cols-3">
+            <Button size="lg" disabled={!nameValid || connecting} onClick={() => playDemo(playName)}>
+              <IconBolt className="h-4 w-4" /> Play vs CPU
             </Button>
-          ) : (
-            <div className="flex flex-col gap-2.5 rounded-2xl border border-white/10 bg-ink-700 p-3 animate-scale-in">
+            <Button variant="secondary" size="lg" disabled={!nameValid || connecting} onClick={() => createRoom(playName)}>
+              Create room
+            </Button>
+            <Button variant="secondary" size="lg" disabled={connecting} onClick={() => setShowJoin((s) => !s)}>
+              Join room
+            </Button>
+          </div>
+
+          {showJoin && (
+            <div className="mt-2.5 flex flex-col gap-2.5 rounded-lg border border-white/10 bg-ink-700 p-3 animate-scale-in sm:flex-row">
               <input
                 value={code}
                 onChange={(e) => setCode(normalizeRoomCode(e.target.value).slice(0, 8))}
-                placeholder="Room code (e.g. BK7Q2)"
+                placeholder="Room code"
                 autoComplete="off"
-                inputMode="text"
                 aria-label="Room code"
-                className="input-field text-center font-mono text-lg uppercase tracking-[0.25em] placeholder:tracking-normal"
+                className="input-field flex-1 text-center font-mono uppercase tracking-[0.25em] placeholder:tracking-normal"
               />
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  fullWidth
-                  onClick={() => setShowJoin(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  fullWidth
-                  disabled={!nameValid || !codeValid || connecting}
-                  onClick={() => joinRoom(code, playName)}
-                >
-                  Join
-                </Button>
-              </div>
+              <Button disabled={!nameValid || !codeValid || connecting} onClick={() => joinRoom(code, playName)}>
+                Join
+              </Button>
             </div>
           )}
 
-        </div>
-
-        {!club && !nameValid && (
-          <p className="mt-3 text-center text-xs text-white/55">
-            Enter a name to start.
+          {error && (
+            <p role="alert" className="mt-3 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-center text-sm text-danger">
+              {error}
+            </p>
+          )}
+          {connecting ? (
+            <p className="mt-2.5 text-center text-sm text-pitch animate-pulse">Connecting…</p>
+          ) : (
+            !nameValid && <p className="mt-2.5 text-xs text-white/40">Enter a name to start.</p>
+          )}
+          <p className="mt-2 text-[11px] text-white/35">
+            {multiplayerAvailable
+              ? `Live 1v1 enabled (${multiplayerProvider === 'ably' ? 'Ably' : 'Supabase'}).`
+              : 'Demo mode — rooms play vs a CPU. Add Ably/Supabase keys for live 1v1.'}
           </p>
-        )}
-        {error && (
-          <p
-            role="alert"
-            className="mt-3 rounded-lg border border-danger/30 bg-danger/10 px-3 py-2 text-center text-sm text-danger"
-          >
-            {error}
-          </p>
-        )}
-        {connecting && (
-          <p className="mt-3 text-center text-sm text-pitch animate-pulse">
-            Connecting…
-          </p>
-        )}
+        </Card>
+      </Section>
 
-        <p className="mt-4 text-center text-[11px] text-white/55">
-          {multiplayerAvailable
-            ? `Real-time multiplayer is enabled (${
-                multiplayerProvider === 'ably' ? 'Ably' : 'Supabase'
-              }).`
-            : 'Demo mode active — Create/Join play vs a CPU. Add Ably or Supabase keys for live 1v1.'}
-        </p>
-      </Card>
-      </section>
+      {/* Versus modes */}
+      <Section title="Head to head">
+        <ModeGrid>
+          <ModeCard emoji="🔍" title="The Scout" sub="Deduce the secret rule" badge="Versus" color="#7c5cff" onClick={() => navigate('scout')} />
+          <ModeCard emoji="🕵️" title="Mystery Duel" sub="Football Guess Who" badge="Versus" color="#2f81f7" onClick={() => navigate('mystery')} />
+        </ModeGrid>
+      </Section>
 
-      {/* Today — the daily reasons to come back */}
-      <section className="mx-auto w-full max-w-md">
-        <SectionLabel hint="Back tomorrow">Today</SectionLabel>
-        <div className="flex flex-col gap-3">
+      {/* Daily */}
+      <Section title="Today">
+        <div className="flex flex-col gap-2.5">
           <DailyRivalCard name={playName} connecting={connecting} onPlay={playDaily} />
+          <ModeGrid>
+            <ModeCard emoji="📅" title="Daily Connections" sub="One puzzle a day" badge="Daily" color="#e0b23c" onClick={() => navigate('connectionsDaily')} />
+            <ModeCard emoji="🔎" title="Daily Scout" sub="Crack today’s rule" badge="Daily" color="#20b869" onClick={() => navigate('scoutDaily')} />
+          </ModeGrid>
           <QuestsCard />
           <StreakRewardCard />
         </div>
-      </section>
+      </Section>
 
-      {/* Continue — Career progress */}
-      <section className="mx-auto w-full max-w-md">
-        <SectionLabel hint="Singleplayer">{career ? 'Continue' : 'New challenge'}</SectionLabel>
-        <Card className="p-4">
-          <div className="mb-2 flex items-center gap-2">
-            <IconTrophy className="h-5 w-5 text-gold" />
-            <h2 className="text-[15px] font-bold text-white">Career mode</h2>
-            {career && (
-              <span className="nums ml-auto rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-white/65">
-                S{career.season} · {divisionByTier(career.tier).name}
-              </span>
-            )}
-          </div>
-          {career ? (
-            <p className="text-xs leading-relaxed text-white/55">
-              Season {career.season} in{' '}
-              <span className="font-semibold text-pitch">
-                {divisionByTier(career.tier).name}
-              </span>
-              . Continue your climb to the Premier League.
-            </p>
-          ) : (
-            <p className="text-xs leading-relaxed text-white/55">
-              Start in League Two and manage your club up the pyramid vs the CPU.
-              Difficulty rises as you’re promoted.
-            </p>
-          )}
-          <div className="mt-3">
-            <Button fullWidth onClick={onOpenCareer}>
-              {career ? 'Continue career' : 'Start a career'}{' '}
-              <IconArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </Card>
-      </section>
+      {/* Solo games */}
+      <Section title="Solo games">
+        <ModeGrid>
+          <ModeCard emoji="🔗" title="Connections" sub="A player for both clubs" color="#2bd576" onClick={() => navigate('connections')} />
+          <ModeCard emoji="🧭" title="Career Path" sub="Guess from the clubs" color="#f06595" onClick={() => navigate('careerPath')} />
+          <ModeCard emoji="🎂" title="Older or Younger?" sub="Birth-year higher/lower" color="#fd7e14" onClick={() => navigate('olderYounger')} />
+          <ModeCard emoji="🎩" title="Managers" sub="A manager of both clubs" color="#9775fa" onClick={() => navigate('managers')} />
+          <ModeCard emoji="⚡" title="Arcade" sub="Survival · Time Attack" color="#22b8cf" onClick={() => navigate('modes')} />
+        </ModeGrid>
+      </Section>
 
-      {/* Achievements + leaderboard */}
+      {/* Career & cups */}
+      <Section title="Compete">
+        <ModeGrid>
+          <ModeCard
+            emoji="🏟️"
+            title="Career"
+            sub={career ? `S${career.season} · ${divisionByTier(career.tier).name}` : 'Climb the pyramid'}
+            badge={career ? 'Continue' : undefined}
+            color="#4c6ef5"
+            onClick={() => navigate('career')}
+          />
+          <ModeCard emoji="🏆" title="Cup Runs" sub="Knockout tournaments" color="#e0b23c" onClick={() => navigate('cup')} />
+        </ModeGrid>
+      </Section>
+
+      {/* Progress */}
       <TrophyCabinet />
-
-      {/* Private friend leagues */}
       <LeaguesCard />
 
-      {/* Settings, cosmetics & data */}
-      <div className="mx-auto flex items-center gap-4 text-xs text-white/55">
+      <div className="flex items-center gap-4 text-xs text-white/45">
         <button type="button" onClick={() => setShowCosmetics(true)} className="hover:text-white">
-          🎨 Cosmetics
+          Cosmetics
         </button>
         <button type="button" onClick={() => setShowSettings(true)} className="hover:text-white">
-          ⚙ Settings &amp; data
+          Settings &amp; data
         </button>
       </div>
+
+      {editingClub && (
+        <ClubIdentityModal initial={club} onSave={saveClub} onClose={() => setEditingClub(false)} />
+      )}
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       {showCosmetics && <CosmeticsModal onClose={() => setShowCosmetics(false)} />}
       {showOnboarding && (
@@ -372,50 +248,63 @@ export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
   );
 }
 
-/** A small "final score" preview shown to first-time visitors. */
-function MatchPreviewCard() {
+/** A labelled section with a small muted header. */
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="mt-5 w-full max-w-xs animate-fade-in">
-      <div className="glass rounded-2xl p-4">
-        <div className="text-xs font-medium text-white/55">Full time</div>
-        <div className="mt-1.5 flex items-center gap-2.5 font-bold">
-          <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-danger" aria-hidden />
-            <span className="text-sm text-white">Sara FC</span>
-          </span>
-          <span className="nums text-xl">3–2</span>
-          <span className="flex items-center gap-1.5">
-            <span className="text-sm text-white">Jonas United</span>
-            <span className="h-2.5 w-2.5 rounded-full bg-sky-400" aria-hidden />
-          </span>
-        </div>
-        <div className="mt-1.5 text-xs text-white/55">
-          Won 90+2&rsquo; · 8/10 correct · best category Transfers
-        </div>
-      </div>
-    </div>
+    <section className="animate-fade-in">
+      <h2 className="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-white/40">{title}</h2>
+      {children}
+    </section>
   );
+}
+
+/** Responsive 2-column grid for mode cards. */
+function ModeGrid({ children }: { children: ReactNode }) {
+  return <div className="grid gap-2.5 sm:grid-cols-2">{children}</div>;
 }
 
 /**
- * Section header — a serif label with a mono index, sat on a hairline rule.
- * Asymmetric on purpose: heading left, hint right.
+ * A game-mode card: a colourful thumbnail tile + title + one-line description,
+ * the clean playfootball-style catalogue row.
  */
-function SectionLabel({ children, hint }: { children: ReactNode; hint?: string }) {
+function ModeCard({
+  emoji,
+  title,
+  sub,
+  badge,
+  color,
+  onClick,
+}: {
+  emoji: string;
+  title: string;
+  sub: string;
+  badge?: string;
+  color: string;
+  onClick: () => void;
+}) {
   return (
-    <div className="mb-3 flex items-baseline justify-between gap-3">
-      <h2 className="text-lg font-bold tracking-tight text-white">{children}</h2>
-      {hint && <span className="text-xs text-white/55">{hint}</span>}
-    </div>
-  );
-}
-
-/** One stat: label above, tabular value below. */
-function LedgerRow({ k, v }: { k: string; v: string }) {
-  return (
-    <div className="flex flex-col">
-      <dt className="text-[11px] font-medium uppercase tracking-wide text-white/55">{k}</dt>
-      <dd className="nums mt-0.5 text-xl font-bold text-white">{v}</dd>
-    </div>
+    <button
+      onClick={onClick}
+      className="group flex items-center gap-3 rounded-xl border border-white/[0.06] bg-ink-800 p-2.5 text-left transition-colors hover:bg-ink-700"
+    >
+      <span
+        className="grid h-14 w-14 shrink-0 place-items-center rounded-lg text-2xl"
+        style={{ background: `${color} linear-gradient(155deg, rgba(255,255,255,0.22), rgba(0,0,0,0.14))` }}
+        aria-hidden
+      >
+        {emoji}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-1.5">
+          <span className="truncate text-[15px] font-bold text-white">{title}</span>
+          {badge && (
+            <span className="shrink-0 rounded bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white/70">
+              {badge}
+            </span>
+          )}
+        </span>
+        <span className="mt-0.5 block truncate text-xs text-white/55">{sub}</span>
+      </span>
+    </button>
   );
 }
