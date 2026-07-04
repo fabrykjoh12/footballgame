@@ -20,8 +20,8 @@ const LIFT = 'motion-safe:enabled:hover:-translate-y-0.5';
 const VARIANTS: Record<Variant, string> = {
   primary: [
     'bg-royal text-white font-semibold',
-    'shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_4px_16px_-2px_rgba(91,75,214,0.5)]',
-    'enabled:hover:bg-royal-soft enabled:hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.32),0_10px_30px_-6px_rgba(91,75,214,0.65)]',
+    'shadow-[0_1px_2px_rgba(0,0,0,0.25)]',
+    'enabled:hover:bg-royal-soft',
     LIFT,
   ].join(' '),
   secondary: [

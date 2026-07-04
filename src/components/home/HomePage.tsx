@@ -504,14 +504,14 @@ function ModeTile({
 }) {
   void tag;
   void tagTone;
+  void accent;
   return (
     <button
       onClick={onClick}
       className="card-lite card-lite-hover group flex w-full items-center gap-3 p-3 text-left"
     >
       <span
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-xl"
-        style={{ backgroundColor: `${accent}1f`, boxShadow: `inset 0 0 0 1.5px ${accent}55` }}
+        className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-black/[0.05] text-xl ring-1 ring-inset ring-black/[0.06]"
         aria-hidden
       >
         {emoji}
@@ -520,7 +520,7 @@ function ModeTile({
         <span className="block truncate text-[15px] font-bold leading-tight text-ink-900">{name}</span>
         <span className="mt-0.5 block truncate text-[13px] leading-tight text-ink-900/55">{sub}</span>
       </div>
-      <span className="shrink-0 rounded-lg bg-royal px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_2px_10px_-2px_rgba(91,75,214,0.6)] transition-transform duration-200 group-hover:-translate-y-0.5">
+      <span className="shrink-0 rounded-lg bg-royal px-3.5 py-1.5 text-xs font-bold text-white transition-transform duration-200 group-hover:-translate-y-0.5">
         Play
       </span>
     </button>

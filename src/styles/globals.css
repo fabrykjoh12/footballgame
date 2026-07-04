@@ -15,10 +15,9 @@
 
   body {
     @apply bg-ink-900 text-white font-sans antialiased;
-    /* Deep indigo/purple stage — a single quiet top-down gradient, no glow
-     * soup. Kept even on overscroll. */
-    background-color: #171034;
-    background-image: linear-gradient(180deg, #241a52 0%, #191140 34%, #150e33 100%);
+    /* Neutral graphite stage — a single quiet top-down gradient. */
+    background-color: #101114;
+    background-image: linear-gradient(180deg, #191c21 0%, #141619 40%, #0e0f12 100%);
     background-attachment: fixed;
     overscroll-behavior: none;
   }
@@ -29,7 +28,7 @@
   }
 
   ::selection {
-    background: rgba(124, 110, 240, 0.35);
+    background: rgba(47, 158, 96, 0.32);
   }
 }
 
@@ -40,13 +39,13 @@
    * the indigo palette so surfaces read as one material.
    */
   .glass {
-    @apply rounded-2xl border border-white/[0.09] bg-[#221a4d]/70;
-    box-shadow: 0 1px 2px rgba(10, 6, 30, 0.35);
+    @apply rounded-2xl border border-white/[0.08] bg-[#1c1f24]/80;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   }
 
   .glass-strong {
-    @apply rounded-2xl border border-white/[0.1] bg-[#251d54]/85;
-    box-shadow: 0 1px 3px rgba(10, 6, 30, 0.4);
+    @apply rounded-2xl border border-white/[0.1] bg-[#1f2228]/90;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   }
 
   /*
@@ -131,7 +130,7 @@
    */
   .lower-third {
     @apply relative overflow-hidden rounded-xl border border-white/10;
-    background-image: linear-gradient(90deg, rgba(124, 110, 240, 0.16), rgba(29, 17, 71, 0.6) 22%);
+    background-image: linear-gradient(90deg, rgba(47, 158, 96, 0.14), rgba(20, 22, 25, 0.6) 22%);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
   .lower-third::before {
@@ -284,7 +283,7 @@
 
 .a11y-contrast .glass,
 .a11y-contrast .glass-strong {
-  background-color: rgba(29, 17, 71, 0.94) !important;
+  background-color: rgba(20, 22, 25, 0.96) !important;
   backdrop-filter: none !important;
   border-color: rgba(255, 255, 255, 0.45) !important;
 }
