@@ -1,7 +1,8 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthProvider';
-import { hashToView, viewToHash, type View } from './lib/viewRoute';
+import { type View } from './lib/viewRoute';
 import { GameProvider, useGame } from './context/GameProvider';
+import { NavProvider, useNav } from './context/NavProvider';
 import { FriendsProvider } from './context/FriendsProvider';
 import { LeaguesProvider } from './context/LeaguesProvider';
 import { AppShell } from './components/layout/AppShell';
@@ -83,53 +84,18 @@ function activeScreen(
   if (view === 'managers') return <ManagerMerryGoRound onExit={() => setView('home')} />;
   if (view === 'scout') return <ScoutGame key="scout" onExit={() => setView('home')} />;
   if (view === 'scoutDaily') return <ScoutGame key="scout-daily" daily onExit={() => setView('home')} />;
-  return (
-    <HomePage
-      onOpenCareer={() => setView('career')}
-      onOpenModes={() => setView('modes')}
-      onOpenCup={() => setView('cup')}
-      onOpenConnections={() => setView('connections')}
-      onOpenConnectionsDaily={() => setView('connectionsDaily')}
-      onOpenMystery={() => setView('mystery')}
-      onOpenOlderYounger={() => setView('olderYounger')}
-      onOpenCareerPath={() => setView('careerPath')}
-      onOpenManagers={() => setView('managers')}
-      onOpenScout={() => setView('scout')}
-    />
-  );
+  return <HomePage onOpenCareer={() => setView('career')} />;
 }
 
-/** Routes between screens based on the live room status (and the home view). */
+/** Routes between screens based on the live room status (and the nav view). */
 function Screens() {
   const { room } = useGame();
   const { hydrating } = useAuth();
-  // The URL hash is the source of truth for the singleplayer view, so the
-  // browser Back button works and every mode is deep-linkable (#career, …).
-  const [view, setViewState] = useState<View>(() =>
-    typeof window === 'undefined' ? 'home' : hashToView(window.location.hash),
-  );
-
-  // Back/forward and any programmatic hash change drive the view.
-  useEffect(() => {
-    const onHash = () => setViewState(hashToView(window.location.hash));
-    window.addEventListener('hashchange', onHash);
-    return () => window.removeEventListener('hashchange', onHash);
-  }, []);
-
-  const setView = useCallback((v: View) => {
-    if (v === 'home') {
-      // Clear the hash without leaving a dangling '#'. pushState fires no
-      // hashchange event, so sync the state by hand.
-      window.history.pushState(null, '', window.location.pathname + window.location.search);
-      setViewState('home');
-    } else {
-      window.location.hash = viewToHash(v); // fires hashchange → state sync
-    }
-  }, []);
+  const { view, navigate } = useNav();
 
   if (hydrating && !room) return <SyncSplash />;
 
-  return <Suspense fallback={<RouteFallback />}>{activeScreen(room, view, setView)}</Suspense>;
+  return <Suspense fallback={<RouteFallback />}>{activeScreen(room, view, navigate)}</Suspense>;
 }
 
 export default function App() {
@@ -139,9 +105,11 @@ export default function App() {
         <GameProvider>
           <FriendsProvider>
             <LeaguesProvider>
-              <AppShell>
-                <Screens />
-              </AppShell>
+              <NavProvider>
+                <AppShell>
+                  <Screens />
+                </AppShell>
+              </NavProvider>
             </LeaguesProvider>
           </FriendsProvider>
         </GameProvider>

@@ -1,36 +1,71 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { StadiumBackground } from './StadiumBackground';
+import { SideNav } from './SideNav';
 import { useGame } from '../../context/GameProvider';
+import { useNav } from '../../context/NavProvider';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { setSoundEnabled, play } from '../../lib/sound';
-import { IconSound, IconMute } from '../ui/icons';
+import { IconSound, IconMute, IconClose } from '../ui/icons';
 import { AccountButton } from '../auth/AccountButton';
 import { FriendsButton } from '../friends/FriendsButton';
 import { IncomingInviteToast } from '../friends/IncomingInviteToast';
+import type { View } from '../../lib/viewRoute';
 
-/** App frame: stadium backdrop, brand header, and a centered content column. */
+/**
+ * App frame: stadium backdrop, brand header, a mode sidebar (desktop) / drawer
+ * (mobile), and the centered content column. The sidebar is hidden while a
+ * match is live so the game screen gets the full width.
+ */
 export function AppShell({ children }: { children: ReactNode }) {
-  const { connectionState } = useGame();
+  const { connectionState, room } = useGame();
+  const { view, navigate } = useNav();
   const [soundOn, setSoundOn] = useLocalStorage('bk_sound', true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Keep the sound engine's flag in sync with the persisted toggle.
   useEffect(() => {
     setSoundEnabled(soundOn);
   }, [soundOn]);
 
+  // The mode nav is only shown between matches; a live room takes over.
+  const showNav = !room;
+
+  const go = (next: View) => {
+    navigate(next);
+    setDrawerOpen(false);
+  };
+
   return (
     <div className="relative flex min-h-[100dvh] flex-col">
       <StadiumBackground />
 
-      <header className="z-10 flex items-center justify-between border-b border-white/[0.07] px-4 py-4 sm:px-6">
+      <header className="z-20 flex items-center justify-between border-b border-white/[0.07] px-4 py-3.5 sm:px-6">
         <div className="flex items-center gap-2.5">
-          <BallMark />
-          <div className="leading-tight">
-            <div className="font-display text-lg font-bold tracking-tight">
-              Ball Knowledge
+          {showNav && (
+            <button
+              type="button"
+              onClick={() => setDrawerOpen(true)}
+              aria-label="Open menu"
+              className="answer-press -ml-1 grid h-9 w-9 place-items-center rounded-lg text-white/70 hover:bg-white/10 hover:text-white lg:hidden"
+            >
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => go('home')}
+            className="flex items-center gap-2.5 text-left"
+            aria-label="Ball Knowledge home"
+          >
+            <BallMark />
+            <div className="leading-tight">
+              <div className="font-display text-lg font-bold tracking-tight">Ball Knowledge</div>
+              <div className="hidden text-xs text-white/45 sm:block">Football knowledge duels</div>
             </div>
-            <div className="text-xs text-white/45">Football knowledge duels</div>
-          </div>
+          </button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -71,9 +106,50 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       )}
 
-      <main className="z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 pb-10 sm:px-6">
-        {children}
-      </main>
+      <div className="z-10 mx-auto flex w-full max-w-6xl flex-1">
+        {/* Desktop sidebar */}
+        {showNav && (
+          <aside className="sticky top-0 hidden h-[calc(100dvh-64px)] w-60 shrink-0 overflow-y-auto border-r border-white/[0.07] px-3 py-5 lg:block">
+            <SideNav view={view} onNavigate={go} />
+          </aside>
+        )}
+
+        <main className="flex min-w-0 flex-1 flex-col px-4 pb-10 sm:px-6">
+          <div className={showNav ? 'mx-auto w-full max-w-3xl' : 'mx-auto w-full max-w-3xl'}>
+            {children}
+          </div>
+        </main>
+      </div>
+
+      {/* Mobile drawer */}
+      {showNav &&
+        drawerOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[90] lg:hidden">
+            <div
+              className="absolute inset-0 bg-black/60"
+              onClick={() => setDrawerOpen(false)}
+              aria-hidden
+            />
+            <div className="absolute inset-y-0 left-0 flex w-72 max-w-[82%] flex-col bg-ink-800 shadow-2xl animate-[fade-in_0.2s_ease-out]">
+              <div className="flex items-center justify-between border-b border-white/[0.07] px-4 py-3.5">
+                <span className="font-display text-base font-bold">Menu</span>
+                <button
+                  type="button"
+                  onClick={() => setDrawerOpen(false)}
+                  aria-label="Close menu"
+                  className="answer-press grid h-8 w-8 place-items-center rounded-lg text-white/60 hover:bg-white/10 hover:text-white"
+                >
+                  <IconClose className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto px-3 py-4">
+                <SideNav view={view} onNavigate={go} />
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
 
       <IncomingInviteToast />
     </div>

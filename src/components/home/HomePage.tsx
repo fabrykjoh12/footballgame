@@ -35,31 +35,8 @@ import {
   IconBolt,
   IconArrowRight,
 } from '../ui/icons';
-import { getDailyConnectionsState, hasPlayedDailyConnectionToday } from '../../lib/dailyConnections';
 
-export function HomePage({
-  onOpenCareer,
-  onOpenModes,
-  onOpenCup,
-  onOpenConnections,
-  onOpenConnectionsDaily,
-  onOpenMystery,
-  onOpenOlderYounger,
-  onOpenCareerPath,
-  onOpenManagers,
-  onOpenScout,
-}: {
-  onOpenCareer: () => void;
-  onOpenModes: () => void;
-  onOpenCup: () => void;
-  onOpenConnections: () => void;
-  onOpenConnectionsDaily: () => void;
-  onOpenMystery: () => void;
-  onOpenOlderYounger: () => void;
-  onOpenCareerPath: () => void;
-  onOpenManagers: () => void;
-  onOpenScout: () => void;
-}) {
+export function HomePage({ onOpenCareer }: { onOpenCareer: () => void }) {
   const {
     createRoom,
     joinRoom,
@@ -74,8 +51,6 @@ export function HomePage({
   const [showJoin, setShowJoin] = useState(false);
   const [code, setCode] = useState('');
   const [stats, setStats] = useState(() => getProfileStats());
-  const [dailyConn] = useState(() => getDailyConnectionsState());
-  const dailyConnDone = hasPlayedDailyConnectionToday(dailyConn);
   const [career] = useState(() => getCareer());
   const [club, setClub] = useState<ClubIdentity | null>(() => getClubIdentity());
   const [editingClub, setEditingClub] = useState(false);
@@ -372,29 +347,6 @@ export function HomePage({
         </Card>
       </section>
 
-      {/* Game Modes hub — compact grid of every mode */}
-      <section className="mx-auto w-full max-w-md">
-        <SectionLabel hint="Pick your challenge">Game modes</SectionLabel>
-        <div className="grid grid-cols-1 gap-2.5">
-          <ModeTile emoji="🔗" name="Connections" sub="Name a player for both clubs" tag="Puzzle" accent="#16c974" onClick={onOpenConnections} />
-          <ModeTile
-            emoji="📅"
-            name="Daily Connections"
-            sub={dailyConnDone ? `Done today · 🔥 ${dailyConn.streak}` : dailyConn.streak > 0 ? `🔥 ${dailyConn.streak}-day streak` : 'One puzzle a day'}
-            tag={dailyConnDone ? 'Done' : 'Daily'}
-            accent="#ffd24a"
-            onClick={onOpenConnectionsDaily}
-          />
-          <ModeTile emoji="🔍" name="The Scout" sub="Deduce the secret rule" tag="Versus" accent="#5b4bd6" onClick={onOpenScout} />
-          <ModeTile emoji="🕵️" name="Mystery Duel" sub="Football Guess Who" tag="Versus" accent="#38bdf8" onClick={onOpenMystery} />
-          <ModeTile emoji="🧭" name="Career Path" sub="Guess the player from their clubs" tag="Solo" accent="#f472b6" onClick={onOpenCareerPath} />
-          <ModeTile emoji="🎂" name="Older or Younger?" sub="Birth-year Higher / Lower" tag="Solo" accent="#fb923c" onClick={onOpenOlderYounger} />
-          <ModeTile emoji="🎩" name="Managers" sub="Name a manager of both clubs" tag="Solo" accent="#a78bfa" onClick={onOpenManagers} />
-          <ModeTile emoji="🏆" name="Cup Runs" sub="Knockout tournaments" tag="Cup" accent="#ffd24a" onClick={onOpenCup} />
-          <ModeTile emoji="⚡" name="Arcade" sub="Survival · Time Attack · Gauntlet" tag="Solo" accent="#2dd4bf" onClick={onOpenModes} />
-        </div>
-      </section>
-
       {/* Achievements + leaderboard */}
       <TrophyCabinet />
 
@@ -475,54 +427,5 @@ function StatPill({
       </div>
       <div className="mt-0.5 text-[11px] text-white/45">{label}</div>
     </div>
-  );
-}
-
-/**
- * A mode row in the Game Modes list — a flat white card with a circular
- * colour-coded icon badge, bold title, grey subtitle, and an indigo Play
- * pill on the right (the playfootball.games list-card pattern).
- */
-function ModeTile({
-  emoji,
-  name,
-  sub,
-  tag,
-  tagTone,
-  accent = '#5b4bd6',
-  onClick,
-}: {
-  emoji: string;
-  name: string;
-  sub: string;
-  tag?: string;
-  /** Legacy props from the old dark tiles — no longer rendered. */
-  tagTone?: string;
-  /** Icon-badge accent colour (hex). */
-  accent?: string;
-  onClick: () => void;
-}) {
-  void tag;
-  void tagTone;
-  void accent;
-  return (
-    <button
-      onClick={onClick}
-      className="card-lite card-lite-hover group flex w-full items-center gap-3 p-3 text-left"
-    >
-      <span
-        className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-black/[0.05] text-xl ring-1 ring-inset ring-black/[0.06]"
-        aria-hidden
-      >
-        {emoji}
-      </span>
-      <div className="min-w-0 flex-1">
-        <span className="block truncate text-[15px] font-bold leading-tight text-ink-900">{name}</span>
-        <span className="mt-0.5 block truncate text-[13px] leading-tight text-ink-900/55">{sub}</span>
-      </div>
-      <span className="shrink-0 rounded-lg bg-royal px-3.5 py-1.5 text-xs font-bold text-white transition-transform duration-200 group-hover:-translate-y-0.5">
-        Play
-      </span>
-    </button>
   );
 }
