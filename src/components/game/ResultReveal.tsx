@@ -89,7 +89,7 @@ export function ResultReveal({
 
           {result.revealValues && <RevealValues result={result} />}
 
-          <p className="mx-auto mt-2 max-w-prose text-sm text-white/60">
+          <p className="mx-auto mt-2 max-w-prose text-sm text-ink-600">
             {result.explanation}
           </p>
         </div>
@@ -120,7 +120,7 @@ export function ResultReveal({
 
       {/* Speed-vs-opponent insight */}
       {insight && (
-        <p className="-mt-1 text-center text-xs text-white/55">{insight}</p>
+        <p className="-mt-1 text-center text-xs text-ink-500">{insight}</p>
       )}
 
       {/* Advance control */}
@@ -131,7 +131,7 @@ export function ResultReveal({
           <span className="nums ml-1 font-mono text-xs opacity-70">({secondsLeft})</span>
         </Button>
       ) : (
-        <div className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 py-3.5 text-sm text-white/55">
+        <div className="flex items-center justify-center gap-2 rounded-xl border border-black/10 bg-black/[0.04] py-3.5 text-sm text-ink-500">
           {isLastQuestion ? 'Final whistle approaching…' : 'Next question in'}{' '}
           <span className="nums font-mono text-pitch">{secondsLeft}s</span>
         </div>
@@ -147,17 +147,17 @@ function RevealValues({ result }: { result: QuestionResult }) {
     <div
       className={[
         'flex-1 rounded-xl border px-3 py-2',
-        isCorrect ? 'border-good/50 bg-good/10' : 'border-white/10 bg-white/[0.03]',
+        isCorrect ? 'border-good/50 bg-good/10' : 'border-black/10 bg-black/[0.03]',
       ].join(' ')}
     >
-      <div className="flex items-center gap-1 truncate text-xs text-white/55">
+      <div className="flex items-center gap-1 truncate text-xs text-ink-500">
         {isCorrect && <IconCheck className="h-3 w-3 shrink-0 text-good" aria-hidden />}
         <span className="truncate">{name}</span>
         {isCorrect && <span className="sr-only"> (correct)</span>}
       </div>
-      <div className={['nums font-mono text-lg font-bold', isCorrect ? 'text-good' : 'text-white/80'].join(' ')}>
+      <div className={['nums font-mono text-lg font-bold', isCorrect ? 'text-good' : 'text-ink-800'].join(' ')}>
         {value}
-        {v.unit ? <span className="ml-1 text-xs font-normal text-white/50">{v.unit}</span> : null}
+        {v.unit ? <span className="ml-1 text-xs font-normal text-ink-500">{v.unit}</span> : null}
       </div>
     </div>
   );
@@ -221,7 +221,7 @@ function PlayerResultCard({
       {/* Football framing: every answer is an attack phase. */}
       <div className="mb-2.5">
         <Badge tone={PHASE_TONE[phase.tone]}>{phase.label}</Badge>
-        <p className="mt-1.5 text-[11px] leading-snug text-white/55">{phase.detail}</p>
+        <p className="mt-1.5 text-[11px] leading-snug text-ink-500">{phase.detail}</p>
       </div>
 
       <div className="flex items-center gap-2">
@@ -235,7 +235,7 @@ function PlayerResultCard({
         >
           {isCorrect ? <IconCheck className="h-4 w-4" /> : <IconClose className="h-4 w-4" />}
         </span>
-        <span className="truncate text-sm text-white/70">
+        <span className="truncate text-sm text-ink-600">
           {selectedAnswer ?? 'No answer'}
         </span>
       </div>
@@ -244,19 +244,19 @@ function PlayerResultCard({
         <span
           className={[
             'nums font-display text-2xl font-bold',
-            breakdown.total > 0 ? 'text-pitch' : 'text-white/40',
+            breakdown.total > 0 ? 'text-pitch' : 'text-ink-500',
             result.scoredGoal ? 'motion-safe:animate-goal-pop' : '',
           ].join(' ')}
         >
           +{breakdown.total}
         </span>
-        <span className="text-xs text-white/40">pts</span>
+        <span className="text-xs text-ink-500">pts</span>
         {result.scoredGoal && (
           <span className="ml-auto text-base" aria-label="Goal">⚽</span>
         )}
       </div>
       {breakdown.total > 0 && (breakdown.speedBonus > 0 || breakdown.streakBonus > 0) && (
-        <div className="nums mt-0.5 text-[11px] text-white/45">
+        <div className="nums mt-0.5 text-[11px] text-ink-500">
           {breakdown.base} base
           {breakdown.speedBonus > 0 && ` · +${breakdown.speedBonus} speed`}
           {breakdown.streakBonus > 0 && ` · +${breakdown.streakBonus} streak`}

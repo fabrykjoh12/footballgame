@@ -52,7 +52,7 @@ export function ClubIdentityModal({
       onClick={onClose}
     >
       <div
-        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-white/10 bg-ink-800 p-5 shadow-elev-2 sm:rounded-2xl"
+        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-2xl border border-black/10 bg-white p-5 shadow-elev-2 sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
@@ -60,18 +60,18 @@ export function ClubIdentityModal({
           <button
             onClick={onClose}
             aria-label="Close"
-            className="grid h-8 w-8 place-items-center rounded-lg text-white/50 hover:bg-white/10 hover:text-white"
+            className="grid h-8 w-8 place-items-center rounded-lg text-ink-500 hover:bg-black/[0.05] hover:text-ink-900"
           >
             <IconClose className="h-5 w-5" />
           </button>
         </div>
 
         {/* Live preview */}
-        <div className="mb-4 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">
+        <div className="mb-4 flex items-center gap-3 rounded-xl border border-black/10 bg-black/[0.03] p-3">
           <ClubBadge identity={identity} size={56} />
           <div className="min-w-0">
             <div className="truncate font-display text-lg font-bold">{identity.name}</div>
-            <div className="truncate text-xs text-white/55">
+            <div className="truncate text-xs text-ink-500">
               {identity.nickname} · {identity.stadium}
             </div>
           </div>
@@ -174,7 +174,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-xs font-medium text-white/45">
+      <span className="mb-1 block text-xs font-medium text-ink-500">
         {label}
       </span>
       {children}
@@ -208,7 +208,7 @@ function ColorRow({
               onClick={() => onPick(c)}
               className={[
                 'h-7 w-7 rounded-full border-2 transition',
-                active ? 'border-pitch scale-110' : 'border-white/15',
+                active ? 'border-pitch scale-110' : 'border-black/15',
               ].join(' ')}
               style={{ backgroundColor: c }}
             />
@@ -237,7 +237,7 @@ function Chip({
         'rounded-full border px-3 py-1.5 text-sm font-medium transition',
         active
           ? 'border-pitch/50 bg-pitch/15 text-pitch'
-          : 'border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.06]',
+          : 'border-black/10 bg-black/[0.03] text-ink-600 hover:bg-black/[0.03]',
       ].join(' ')}
     >
       {children}

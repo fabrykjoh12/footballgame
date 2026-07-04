@@ -25,7 +25,7 @@ export function TrophyCabinet() {
     <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
       <div className="mb-2 flex items-center gap-2">
         <IconTrophy className="h-5 w-5 text-gold" />
-        <h2 className="text-[15px] font-bold text-white">Trophy cabinet</h2>
+        <h2 className="text-[15px] font-bold text-ink-900">Trophy cabinet</h2>
         <span className="ml-auto text-xs font-bold text-gold">
           {earned}/{ACHIEVEMENTS.length}
         </span>
@@ -37,7 +37,7 @@ export function TrophyCabinet() {
             title={`${a.title} — ${a.description}`}
             className={[
               'grid h-8 w-8 place-items-center rounded-full text-base',
-              a.unlocked ? 'bg-gold/15 ring-1 ring-gold/30' : 'bg-white/[0.03] opacity-30 grayscale',
+              a.unlocked ? 'bg-gold/15 ring-1 ring-gold/30' : 'bg-black/[0.03] opacity-30 grayscale',
             ].join(' ')}
           >
             <span aria-hidden>{a.icon}</span>
@@ -85,14 +85,14 @@ function ModalShell({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-md rounded-2xl border border-white/12 bg-ink-800 p-6 shadow-elev-2 animate-scale-in"
+        className="relative w-full max-w-md rounded-2xl border border-black/10 bg-white p-6 shadow-elev-2 animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-3 top-3 rounded-full p-1.5 text-white/40 hover:bg-white/10 hover:text-white"
+          className="absolute right-3 top-3 rounded-full p-1.5 text-ink-500 hover:bg-black/[0.05] hover:text-ink-900"
         >
           <IconClose className="h-4 w-4" />
         </button>
@@ -116,7 +116,7 @@ function AchievementsModal({ onClose }: { onClose: () => void }) {
               'flex items-center gap-3 rounded-xl border px-3 py-2',
               a.unlocked
                 ? 'border-gold/30 bg-gold/[0.06]'
-                : 'border-white/10 bg-white/[0.02]',
+                : 'border-black/10 bg-black/[0.03]',
             ].join(' ')}
           >
             <span
@@ -130,7 +130,7 @@ function AchievementsModal({ onClose }: { onClose: () => void }) {
             </span>
             <span className="min-w-0 flex-1">
               <span className="block text-sm font-semibold">{a.title}</span>
-              <span className="block text-xs text-white/50">{a.description}</span>
+              <span className="block text-xs text-ink-500">{a.description}</span>
             </span>
             {a.unlocked && <span className="text-xs font-bold text-gold">✓</span>}
           </li>
@@ -166,16 +166,16 @@ function LeaderboardModal({ onClose }: { onClose: () => void }) {
           All-time
         </TabButton>
       </div>
-      <p className="mb-3 text-center text-[11px] text-white/40">{boardLabel(board)}</p>
+      <p className="mb-3 text-center text-[11px] text-ink-500">{boardLabel(board)}</p>
 
       {!configured ? (
-        <p className="py-6 text-center text-sm text-white/50">
+        <p className="py-6 text-center text-sm text-ink-500">
           Online leaderboards aren’t enabled in this build.
         </p>
       ) : entries === null ? (
         <div className="flex flex-col gap-1.5 py-1" aria-busy="true" aria-label="Loading leaderboard">
           {[0, 1, 2, 3, 4].map((i) => (
-            <div key={i} className="flex items-center gap-3 rounded-xl border border-white/10 px-3 py-2">
+            <div key={i} className="flex items-center gap-3 rounded-xl border border-black/10 px-3 py-2">
               <span className="skeleton h-4 w-6" />
               <span className="skeleton h-4 flex-1" />
               <span className="skeleton h-4 w-12" />
@@ -183,7 +183,7 @@ function LeaderboardModal({ onClose }: { onClose: () => void }) {
           ))}
         </div>
       ) : entries.length === 0 ? (
-        <p className="py-6 text-center text-sm text-white/50">
+        <p className="py-6 text-center text-sm text-ink-500">
           No scores yet. {board.startsWith('daily-') ? 'Play today’s Daily Challenge' : 'Play a match'} to
           get on the board!
         </p>
@@ -196,10 +196,10 @@ function LeaderboardModal({ onClose }: { onClose: () => void }) {
                 'flex items-center gap-3 rounded-xl border px-3 py-2',
                 user && e.uid === user.id
                   ? 'border-pitch/40 bg-pitch/[0.08]'
-                  : 'border-white/10 bg-white/[0.02]',
+                  : 'border-black/10 bg-black/[0.03]',
               ].join(' ')}
             >
-              <span className="w-6 text-center font-mono text-sm font-bold text-white/60">
+              <span className="w-6 text-center font-mono text-sm font-bold text-ink-600">
                 {i + 1}
               </span>
               <span className="min-w-0 flex-1 truncate text-sm font-semibold">{e.name}</span>
@@ -244,7 +244,7 @@ function TabButton({
         'answer-press rounded-full border px-4 py-1.5 text-xs font-semibold',
         active
           ? 'border-pitch/60 bg-pitch/15 text-pitch'
-          : 'border-white/10 bg-white/[0.03] text-white/55 hover:bg-white/[0.06]',
+          : 'border-black/10 bg-black/[0.03] text-ink-500 hover:bg-black/[0.03]',
       ].join(' ')}
     >
       {children}

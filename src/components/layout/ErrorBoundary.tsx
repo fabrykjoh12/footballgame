@@ -29,13 +29,13 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (!this.state.error) return this.props.children;
     return (
-      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-ink-900 px-6 text-center text-white">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-5 bg-[#f6f6f5] px-6 text-center text-ink-900">
         <div className="text-5xl" aria-hidden>
           🟥
         </div>
         <div>
-          <h1 className="font-display text-2xl font-bold">Straight red card</h1>
-          <p className="mx-auto mt-2 max-w-sm text-sm text-white/55">
+          <h1 className="text-2xl font-bold">Straight red card</h1>
+          <p className="mx-auto mt-2 max-w-sm text-sm text-ink-600">
             Something went wrong on our side of the pitch. Reload to restart the
             match — your progress is saved on this device.
           </p>
@@ -43,15 +43,15 @@ export class ErrorBoundary extends Component<Props, State> {
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="rounded-xl bg-pitch px-6 py-3 font-semibold text-ink-900 shadow-[0_4px_16px_-2px_rgba(22,255,122,0.40)] transition-transform active:scale-[0.97]"
+          className="rounded-lg bg-royal px-6 py-3 font-semibold text-white transition-transform active:scale-[0.97]"
         >
           Reload the app
         </button>
-        <details className="max-w-md text-left text-xs text-white/30">
-          <summary className="cursor-pointer text-center hover:text-white/60">
+        <details className="max-w-md text-left text-xs text-ink-500">
+          <summary className="cursor-pointer text-center hover:text-ink-900">
             Technical details
           </summary>
-          <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words rounded-lg bg-white/5 p-3">
+          <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words rounded-lg border border-black/10 bg-white p-3">
             {String(this.state.error?.stack ?? this.state.error)}
           </pre>
         </details>

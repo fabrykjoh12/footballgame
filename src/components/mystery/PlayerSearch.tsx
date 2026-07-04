@@ -54,13 +54,13 @@ export function PlayerSearch({
 
       <div className="max-h-[46vh] overflow-y-auto pr-1">
         {list.length === 0 ? (
-          <p className="py-6 text-center text-sm text-white/40">No players match.</p>
+          <p className="py-6 text-center text-sm text-ink-500">No players match.</p>
         ) : (
           <ul className="flex flex-col gap-1.5">
             {list.map((p) => (
               <li
                 key={p.id}
-                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-2.5"
+                className="flex items-center gap-3 rounded-xl border border-black/10 bg-black/[0.03] p-2.5"
               >
                 <Silhouette role={p.primaryPosition} />
                 <div className="min-w-0 flex-1">
@@ -68,10 +68,10 @@ export function PlayerSearch({
                     <span className="truncate text-sm font-semibold">{p.name}</span>
                     <Fame label={fameLabel(p)} />
                   </div>
-                  <div className="truncate text-[11px] text-white/45">
+                  <div className="truncate text-[11px] text-ink-500">
                     {p.nationality} · {p.primaryPosition} · {p.active ? 'Active' : 'Retired'}
                   </div>
-                  <div className="truncate text-[10px] text-white/35">{p.clubs.join(', ')}</div>
+                  <div className="truncate text-[10px] text-ink-400">{p.clubs.join(', ')}</div>
                 </div>
                 <Button onClick={() => onPick(p)}>{actionLabel}</Button>
               </li>
@@ -99,7 +99,7 @@ function RoleChip({
       aria-pressed={active}
       className={[
         'rounded-full border px-2.5 py-1 text-xs font-medium capitalize transition',
-        active ? 'border-pitch/50 bg-pitch/15 text-pitch' : 'border-white/10 bg-white/[0.03] text-white/60',
+        active ? 'border-pitch/50 bg-pitch/15 text-pitch' : 'border-black/10 bg-black/[0.03] text-ink-600',
       ].join(' ')}
     >
       {children}
@@ -118,7 +118,7 @@ function Silhouette({ role }: { role: PlayerRole }) {
   return (
     <span
       aria-hidden
-      className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/10 bg-gradient-to-b from-white/10 to-white/[0.02] text-xs"
+      className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-black/10 bg-gradient-to-b from-black/[0.05] to-black/[0.03] text-xs"
     >
       {role === 'goalkeeper' ? '🧤' : role === 'defender' ? '🛡️' : role === 'midfielder' ? '🎯' : '⚽'}
     </span>

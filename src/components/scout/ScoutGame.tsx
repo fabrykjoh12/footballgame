@@ -115,8 +115,8 @@ function ScoutLobby({ onExit, onDaily, onDuel }: { onExit: () => void; onDaily: 
       <Card strong className="relative overflow-hidden p-5">
         <div className="relative">
           <h1 className="font-display text-2xl font-bold text-gradient-pitch">The Scout</h1>
-          <p className="mt-2 text-sm leading-relaxed text-white/65">
-            The opposing Director of Football signs players by a <span className="font-semibold text-white/90">secret rule</span>.
+          <p className="mt-2 text-sm leading-relaxed text-ink-600">
+            The opposing Director of Football signs players by a <span className="font-semibold text-ink-900">secret rule</span>.
             Probe any footballer — you&rsquo;ll hear <span className="text-pitch">&ldquo;fits our profile&rdquo;</span> or{' '}
             <span className="text-danger">&ldquo;not our type&rdquo;</span> — and deduce the rule before they crack yours.
             A wrong accusation costs you a turn.
@@ -127,8 +127,8 @@ function ScoutLobby({ onExit, onDaily, onDuel }: { onExit: () => void; onDaily: 
       <div className="flex flex-col gap-2">
         <Card className="flex items-center justify-between gap-3 p-4">
           <div>
-            <div className="text-sm font-bold text-white/90">Daily rule</div>
-            <p className="nums text-xs text-white/50">
+            <div className="text-sm font-bold text-ink-900">Daily rule</div>
+            <p className="nums text-xs text-ink-500">
               {dailyDone
                 ? `Done today${progress.daily.streak > 0 ? ` · 🔥 ${progress.daily.streak}-day streak` : ''}`
                 : progress.daily.streak > 0
@@ -142,8 +142,8 @@ function ScoutLobby({ onExit, onDaily, onDuel }: { onExit: () => void; onDaily: 
         </Card>
         <Card className="flex items-center justify-between gap-3 p-4">
           <div>
-            <div className="text-sm font-bold text-white/90">Vs CPU</div>
-            <p className="nums text-xs text-white/50">
+            <div className="text-sm font-bold text-ink-900">Vs CPU</div>
+            <p className="nums text-xs text-ink-500">
               {progress.duelsPlayed > 0 ? `Record ${progress.duelsWon}–${progress.duelsPlayed - progress.duelsWon}` : 'Duel a scheming AI director'}
             </p>
           </div>
@@ -153,8 +153,8 @@ function ScoutLobby({ onExit, onDaily, onDuel }: { onExit: () => void; onDaily: 
         </Card>
         <Card className="flex items-center justify-between gap-3 p-4">
           <div>
-            <div className="text-sm font-bold text-white/90">Pass &amp; play</div>
-            <p className="text-xs text-white/50">Two managers, one device</p>
+            <div className="text-sm font-bold text-ink-900">Pass &amp; play</div>
+            <p className="text-xs text-ink-500">Two managers, one device</p>
           </div>
           <Button size="sm" variant="secondary" onClick={() => onDuel('hotseat')}>
             Play <IconArrowRight className="h-4 w-4" />
@@ -174,12 +174,12 @@ function EvidenceRow({ probe }: { probe: ScoutProbe }) {
     <li
       className={[
         'flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs',
-        probe.fits ? 'border-pitch/25 bg-pitch/[0.06] text-white/85' : 'border-white/10 bg-white/[0.03] text-white/60',
+        probe.fits ? 'border-pitch/25 bg-pitch/[0.06] text-ink-800' : 'border-black/10 bg-black/[0.03] text-ink-600',
       ].join(' ')}
     >
       {probe.fits ? <IconCheck className="h-3.5 w-3.5 shrink-0 text-pitch" /> : <IconClose className="h-3.5 w-3.5 shrink-0 text-danger" />}
       <span className="min-w-0 truncate">{probe.playerName}</span>
-      <span className={probe.fits ? 'ml-auto shrink-0 text-[11px] font-semibold text-pitch' : 'ml-auto shrink-0 text-[11px] text-white/35'}>
+      <span className={probe.fits ? 'ml-auto shrink-0 text-[11px] font-semibold text-pitch' : 'ml-auto shrink-0 text-[11px] text-ink-400'}>
         {probe.fits ? 'Fits' : 'Not our type'}
       </span>
     </li>
@@ -251,7 +251,7 @@ function ProbeInput({
             <button
               key={name}
               type="button"
-              className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/75 transition hover:border-pitch/40 hover:text-white answer-press"
+              className="rounded-full border border-black/10 bg-black/[0.03] px-3 py-1 text-xs text-ink-700 transition hover:border-pitch/40 hover:text-ink-900 answer-press"
               onClick={() => submit(name)}
             >
               {name}
@@ -312,14 +312,14 @@ function RulePicker({
           onChange={(e) => setFilter(e.target.value)}
         />
         {consistent && (
-          <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-[11px] text-white/55">
+          <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-[11px] text-ink-500">
             <input type="checkbox" checked={detective} onChange={(e) => setDetective(e.target.checked)} className="accent-pitch" />
             Detective panel
           </label>
         )}
       </div>
       {consistent && (
-        <p className="nums text-[11px] text-white/40" role="status">
+        <p className="nums text-[11px] text-ink-500" role="status">
           {consistent.size} of {catalog.length} rules still match the evidence.
         </p>
       )}
@@ -328,27 +328,27 @@ function RulePicker({
           <li key={c.id}>
             {armedId === c.id ? (
               <div className="flex items-center gap-2 rounded-lg border border-gold/40 bg-gold/10 px-2.5 py-1.5">
-                <span className="min-w-0 flex-1 truncate text-xs font-semibold text-white/90">{c.label}</span>
+                <span className="min-w-0 flex-1 truncate text-xs font-semibold text-ink-900">{c.label}</span>
                 <Button size="sm" onClick={() => onPick(c.id)}>
                   {actionLabel}
                 </Button>
-                <button type="button" className="text-xs text-white/45 hover:text-white/80" onClick={() => setArmedId(null)}>
+                <button type="button" className="text-xs text-ink-500 hover:text-ink-800" onClick={() => setArmedId(null)}>
                   Cancel
                 </button>
               </div>
             ) : (
               <button
                 type="button"
-                className="flex w-full items-center justify-between gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-left text-xs text-white/75 transition hover:border-pitch/40 hover:text-white answer-press"
+                className="flex w-full items-center justify-between gap-2 rounded-lg border border-black/10 bg-black/[0.03] px-2.5 py-1.5 text-left text-xs text-ink-700 transition hover:border-pitch/40 hover:text-ink-900 answer-press"
                 onClick={() => setArmedId(c.id)}
               >
                 <span className="min-w-0 truncate">{c.label}</span>
-                <span className="shrink-0 text-[11px] text-white/30">{c.kind}</span>
+                <span className="shrink-0 text-[11px] text-ink-400">{c.kind}</span>
               </button>
             )}
           </li>
         ))}
-        {shown.length === 0 && <li className="px-2 py-3 text-center text-xs text-white/40">No rules match.</li>}
+        {shown.length === 0 && <li className="px-2 py-3 text-center text-xs text-ink-500">No rules match.</li>}
       </ul>
     </div>
   );
@@ -404,11 +404,11 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>🔍</div>
         <div>
-          <div className="text-xs font-bold text-white/40">The Scout · Daily rule</div>
-          <h1 className="mt-1 font-display text-2xl font-bold text-white/90">
+          <div className="text-xs font-bold text-ink-500">The Scout · Daily rule</div>
+          <h1 className="mt-1 font-display text-2xl font-bold text-ink-900">
             {progress.daily.lastSolved ? 'Cracked today’s rule' : 'Today’s rule got away'}
           </h1>
-          <p className="nums mt-1 text-sm text-white/55">
+          <p className="nums mt-1 text-sm text-ink-500">
             {progress.daily.streak > 0 ? `🔥 ${progress.daily.streak}-day streak` : 'A new rule drops tomorrow'}
             {progress.daily.bestProbes !== null ? ` · best crack: ${progress.daily.bestProbes} probes` : ''}
           </p>
@@ -431,14 +431,14 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>{solved ? '🕵️' : '🙈'}</div>
         <div>
-          <div className="text-xs font-bold text-white/40">The Scout · Daily rule</div>
+          <div className="text-xs font-bold text-ink-500">The Scout · Daily rule</div>
           <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">
             {solved ? `Cracked in ${probes.length} probe${probes.length === 1 ? '' : 's'}` : 'Case closed — unsolved'}
           </h1>
-          <p className="mt-2 text-sm text-white/70">
-            The rule was <span className="font-semibold text-white/95">{secret.label}</span>.
+          <p className="mt-2 text-sm text-ink-600">
+            The rule was <span className="font-semibold text-ink-900">{secret.label}</span>.
           </p>
-          <p className="nums mt-1 text-sm text-white/55">
+          <p className="nums mt-1 text-sm text-ink-500">
             {solved && streak > 0 ? `🔥 ${streak}-day streak` : 'The streak resets — new rule tomorrow'}
           </p>
         </div>
@@ -464,19 +464,19 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="nums font-display text-2xl font-bold text-pitch">{probes.length}</span>
-          <span className="text-[11px] text-white/40">probes</span>
+          <span className="text-[11px] text-ink-500">probes</span>
         </div>
-        <span className="nums text-sm text-white/55">
+        <span className="nums text-sm text-ink-500">
           {accusationsLeft} accusation{accusationsLeft === 1 ? '' : 's'} left
         </span>
       </Card>
 
       <Card strong className="relative overflow-hidden p-4">
         <div className="relative">
-          <div className="text-xs font-bold text-white/45">Today&rsquo;s secret recruitment rule</div>
-          <p className="mt-1 text-sm text-white/65">
+          <div className="text-xs font-bold text-ink-500">Today&rsquo;s secret recruitment rule</div>
+          <p className="mt-1 text-sm text-ink-600">
             Probe players to hear <span className="text-pitch">fits</span> / <span className="text-danger">not our type</span>, then accuse the rule.
-            It&rsquo;s one of <span className="nums font-semibold text-white/90">{catalog.length}</span> in the book.
+            It&rsquo;s one of <span className="nums font-semibold text-ink-900">{catalog.length}</span> in the book.
           </p>
         </div>
       </Card>
@@ -492,7 +492,7 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
 
       {probes.length > 0 && (
         <div>
-          <div className="mb-1.5 text-[11px] font-bold text-white/40">Evidence</div>
+          <div className="mb-1.5 text-[11px] font-bold text-ink-500">Evidence</div>
           <ul className="flex flex-col gap-1">
             {[...probes].reverse().map((p) => (
               <EvidenceRow key={p.playerId} probe={p} />
@@ -503,7 +503,7 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
 
       <Card className="p-3">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-[11px] font-bold text-white/40">Accuse the rule</span>
+          <span className="text-[11px] font-bold text-ink-500">Accuse the rule</span>
           {wrong.length > 0 && <span className="text-[11px] text-danger/90">Wrong: {wrong.length}</span>}
         </div>
         <RulePicker
@@ -552,8 +552,8 @@ function SecretSetup({
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>🤫</div>
-        <p className="max-w-xs text-sm text-white/65">
-          Pass the device to <span className="font-semibold text-white/95">{who}</span> — they pick their secret rule in private.
+        <p className="max-w-xs text-sm text-ink-600">
+          Pass the device to <span className="font-semibold text-ink-900">{who}</span> — they pick their secret rule in private.
         </p>
         <Button size="lg" onClick={() => setRevealed(true)}>
           I&rsquo;m {who} — show the rules
@@ -571,7 +571,7 @@ function SecretSetup({
         <Badge tone="pitch">🔍 {who}: pick a secret rule</Badge>
       </div>
       <Card strong className="p-4">
-        <p className="text-sm text-white/65">
+        <p className="text-sm text-ink-600">
           Sign players by a rule only you know. Sneaky rules overlap with others — a club rule can pass for a nationality rule for a long time.
         </p>
         <div className="mt-2">
@@ -676,17 +676,17 @@ function ScoutDuel({
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>{humanWon ? '🏆' : '🕵️'}</div>
         <div>
-          <div className="text-xs font-bold text-white/40">The Scout</div>
+          <div className="text-xs font-bold text-ink-500">The Scout</div>
           <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">{nameOf(winner)} cracked the rule</h1>
-          <p className="nums mt-1 text-sm text-white/55">
+          <p className="nums mt-1 text-sm text-ink-500">
             in {round.probes[winner].length} probe{round.probes[winner].length === 1 ? '' : 's'}
           </p>
-          <div className="mt-3 flex flex-col gap-1 text-sm text-white/70">
+          <div className="mt-3 flex flex-col gap-1 text-sm text-ink-600">
             <span>
-              {possessive('A')} rule: <span className="font-semibold text-white/95">{scoutCategoryById(round.secrets.A, catalog)?.label}</span>
+              {possessive('A')} rule: <span className="font-semibold text-ink-900">{scoutCategoryById(round.secrets.A, catalog)?.label}</span>
             </span>
             <span>
-              {possessive('B')} rule: <span className="font-semibold text-white/95">{scoutCategoryById(round.secrets.B, catalog)?.label}</span>
+              {possessive('B')} rule: <span className="font-semibold text-ink-900">{scoutCategoryById(round.secrets.B, catalog)?.label}</span>
             </span>
           </div>
         </div>
@@ -717,16 +717,16 @@ function ScoutDuel({
 
       {/* Turn banner */}
       <Card className="flex items-center justify-between p-3">
-        <span className="text-sm font-bold text-white/90">
+        <span className="text-sm font-bold text-ink-900">
           {isCpuTurn ? 'CPU is scouting…' : `${nameOf(acting)} to act`}
         </span>
-        <span className="nums text-xs text-white/45">
+        <span className="nums text-xs text-ink-500">
           Probes {round.probes[acting].length}/{SCOUT_MAX_PROBES}
         </span>
       </Card>
 
       {lastNote && (
-        <div role="status" className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-white/70 animate-fade-in">
+        <div role="status" className="rounded-xl border border-black/10 bg-black/[0.03] px-3 py-2 text-xs text-ink-600 animate-fade-in">
           {lastNote}
         </div>
       )}
@@ -742,7 +742,7 @@ function ScoutDuel({
               disabled={mustAccuse}
               className={[
                 'rounded-xl border px-3 py-2 text-sm font-semibold transition',
-                activeTab === 'probe' ? 'border-pitch/50 bg-pitch/10 text-pitch' : 'border-white/10 bg-white/[0.03] text-white/55 hover:text-white',
+                activeTab === 'probe' ? 'border-pitch/50 bg-pitch/10 text-pitch' : 'border-black/10 bg-black/[0.03] text-ink-500 hover:text-ink-900',
                 mustAccuse ? 'opacity-40' : '',
               ].join(' ')}
               onClick={() => setTab('probe')}
@@ -755,7 +755,7 @@ function ScoutDuel({
               aria-selected={activeTab === 'accuse'}
               className={[
                 'rounded-xl border px-3 py-2 text-sm font-semibold transition',
-                activeTab === 'accuse' ? 'border-gold/50 bg-gold/10 text-gold' : 'border-white/10 bg-white/[0.03] text-white/55 hover:text-white',
+                activeTab === 'accuse' ? 'border-gold/50 bg-gold/10 text-gold' : 'border-black/10 bg-black/[0.03] text-ink-500 hover:text-ink-900',
               ].join(' ')}
               onClick={() => setTab('accuse')}
             >
@@ -780,7 +780,7 @@ function ScoutDuel({
             />
           ) : (
             <Card className="p-3">
-              <p className="mb-2 text-[11px] text-white/45">A wrong accusation costs your next turn.</p>
+              <p className="mb-2 text-[11px] text-ink-500">A wrong accusation costs your next turn.</p>
               <RulePicker
                 catalog={catalog}
                 evidence={round.probes[acting]}
@@ -808,7 +808,7 @@ function ScoutDuel({
       <div className="grid grid-cols-2 gap-2">
         {(['A', 'B'] as const).map((side) => (
           <div key={side}>
-            <div className="mb-1.5 flex items-center justify-between text-[11px] font-bold text-white/40">
+            <div className="mb-1.5 flex items-center justify-between text-[11px] font-bold text-ink-500">
               <span>{possessive(side)} evidence</span>
               {round.accusations[side].length > 0 && (
                 <span className="normal-case text-danger/80">{round.accusations[side].length} wrong</span>
@@ -819,7 +819,7 @@ function ScoutDuel({
                 <EvidenceRow key={p.playerId} probe={p} />
               ))}
               {round.probes[side].length === 0 && (
-                <li className="rounded-lg border border-dashed border-white/10 px-2.5 py-2 text-center text-[11px] text-white/30">
+                <li className="rounded-lg border border-dashed border-black/10 px-2.5 py-2 text-center text-[11px] text-ink-400">
                   No probes yet
                 </li>
               )}

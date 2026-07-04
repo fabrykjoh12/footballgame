@@ -103,9 +103,9 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>🧭</div>
         <div>
-          <div className="text-xs font-bold text-white/40">Career Path</div>
+          <div className="text-xs font-bold text-ink-500">Career Path</div>
           <h1 className="nums mt-1 font-display text-3xl font-bold text-gradient-pitch">{streak} solved</h1>
-          <p className="nums mt-1 text-sm text-white/55">{score.toLocaleString()} pts · best streak {best}</p>
+          <p className="nums mt-1 text-sm text-ink-500">{score.toLocaleString()} pts · best streak {best}</p>
         </div>
         <div className="flex gap-2">
           <Button
@@ -131,7 +131,7 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
   }
 
   if (!player) {
-    return <div className="flex flex-1 items-center justify-center py-20 text-white/50">No players available.</div>;
+    return <div className="flex flex-1 items-center justify-center py-20 text-ink-500">No players available.</div>;
   }
 
   const total = player.clubs.length;
@@ -151,31 +151,31 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="nums font-display text-2xl font-bold text-pitch">{score.toLocaleString()}</span>
-          <span className="text-[11px] text-white/40">pts</span>
+          <span className="text-[11px] text-ink-500">pts</span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           {streak >= 2 && (
             <span className="nums inline-flex items-center gap-1 font-semibold text-gold"><IconBolt className="h-4 w-4" /> {streak}</span>
           )}
-          <span className="nums text-white/55">Best {best}</span>
+          <span className="nums text-ink-500">Best {best}</span>
         </div>
       </Card>
 
       {/* Club chain */}
       <Card strong className="relative overflow-hidden p-4">
         <div className="relative">
-        <div className="mb-2 text-center text-xs text-white/40">Which player is this?</div>
+        <div className="mb-2 text-center text-xs text-ink-500">Which player is this?</div>
         <ol className="flex flex-col gap-1.5">
           {player.clubs.map((club, i) => {
             const shown = showAll || i < revealed;
             const kit = teamIdentity(club);
             return (
               <li key={i} className="flex items-center gap-2">
-                <span className="nums w-5 text-right text-xs text-white/30">{i + 1}</span>
+                <span className="nums w-5 text-right text-xs text-ink-400">{i + 1}</span>
                 <span
                   className={[
                     'flex flex-1 items-center gap-2 rounded-lg border px-3 py-2 font-display font-bold',
-                    shown ? 'border-white/10 bg-white/[0.05] text-white/90' : 'border-dashed border-white/10 bg-white/[0.02] text-white/25',
+                    shown ? 'border-black/10 bg-black/[0.04] text-ink-900' : 'border-dashed border-black/10 bg-black/[0.03] text-ink-400',
                   ].join(' ')}
                 >
                   <span
@@ -192,7 +192,7 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
         {!revealing && revealed < total && (
           <button
             onClick={() => setRevealed((r) => Math.min(total, r + 1))}
-            className="mt-2 w-full rounded-lg border border-white/10 bg-white/[0.03] py-1.5 text-xs text-white/55 transition hover:text-white answer-press"
+            className="mt-2 w-full rounded-lg border border-black/10 bg-black/[0.03] py-1.5 text-xs text-ink-500 transition hover:text-ink-900 answer-press"
           >
             Reveal next club (−points)
           </button>
@@ -244,7 +244,7 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
                   type="button"
                   role="option"
                   aria-selected={false}
-                  className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/75 transition hover:border-pitch/40 hover:text-white answer-press"
+                  className="rounded-full border border-black/10 bg-black/[0.04] px-3 py-1 text-xs text-ink-600 transition hover:border-pitch/40 hover:text-ink-900 answer-press"
                   onClick={() => { setInput(name); inputRef.current?.focus(); }}
                 >
                   {name}
@@ -252,7 +252,7 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
               ))}
             </div>
           )}
-          <button type="button" onClick={giveUp} className="self-center text-[11px] text-white/35 hover:text-white/60">
+          <button type="button" onClick={giveUp} className="self-center text-[11px] text-ink-400 hover:text-ink-600">
             Give up
           </button>
         </form>

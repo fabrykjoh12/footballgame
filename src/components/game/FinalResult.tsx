@@ -142,13 +142,13 @@ export function FinalResult() {
             <div className="flex flex-col items-center px-1">
               <div className="nums font-display text-4xl font-black leading-none sm:text-5xl">
                 <span style={{ color: idA.color }}>{a.goals}</span>
-                <span className="mx-1.5 text-white/25">–</span>
+                <span className="mx-1.5 text-ink-400">–</span>
                 <span style={{ color: idB.color }}>{b.goals}</span>
               </div>
               <div
                 className={[
                   'nums mt-1.5 font-mono text-xs',
-                  onPoints ? 'font-bold text-pitch' : 'text-white/40',
+                  onPoints ? 'font-bold text-pitch' : 'text-ink-500',
                 ].join(' ')}
               >
                 {a.score}–{b.score} pts
@@ -163,10 +163,10 @@ export function FinalResult() {
               className={[
                 'inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-bold',
                 isDraw
-                  ? 'border-white/15 bg-white/5 text-white/80'
+                  ? 'border-black/10 bg-black/[0.04] text-ink-800'
                   : youWon
                     ? 'border-pitch/40 bg-pitch/10 text-pitch'
-                    : 'border-white/15 bg-white/5 text-white/70',
+                    : 'border-black/10 bg-black/[0.04] text-ink-600',
               ].join(' ')}
             >
               {isDraw ? (
@@ -179,13 +179,13 @@ export function FinalResult() {
             </span>
           </div>
           {onPoints && (
-            <p className="mt-2 text-xs text-white/45">
+            <p className="mt-2 text-xs text-ink-500">
               Goals were level, so the higher points total takes it.
             </p>
           )}
 
           {/* Pundit's verdict — broadcast flavour. */}
-          <p className="mx-auto mt-4 max-w-prose border-t border-white/10 pt-3 text-sm italic text-white/60">
+          <p className="mx-auto mt-4 max-w-prose border-t border-black/10 pt-3 text-sm italic text-ink-600">
             “{verdict}”
           </p>
         </div>
@@ -245,9 +245,9 @@ export function FinalResult() {
         const rec = getOpponentRecord(opp.name);
         if (!rec || rec.played < 2) return null;
         return (
-          <p className="text-center text-xs text-white/50">
+          <p className="text-center text-xs text-ink-500">
             Your record vs {teamName(opp.name)}:{' '}
-            <span className="font-semibold text-white/75">{h2hSummary(rec)}</span> over{' '}
+            <span className="font-semibold text-ink-600">{h2hSummary(rec)}</span> over{' '}
             {rec.played} games
           </p>
         );
@@ -259,7 +259,7 @@ export function FinalResult() {
           <div className="text-xs font-bold text-gold">
             Streak reward unlocked
           </div>
-          <p className="mt-2 text-sm text-white/85">
+          <p className="mt-2 text-sm text-ink-800">
             <span aria-hidden>{streakUnlock.emoji}</span>{' '}
             <span className="nums font-semibold text-gold">{streakUnlock.days}-day streak</span>
             {' — '}
@@ -327,7 +327,7 @@ export function FinalResult() {
           </Button>
         </div>
         {!isHost && serviceMode === 'remote' && (
-          <p className="text-center text-xs text-white/40">
+          <p className="text-center text-xs text-ink-500">
             Waiting for the host to start a rematch…
           </p>
         )}
@@ -366,7 +366,7 @@ function ResultTeam({
         {won && <span className="absolute -top-2.5 text-sm" aria-label="Winner">👑</span>}
       </div>
       <div
-        className={['truncate font-display text-sm font-bold leading-tight', won ? '' : 'text-white/80'].join(' ')}
+        className={['truncate font-display text-sm font-bold leading-tight', won ? '' : 'text-ink-800'].join(' ')}
         style={won ? { color: identity.color } : undefined}
       >
         {teamName(name)}
@@ -405,8 +405,8 @@ function StatsCard({
         {isYou && <Badge tone="pitch">You</Badge>}
       </div>
 
-      <div className="mb-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
-        <div className="text-[11px] text-white/40">Title</div>
+      <div className="mb-3 rounded-lg border border-black/10 bg-black/[0.03] px-3 py-2">
+        <div className="text-[11px] text-ink-500">Title</div>
         <div className="flex items-center gap-1.5 font-semibold text-gold">
           <span aria-hidden>{title.emoji}</span> {title.title}
         </div>
@@ -447,7 +447,7 @@ function StatsCard({
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <dt className="text-white/45">{label}</dt>
+      <dt className="text-ink-500">{label}</dt>
       <dd className="nums font-mono font-semibold">{value}</dd>
     </div>
   );
@@ -479,20 +479,20 @@ function MatchHonours({
             {teamName(motm.name)}
             {motm.id === localPlayerId ? ' (You)' : ''}
           </div>
-          <div className="nums mt-0.5 text-xs text-white/50">
+          <div className="nums mt-0.5 text-xs text-ink-500">
             {motm.correctAnswers} correct · {motm.score} pts
           </div>
         </Card>
       )}
       {biggest && bigPlayer && (
         <Card className="p-4">
-          <div className="text-[11px] text-white/40">
+          <div className="text-[11px] text-ink-500">
             Biggest moment
           </div>
-          <div className="mt-1 font-display text-lg font-bold text-white">
+          <div className="mt-1 font-display text-lg font-bold text-ink-900">
             {biggest.minute}' {biggest.label}
           </div>
-          <div className="mt-0.5 truncate text-xs text-white/50">{teamName(bigPlayer.name)}</div>
+          <div className="mt-0.5 truncate text-xs text-ink-500">{teamName(bigPlayer.name)}</div>
         </Card>
       )}
     </div>
@@ -513,13 +513,13 @@ function KnowledgeShareBar({
   const [idA, idB] = matchIdentities(a.name, b.name);
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between text-[11px] font-medium text-white/40">
+      <div className="mb-1 flex items-center justify-between text-[11px] font-medium text-ink-500">
         <span className="nums">{shareA}% {teamName(a.name)}</span>
         <span>Knowledge</span>
         <span className="nums">{teamName(b.name)} {shareB}%</span>
       </div>
       <div
-        className="flex h-2.5 overflow-hidden rounded-full bg-white/10"
+        className="flex h-2.5 overflow-hidden rounded-full bg-black/[0.05]"
         role="img"
         aria-label={`Knowledge share: ${teamName(a.name)} ${shareA} percent, ${teamName(b.name)} ${shareB} percent`}
       >
@@ -542,14 +542,14 @@ function TimelineReplay({
   const [idA, idB] = matchIdentities(a.name, b.name);
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-white/35">
+      <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-ink-400">
         <span>0'</span>
         <span>Match replay</span>
         <span>90'</span>
       </div>
-      <div className="relative h-2 rounded-full bg-white/10">
+      <div className="relative h-2 rounded-full bg-black/[0.05]">
         {/* Half-time tick. */}
-        <span className="absolute left-1/2 top-0 h-2 w-px -translate-x-1/2 bg-white/15" aria-hidden />
+        <span className="absolute left-1/2 top-0 h-2 w-px -translate-x-1/2 bg-black/10" aria-hidden />
         {marks.map((m) => {
           const color = m.side === 'home' ? idA.color : idB.color;
           const left = `${(Math.min(m.minute, FULL_TIME) / FULL_TIME) * 100}%`;

@@ -4,13 +4,13 @@ import type { Difficulty } from '../../types/game';
 type Tone = 'pitch' | 'gold' | 'white' | 'danger' | 'muted' | 'blue' | 'royal';
 
 const TONES: Record<Tone, string> = {
-  pitch: 'text-pitch border-pitch/40',
-  gold: 'text-gold border-gold/40',
-  white: 'text-bone border-bone/25',
-  danger: 'text-danger border-danger/45',
-  muted: 'text-bone-dim border-bone/15',
-  blue: 'text-sky-300 border-sky-400/40',
-  royal: 'text-royal border-royal/50',
+  pitch: 'text-pitch bg-pitch/10 border-pitch/20',
+  gold: 'text-gold bg-gold/10 border-gold/20',
+  white: 'text-ink-600 bg-black/[0.04] border-black/10',
+  danger: 'text-danger bg-danger/10 border-danger/20',
+  muted: 'text-ink-500 bg-black/[0.03] border-black/[0.08]',
+  blue: 'text-sky-700 bg-sky-500/10 border-sky-500/20',
+  royal: 'text-royal bg-royal/10 border-royal/20',
 };
 
 interface BadgeProps {
@@ -19,13 +19,13 @@ interface BadgeProps {
   className?: string;
 }
 
-/** A flat mono metadata chip: hairline border, spaced small caps, no fill. */
+/** A small pill chip: soft tinted fill, thin border. */
 export function Badge({ children, tone = 'white', className = '' }: BadgeProps) {
   return (
     <span
       className={[
-        'inline-flex items-center gap-1.5 rounded-sm border-[0.5px] px-2 py-0.5',
-        'font-mono text-[10px] font-medium uppercase tracking-[0.12em]',
+        'inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5',
+        'text-[11px] font-semibold',
         TONES[tone],
         className,
       ].join(' ')}

@@ -96,7 +96,7 @@ export function CommentaryTicker() {
       aria-live="polite"
       aria-atomic="true"
       aria-label="Live commentary"
-      className="flex items-center gap-2.5 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2"
+      className="flex items-center gap-2.5 rounded-xl border border-black/10 bg-black/[0.03] px-3 py-2"
     >
       <span
         aria-hidden
@@ -107,7 +107,7 @@ export function CommentaryTicker() {
       </span>
       <span
         key={tick}
-        className="min-w-0 flex-1 text-sm leading-snug text-white/80 motion-safe:animate-fade-in"
+        className="min-w-0 flex-1 text-sm leading-snug text-ink-800 motion-safe:animate-fade-in"
       >
         {line}
       </span>

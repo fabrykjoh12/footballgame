@@ -128,7 +128,7 @@ export function GamePage() {
           <div className="flex items-center justify-between gap-2">
             <Badge tone="muted">{MATCH_MODES[room.settings.mode].label}</Badge>
             <div className="flex items-center gap-3">
-              <span className="text-xs text-white/40">
+              <span className="text-xs text-ink-500">
                 Question {Math.min(room.currentQuestionIndex + 1, total)} of {total}
               </span>
               {canPause && (
@@ -136,7 +136,7 @@ export function GamePage() {
                   type="button"
                   onClick={() => void pauseMatch()}
                   aria-label="Pause match"
-                  className="rounded-lg border border-white/10 px-2 py-1 text-xs font-semibold text-white/60 transition hover:border-pitch/50 hover:text-pitch focus:outline-none focus-visible:ring-2 focus-visible:ring-pitch"
+                  className="rounded-lg border border-black/10 px-2 py-1 text-xs font-semibold text-ink-600 transition hover:border-pitch/50 hover:text-pitch focus:outline-none focus-visible:ring-2 focus-visible:ring-pitch"
                 >
                   ⏸ Pause
                 </button>
@@ -223,8 +223,8 @@ function Kickoff({
       </div>
       <div className="font-display text-3xl font-bold text-gradient-pitch">Kick off!</div>
       {a && b && (
-        <div className="text-white/70">
-          {teamName(a.name)} <span className="text-white/40">vs</span> {teamName(b.name)}
+        <div className="text-ink-600">
+          {teamName(a.name)} <span className="text-ink-500">vs</span> {teamName(b.name)}
         </div>
       )}
       <Badge tone="pitch">{MATCH_MODES[mode].label}</Badge>

@@ -43,7 +43,7 @@ export function AccountButton() {
         onClick={() => setOpen(true)}
         aria-label={user ? 'Account' : 'Sign in'}
         title={user ? `Account${user.username ? ` (@${user.username})` : ''}` : 'Sign in'}
-        className="answer-press flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-2.5 py-2 text-white/70 hover:bg-white/10 hover:text-white"
+        className="answer-press flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.04] px-2.5 py-2 text-ink-700 hover:bg-black/[0.05] hover:text-ink-900"
       >
         {user ? (
           <span className="grid h-5 w-5 place-items-center rounded-full bg-pitch/20 text-[11px] font-bold text-pitch">
@@ -125,14 +125,14 @@ function AuthModal({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-sm rounded-2xl border border-white/12 bg-ink-800 p-6 shadow-elev-2 animate-scale-in"
+        className="relative w-full max-w-sm rounded-2xl border border-black/10 bg-white p-6 shadow-elev-2 animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-3 top-3 rounded-full p-1.5 text-white/40 hover:bg-white/10 hover:text-white"
+          className="absolute right-3 top-3 rounded-full p-1.5 text-ink-500 hover:bg-black/[0.05] hover:text-ink-900"
         >
           <IconClose className="h-4 w-4" />
         </button>
@@ -148,8 +148,8 @@ function AuthModal({ onClose }: { onClose: () => void }) {
             {user.username && (
               <p className="mt-1 font-mono text-base font-bold text-pitch">@{user.username}</p>
             )}
-            <p className="mt-1 break-all text-sm text-white/55">{user.email}</p>
-            <p className="mt-3 text-xs text-white/45">
+            <p className="mt-1 break-all text-sm text-ink-500">{user.email}</p>
+            <p className="mt-3 text-xs text-ink-500">
               Your Career, stats and daily streak sync automatically across your
               devices.
             </p>
@@ -158,7 +158,7 @@ function AuthModal({ onClose }: { onClose: () => void }) {
                 <IconLogout className="h-4 w-4" /> Sign out
               </Button>
             </div>
-            <p className="mt-2 text-[11px] text-white/30">
+            <p className="mt-2 text-[11px] text-ink-400">
               Signing out keeps your progress on this device.
             </p>
           </div>
@@ -168,9 +168,9 @@ function AuthModal({ onClose }: { onClose: () => void }) {
               <IconCheck className="h-6 w-6" />
             </div>
             <h2 className="font-display text-xl font-bold">Check your email</h2>
-            <p className="mt-2 text-sm text-white/55">
+            <p className="mt-2 text-sm text-ink-500">
               We sent a sign-in link to{' '}
-              <span className="font-semibold text-white/80">{email.trim()}</span>.
+              <span className="font-semibold text-ink-800">{email.trim()}</span>.
               Open it on this device to finish signing in.
             </p>
             <div className="mt-5">
@@ -187,7 +187,7 @@ function AuthModal({ onClose }: { onClose: () => void }) {
             <h2 className="text-center font-display text-xl font-bold">
               {tab === 'signin' ? 'Sign in to save progress' : 'Create your account'}
             </h2>
-            <p className="mx-auto mt-1 max-w-xs text-center text-sm text-white/55">
+            <p className="mx-auto mt-1 max-w-xs text-center text-sm text-ink-500">
               Sync your Career, stats and daily streak across devices.
             </p>
 
@@ -203,16 +203,16 @@ function AuthModal({ onClose }: { onClose: () => void }) {
               </Button>
             </div>
 
-            <div className="my-4 flex items-center gap-3 text-[11px] text-white/30">
-              <span className="h-px flex-1 bg-white/10" />
+            <div className="my-4 flex items-center gap-3 text-[11px] text-ink-400">
+              <span className="h-px flex-1 bg-black/10" />
               or
-              <span className="h-px flex-1 bg-white/10" />
+              <span className="h-px flex-1 bg-black/10" />
             </div>
 
             {/* Email + password */}
             <label
               htmlFor="auth-email"
-              className="mb-1.5 block text-xs font-semibold text-white/50"
+              className="mb-1.5 block text-xs font-semibold text-ink-500"
             >
               Email
             </label>
@@ -231,7 +231,7 @@ function AuthModal({ onClose }: { onClose: () => void }) {
             />
             <label
               htmlFor="auth-password"
-              className="mb-1.5 mt-3 block text-xs font-semibold text-white/50"
+              className="mb-1.5 mt-3 block text-xs font-semibold text-ink-500"
             >
               Password
             </label>
@@ -277,20 +277,20 @@ function AuthModal({ onClose }: { onClose: () => void }) {
                 setError(null);
                 setTab((t) => (t === 'signin' ? 'signup' : 'signin'));
               }}
-              className="mt-3 w-full text-center text-xs text-white/55 hover:text-white"
+              className="mt-3 w-full text-center text-xs text-ink-500 hover:text-ink-900"
             >
               {tab === 'signin'
                 ? 'New here? Create an account'
                 : 'Already have an account? Sign in'}
             </button>
 
-            <div className="my-3 h-px bg-white/[0.06]" />
+            <div className="my-3 h-px bg-black/10" />
 
             <button
               type="button"
               disabled={!emailValid || busy}
               onClick={() => run(() => signInWithEmail(email), { magic: true })}
-              className="w-full text-center text-xs text-white/45 hover:text-pitch disabled:opacity-40"
+              className="w-full text-center text-xs text-ink-500 hover:text-pitch disabled:opacity-40"
             >
               Or email me a one-tap sign-in link instead
             </button>
@@ -336,14 +336,14 @@ function UsernameStep({
         <IconUser className="h-6 w-6" />
       </div>
       <h2 className="text-center font-display text-xl font-bold">Pick your username</h2>
-      <p className="mx-auto mt-1 max-w-xs text-center text-sm text-white/55">
+      <p className="mx-auto mt-1 max-w-xs text-center text-sm text-ink-500">
         This is how friends can find and add you. Choose wisely!
       </p>
 
       <div className="mt-5">
         <label
           htmlFor="username-pick"
-          className="mb-1.5 block text-xs font-semibold text-white/50"
+          className="mb-1.5 block text-xs font-semibold text-ink-500"
         >
           Username
         </label>
@@ -363,7 +363,7 @@ function UsernameStep({
           placeholder="e.g. messi10"
           className="input-field font-mono text-base"
         />
-        <p className="mt-1 text-[11px] text-white/35">
+        <p className="mt-1 text-[11px] text-ink-400">
           Letters, numbers, underscores — 3 to 20 characters.
         </p>
       </div>
@@ -385,7 +385,7 @@ function UsernameStep({
         </Button>
       </div>
 
-      <p className="mt-3 text-center text-[11px] text-white/30">
+      <p className="mt-3 text-center text-[11px] text-ink-400">
         You can update your username later from Account settings.
       </p>
     </div>

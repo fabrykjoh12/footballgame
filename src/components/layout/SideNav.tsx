@@ -49,19 +49,17 @@ export function SideNav({
   /** Called with the chosen view (the shell navigates + closes the drawer). */
   onNavigate: (view: View) => void;
 }) {
-  let n = 0; // running catalogue index across all groups
   return (
-    <nav className="flex flex-col gap-7" aria-label="Game modes">
+    <nav className="flex flex-col gap-6" aria-label="Game modes">
       {NAV.map((group, gi) => (
-        <div key={group.heading ?? `g${gi}`} className="flex flex-col">
+        <div key={group.heading ?? `g${gi}`} className="flex flex-col gap-0.5">
           {group.heading && (
-            <div className="mb-2 pl-4 font-mono text-[10px] uppercase tracking-[0.2em] text-bone-faint">
+            <div className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-ink-500">
               {group.heading}
             </div>
           )}
           {group.items.map((item) => {
             const active = view === item.view;
-            const num = String(n++).padStart(2, '0');
             return (
               <button
                 key={item.view}
@@ -69,24 +67,16 @@ export function SideNav({
                 onClick={() => onNavigate(item.view)}
                 aria-current={active ? 'page' : undefined}
                 className={[
-                  'flex items-baseline gap-3 border-l-2 py-1.5 pl-3.5 pr-2 text-left transition-colors',
+                  'flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors',
                   active
-                    ? 'border-royal text-bone'
-                    : 'border-transparent text-bone-dim hover:border-bone/30 hover:text-bone',
+                    ? 'bg-royal/10 font-semibold text-royal-dark'
+                    : 'font-medium text-ink-600 hover:bg-black/[0.04] hover:text-ink-900',
                 ].join(' ')}
               >
-                <span
-                  className={[
-                    'font-mono text-[10px] tabular-nums',
-                    active ? 'text-royal' : 'text-bone-faint',
-                  ].join(' ')}
-                  aria-hidden
-                >
-                  {num}
+                <span className="w-5 shrink-0 text-center text-base leading-none" aria-hidden>
+                  {item.icon}
                 </span>
-                <span className={active ? 'text-[15px] font-semibold' : 'text-[15px]'}>
-                  {item.label}
-                </span>
+                <span className="truncate">{item.label}</span>
               </button>
             );
           })}

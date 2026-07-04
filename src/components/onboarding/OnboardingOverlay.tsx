@@ -33,11 +33,11 @@ export function OnboardingOverlay({
       aria-label="Welcome to Ball Knowledge"
       className="fixed inset-0 z-[110] flex items-center justify-center bg-ink-900/90 px-5 backdrop-blur-sm animate-fade-in"
     >
-      <div className="w-full max-w-sm rounded-2xl border border-white/12 bg-ink-800 p-6 text-center shadow-elev-2 animate-scale-in">
+      <div className="w-full max-w-sm rounded-2xl border border-black/10 bg-white p-6 text-center shadow-elev-2 animate-scale-in">
         <button
           type="button"
           onClick={() => finish()}
-          className="ml-auto block text-xs text-white/40 hover:text-white"
+          className="ml-auto block text-xs text-ink-500 hover:text-ink-900"
         >
           Skip
         </button>
@@ -46,7 +46,7 @@ export function OnboardingOverlay({
           {s.emoji}
         </div>
         <h2 className="mt-3 font-display text-xl font-bold text-gradient-pitch">{s.title}</h2>
-        <p className="mx-auto mt-2 max-w-xs text-balance text-sm text-white/60">{s.body}</p>
+        <p className="mx-auto mt-2 max-w-xs text-balance text-sm text-ink-600">{s.body}</p>
 
         {/* Progress dots */}
         <div className="mt-4 flex justify-center gap-1.5" aria-hidden>
@@ -55,7 +55,7 @@ export function OnboardingOverlay({
               key={i}
               className={[
                 'h-1.5 rounded-full transition-all',
-                i === step ? 'w-5 bg-pitch' : 'w-1.5 bg-white/20',
+                i === step ? 'w-5 bg-pitch' : 'w-1.5 bg-black/10',
               ].join(' ')}
             />
           ))}

@@ -17,14 +17,14 @@ export function QuestsCard() {
     <Card className="p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <h3 className="text-[15px] font-bold text-white">Daily quests</h3>
+          <h3 className="text-[15px] font-bold text-ink-900">Daily quests</h3>
         </div>
         <span
           className={[
             'nums rounded-full border px-2.5 py-0.5 text-xs font-bold',
             allDone
               ? 'border-pitch/30 bg-pitch/10 text-pitch'
-              : 'border-white/10 bg-white/5 text-white/60',
+              : 'border-black/10 bg-black/[0.04] text-ink-600',
           ].join(' ')}
         >
           {done}/{quests.length}
@@ -39,7 +39,7 @@ export function QuestsCard() {
               <span
                 className={[
                   'grid h-7 w-7 shrink-0 place-items-center rounded-lg text-sm',
-                  complete ? 'bg-pitch/20 text-pitch' : 'bg-white/10',
+                  complete ? 'bg-pitch/20 text-pitch' : 'bg-black/[0.05]',
                 ].join(' ')}
                 aria-hidden
               >
@@ -49,13 +49,13 @@ export function QuestsCard() {
                 <div
                   className={[
                     'truncate text-sm font-medium',
-                    complete ? 'text-white/45 line-through' : 'text-white/85',
+                    complete ? 'text-ink-500 line-through' : 'text-ink-800',
                   ].join(' ')}
                 >
                   {quest.label}
                 </div>
                 {quest.target > 1 && (
-                  <div className="mt-1 h-1 overflow-hidden rounded-full bg-white/10">
+                  <div className="mt-1 h-1 overflow-hidden rounded-full bg-black/10">
                     <div
                       className={['h-full rounded-full transition-[width] duration-500', complete ? 'bg-pitch' : 'bg-pitch/60'].join(' ')}
                       style={{ width: `${pct}%` }}
@@ -64,7 +64,7 @@ export function QuestsCard() {
                 )}
               </div>
               {quest.target > 1 && (
-                <span className="nums shrink-0 text-[11px] font-semibold text-white/45">
+                <span className="nums shrink-0 text-[11px] font-semibold text-ink-500">
                   {current}/{quest.target}
                 </span>
               )}

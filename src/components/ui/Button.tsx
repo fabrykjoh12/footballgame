@@ -15,22 +15,22 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * colour transition; each variant is a fill or a hairline outline.
  */
 const VARIANTS: Record<Variant, string> = {
-  // Sharp vermilion fill for the one primary action — flat, no glow.
-  primary: 'bg-royal text-bone font-semibold enabled:hover:bg-royal-dark',
-  // Hairline-outlined bone — the editorial secondary.
+  // Crisp green fill, white text — the one primary action.
+  primary: 'bg-royal text-white font-semibold enabled:hover:bg-royal-dark',
+  // White with a thin border — the clean secondary.
   secondary: [
-    'bg-transparent text-bone font-medium border-[0.5px] border-bone/30',
-    'enabled:hover:border-bone/60 enabled:hover:bg-bone/[0.04]',
+    'bg-white text-ink-900 font-medium border border-black/12',
+    'enabled:hover:bg-black/[0.03] enabled:hover:border-black/20',
   ].join(' '),
-  ghost: 'bg-transparent text-bone-dim enabled:hover:text-bone enabled:hover:bg-bone/[0.05]',
-  danger: 'bg-danger text-bone font-semibold enabled:hover:bg-danger/85',
-  gold: 'bg-gold text-ink-900 font-bold enabled:hover:bg-gold-dark',
+  ghost: 'bg-transparent text-ink-600 enabled:hover:text-ink-900 enabled:hover:bg-black/[0.04]',
+  danger: 'bg-danger text-white font-semibold enabled:hover:bg-danger/85',
+  gold: 'bg-gold text-white font-semibold enabled:hover:bg-gold-dark',
 };
 
 const SIZES: Record<Size, string> = {
-  sm: 'px-3.5 py-1.5 text-sm rounded-md',
-  md: 'px-5 py-2.5 text-sm rounded-md',
-  lg: 'px-6 py-3.5 text-base rounded-md',
+  sm: 'px-3.5 py-1.5 text-sm rounded-lg',
+  md: 'px-5 py-2.5 text-sm rounded-lg',
+  lg: 'px-6 py-3.5 text-base rounded-lg',
 };
 
 export function Button({

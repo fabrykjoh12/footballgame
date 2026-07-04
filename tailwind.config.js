@@ -4,47 +4,46 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Editorial palette — warm olive-charcoal stage, bone paper, a single
-        // sharp vermilion accent. Deliberately organic and warm (not cool slate)
-        // to dodge the generic dark-SaaS look. `royal` stays the token name for
-        // the brand accent (now vermilion) so call-sites don't churn.
+        // Clean & light — off-white page, white cards, near-black text, a single
+        // crisp green accent. `royal` stays the brand-accent token name; `ink`
+        // is the near-black text/dark scale; `bone` maps to light surfaces so the
+        // editorial-era class names keep working while reading light.
         royal: {
-          DEFAULT: '#d8542a', // sharp vermilion — the one accent
-          dark: '#b8431f',
-          glow: '#e9683c',
-          soft: '#e0602f',
+          DEFAULT: '#15a34a', // crisp green — the one accent
+          dark: '#128040',
+          glow: '#22c55e',
+          soft: '#18ab50',
         },
         pitch: {
-          DEFAULT: '#7c9b45', // success / correct — muted olive green
-          dark: '#65803a',
-          glow: '#93b158',
+          DEFAULT: '#15a34a', // success / correct
+          dark: '#128040',
+          glow: '#22c55e',
         },
         ink: {
-          // Warm olive-charcoal stage — every bg-ink-* reads warm, not blue-grey.
-          900: '#16150f', // deepest — body backdrop
-          800: '#1d1c14',
-          700: '#26241a',
-          600: '#302e21',
-          500: '#3d3a2b',
+          // Near-black text + dark-element scale (zinc-like).
+          900: '#18181b',
+          800: '#27272a',
+          700: '#3f3f46',
+          600: '#52525b',
+          500: '#71717a',
         },
+        // Surface/foreground helpers so `text-bone`/`bg-bone` etc. read light.
         bone: {
-          DEFAULT: '#e9e3d4', // warm off-white — primary text
-          dim: '#b3ad9c', // muted warm grey — secondary text
-          faint: '#807b6c', // tertiary
+          DEFAULT: '#18181b', // "primary text" now near-black on light
+          dim: '#52525b', // secondary
+          faint: '#8a8a90', // tertiary / faint
         },
-        paper: '#efe9db', // warm off-white surface (used sparingly)
+        paper: '#ffffff', // card surface
         gold: {
-          DEFAULT: '#c9a34a', // muted brass
-          dark: '#a9853a',
+          DEFAULT: '#b7791f', // amber (trophies)
+          dark: '#96610f',
         },
-        danger: '#c94f3a', // brick red
-        good: '#7c9b45',
+        danger: '#dc2626',
+        good: '#15a34a',
       },
       fontFamily: {
-        // Editorial contrast: a serif display against a clean sans body and a
-        // utilitarian mono for metadata/figures. Platform faces — no webfont
-        // fetch, degrades gracefully.
-        display: ['ui-serif', 'Georgia', '"Iowan Old Style"', '"Times New Roman"', 'serif'],
+        // Clean sans-serif throughout; mono reserved for codes/figures.
+        display: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Helvetica', 'Arial', 'sans-serif'],
         sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Helvetica', 'Arial', 'sans-serif'],
         mono: ['ui-monospace', '"SF Mono"', 'Menlo', 'Consolas', '"Liberation Mono"', 'monospace'],
       },

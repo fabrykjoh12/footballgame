@@ -167,7 +167,7 @@ export function SoloGame({ mode, onExit }: { mode: SoloMode; onExit: () => void 
       />
 
       {/* Per-question timer */}
-      <div className="h-1.5 overflow-hidden rounded-full bg-white/10" aria-hidden>
+      <div className="h-1.5 overflow-hidden rounded-full bg-black/[0.05]" aria-hidden>
         <div
           className="h-full rounded-full bg-pitch transition-[width] duration-100 ease-linear"
           style={{ width: `${Math.round(qClock.fraction * 100)}%` }}
@@ -231,7 +231,7 @@ function SoloHud({
     <Card className="flex items-center justify-between p-3">
       <div className="flex items-baseline gap-1.5">
         <span className="font-display text-2xl font-bold text-pitch">{score.toLocaleString()}</span>
-        <span className="text-[11px] text-white/40">pts</span>
+        <span className="text-[11px] text-ink-500">pts</span>
       </div>
 
       <div className="flex items-center gap-3 text-sm">
@@ -241,7 +241,7 @@ function SoloHud({
           </span>
         )}
         {mode === 'survival' && (
-          <span className="font-semibold text-white/80">
+          <span className="font-semibold text-ink-800">
             {'❤️'.repeat(Math.max(0, Math.min(lives, 5)))} · {survived} survived
           </span>
         )}
@@ -249,14 +249,14 @@ function SoloHud({
           <span
             className={[
               'font-mono text-lg font-bold tabular-nums',
-              runSecondsLeft <= 10 ? 'text-danger animate-pulse' : 'text-white/85',
+              runSecondsLeft <= 10 ? 'text-danger animate-pulse' : 'text-ink-800',
             ].join(' ')}
           >
             {runSecondsLeft}s
           </span>
         )}
         {mode === 'gauntlet' && (
-          <span className="font-semibold text-white/80">
+          <span className="font-semibold text-ink-800">
             {Math.min(index + 1, total)} / {total}
           </span>
         )}
@@ -313,7 +313,7 @@ function SoloResult({
         {cfg.icon}
       </div>
       <div>
-        <div className="text-xs font-bold text-white/40">{cfg.label} — full time</div>
+        <div className="text-xs font-bold text-ink-500">{cfg.label} — full time</div>
         <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">{headline}</h1>
         {run?.isBest && (
           <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm font-semibold text-gold">
@@ -347,9 +347,9 @@ function SoloResult({
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
+    <div className="rounded-xl border border-black/10 bg-black/[0.03] p-2 text-center">
       <div className="font-display text-xl font-bold text-pitch">{value}</div>
-      <div className="mt-0.5 text-[11px] text-white/40">{label}</div>
+      <div className="mt-0.5 text-[11px] text-ink-500">{label}</div>
     </div>
   );
 }

@@ -23,14 +23,14 @@ export function LeaguesCard() {
     <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
       <div className="mb-2 flex items-center gap-2">
         <IconTrophy className="h-5 w-5 text-gold" />
-        <h2 className="text-sm font-semibold text-white/80">
+        <h2 className="text-sm font-semibold text-ink-800">
           Friend leagues
         </h2>
         {online && leagues.length > 0 && (
           <span className="ml-auto text-xs font-bold text-gold">{leagues.length}</span>
         )}
       </div>
-      <p className="text-xs leading-relaxed text-white/55">
+      <p className="text-xs leading-relaxed text-ink-500">
         Create a private league with friends — everyone’s Daily Challenge score feeds
         a shared season table. Same questions for all, so it’s a fair race.
       </p>
@@ -84,14 +84,14 @@ function LeaguesModal({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-sm rounded-2xl border border-white/12 bg-ink-800 p-6 shadow-elev-2 animate-scale-in"
+        className="relative w-full max-w-sm rounded-2xl border border-black/10 bg-white p-6 shadow-elev-2 animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-3 top-3 rounded-full p-1.5 text-white/40 hover:bg-white/10 hover:text-white"
+          className="absolute right-3 top-3 rounded-full p-1.5 text-ink-500 hover:bg-black/[0.05] hover:text-ink-900"
         >
           <IconClose className="h-4 w-4" />
         </button>
@@ -101,12 +101,12 @@ function LeaguesModal({ onClose }: { onClose: () => void }) {
         ) : (
           <>
             <h2 className="mb-1 text-center font-display text-xl font-bold">Friend Leagues</h2>
-            <p className="mx-auto mb-4 max-w-xs text-center text-sm text-white/55">
+            <p className="mx-auto mb-4 max-w-xs text-center text-sm text-ink-500">
               Your Daily Challenge score is added to each league’s table every day.
             </p>
 
             {!online ? (
-              <p className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-4 text-center text-sm text-white/55">
+              <p className="rounded-xl border border-black/10 bg-black/[0.03] px-3 py-4 text-center text-sm text-ink-500">
                 Sign in (top-right) to create or join a private league with friends.
               </p>
             ) : (
@@ -119,18 +119,18 @@ function LeaguesModal({ onClose }: { onClose: () => void }) {
                         <button
                           type="button"
                           onClick={() => setViewing(l.id)}
-                          className="answer-press flex w-full items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-left hover:bg-white/[0.06]"
+                          className="answer-press flex w-full items-center gap-2 rounded-xl border border-black/10 bg-black/[0.03] px-3 py-2 text-left hover:bg-black/[0.03]"
                         >
                           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold/15 text-gold">
                             <IconTrophy className="h-4 w-4" />
                           </span>
                           <span className="min-w-0 flex-1">
                             <span className="block truncate text-sm font-semibold">{l.name}</span>
-                            <span className="block text-[11px] text-white/40">
+                            <span className="block text-[11px] text-ink-500">
                               {l.members.length} member{l.members.length === 1 ? '' : 's'} · {l.code}
                             </span>
                           </span>
-                          <span className="text-xs text-white/40">View →</span>
+                          <span className="text-xs text-ink-500">View →</span>
                         </button>
                       </li>
                     ))}
@@ -151,10 +151,10 @@ function LeaguesModal({ onClose }: { onClose: () => void }) {
                   </Button>
                 </div>
 
-                <div className="my-3 flex items-center gap-3 text-[11px] text-white/30">
-                  <span className="h-px flex-1 bg-white/10" />
+                <div className="my-3 flex items-center gap-3 text-[11px] text-ink-400">
+                  <span className="h-px flex-1 bg-black/10" />
                   or join
-                  <span className="h-px flex-1 bg-white/10" />
+                  <span className="h-px flex-1 bg-black/10" />
                 </div>
 
                 {/* Join */}
@@ -223,19 +223,19 @@ function StandingsView({ leagueId, onBack }: { leagueId: string; onBack: () => v
       <button
         type="button"
         onClick={onBack}
-        className="mb-2 text-xs text-white/50 hover:text-white"
+        className="mb-2 text-xs text-ink-500 hover:text-ink-900"
       >
         ← All leagues
       </button>
 
       {data === 'loading' ? (
-        <p className="py-8 text-center text-sm text-white/50">Loading table…</p>
+        <p className="py-8 text-center text-sm text-ink-500">Loading table…</p>
       ) : !data ? (
-        <p className="py-8 text-center text-sm text-white/50">Couldn’t load this league.</p>
+        <p className="py-8 text-center text-sm text-ink-500">Couldn’t load this league.</p>
       ) : (
         <>
           <h2 className="text-center font-display text-xl font-bold">{data.league.name}</h2>
-          <div className="mt-1 mb-4 flex items-center justify-center gap-2 text-xs text-white/45">
+          <div className="mt-1 mb-4 flex items-center justify-center gap-2 text-xs text-ink-500">
             <IconUsers className="h-3.5 w-3.5" />
             {data.league.members.length} members · invite code
             <span className="font-mono font-semibold text-gold">{data.league.code}</span>
@@ -243,14 +243,14 @@ function StandingsView({ leagueId, onBack }: { leagueId: string; onBack: () => v
               type="button"
               onClick={copyCode}
               aria-label="Copy league code"
-              className="rounded-full p-1 text-white/50 hover:bg-white/10 hover:text-white"
+              className="rounded-full p-1 text-ink-500 hover:bg-black/[0.05] hover:text-ink-900"
             >
               {copied ? <IconCheck className="h-3.5 w-3.5 text-pitch" /> : <IconCopy className="h-3.5 w-3.5" />}
             </button>
           </div>
 
           {data.standings.every((r) => r.played === 0) ? (
-            <p className="py-4 text-center text-sm text-white/50">
+            <p className="py-4 text-center text-sm text-ink-500">
               No scores yet — play today’s Daily Challenge to get the season started!
             </p>
           ) : (
@@ -262,15 +262,15 @@ function StandingsView({ leagueId, onBack }: { leagueId: string; onBack: () => v
                     'flex items-center gap-3 rounded-xl border px-3 py-2',
                     user && row.uid === user.id
                       ? 'border-pitch/40 bg-pitch/[0.08]'
-                      : 'border-white/10 bg-white/[0.02]',
+                      : 'border-black/10 bg-black/[0.03]',
                   ].join(' ')}
                 >
-                  <span className="w-6 text-center font-mono text-sm font-bold text-white/60">
+                  <span className="w-6 text-center font-mono text-sm font-bold text-ink-600">
                     {row.rank}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-semibold">{row.name}</span>
-                    <span className="block text-[11px] text-white/40">
+                    <span className="block text-[11px] text-ink-500">
                       {row.played} day{row.played === 1 ? '' : 's'} · best {row.best.toLocaleString()}
                     </span>
                   </span>

@@ -75,7 +75,7 @@ export function MatchTimeline() {
 
   return (
     <div className="select-none">
-      <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-white/35">
+      <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-ink-400">
         <span>0'</span>
         <span className="flex items-center gap-1.5">
           {(pressure || dramatic || stoppage) && (
@@ -96,7 +96,7 @@ export function MatchTimeline() {
         </span>
         <span>90'</span>
       </div>
-      <div className="relative h-2 rounded-full bg-white/10">
+      <div className="relative h-2 rounded-full bg-black/[0.05]">
         <div
           className={[
             'absolute inset-y-0 left-0 rounded-full bg-gradient-to-r motion-safe:transition-[width] motion-safe:duration-500 motion-safe:ease-premium',

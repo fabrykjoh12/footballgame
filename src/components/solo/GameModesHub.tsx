@@ -36,7 +36,7 @@ export function GameModesHub({ onExit }: { onExit: () => void }) {
         <h1 className="font-display text-3xl font-bold tracking-tight">
           <span className="text-gradient-pitch">Game Modes</span>
         </h1>
-        <p className="mx-auto mt-2 max-w-sm text-balance text-sm text-white/55">
+        <p className="mx-auto mt-2 max-w-sm text-balance text-sm text-ink-500">
           Solo challenges against the clock and the question bank. Your best scores
           are saved on this device.
         </p>
@@ -64,7 +64,7 @@ export function GameModesHub({ onExit }: { onExit: () => void }) {
                     <h2 className="font-display text-lg font-bold">{m.label}</h2>
                     <span className="shrink-0 text-[11px] font-semibold text-gold">{bestLabel}</span>
                   </div>
-                  <p className="mt-0.5 text-xs leading-relaxed text-white/55">{m.description}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-ink-500">{m.description}</p>
                 </div>
               </div>
               <div className="mt-3">

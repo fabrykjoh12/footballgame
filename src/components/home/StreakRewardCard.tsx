@@ -23,7 +23,7 @@ export function StreakRewardCard() {
     <Card className="p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <h3 className="text-[15px] font-bold text-white">Streak rewards</h3>
+          <h3 className="text-[15px] font-bold text-ink-900">Streak rewards</h3>
         </div>
         <span className="nums rounded-full border border-gold/30 bg-gold/10 px-2.5 py-0.5 text-xs font-bold text-gold">
           {streak} day{streak === 1 ? '' : 's'}
@@ -33,15 +33,15 @@ export function StreakRewardCard() {
       {next ? (
         <>
           <div className="mb-1.5 flex items-baseline justify-between text-xs">
-            <span className="text-white/55">
+            <span className="text-ink-500">
               Next: <span aria-hidden>{next.emoji}</span>{' '}
-              <span className="font-semibold text-white/80">{next.reward}</span>
+              <span className="font-semibold text-ink-800">{next.reward}</span>
             </span>
             <span className="nums shrink-0 font-semibold text-pitch">
               {remaining} day{remaining === 1 ? '' : 's'} to go
             </span>
           </div>
-          <div className="h-2 overflow-hidden rounded-full bg-white/10">
+          <div className="h-2 overflow-hidden rounded-full bg-black/10">
             <div
               className="h-full rounded-full bg-gold transition-[width] duration-500"
               style={{ width: `${Math.round(progress * 100)}%` }}
@@ -51,7 +51,7 @@ export function StreakRewardCard() {
           </div>
         </>
       ) : (
-        <p className="text-xs text-white/55">
+        <p className="text-xs text-ink-500">
           🏆 Every streak reward unlocked — keep the run alive to defend it.
         </p>
       )}
@@ -68,7 +68,7 @@ export function StreakRewardCard() {
                 ? 'border-pitch/30 bg-pitch/10 text-pitch'
                 : step.isNext
                   ? 'border-gold/30 bg-gold/10 text-gold'
-                  : 'border-white/10 bg-white/[0.03] text-white/40',
+                  : 'border-black/10 bg-black/[0.03] text-ink-500',
             ].join(' ')}
           >
             {step.reached ? '✓' : step.emoji} {step.days}d

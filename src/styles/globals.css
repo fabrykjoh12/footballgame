@@ -4,10 +4,10 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
-    /* Warm hairline — the primary structural device (used instead of shadows). */
-    --line: rgba(233, 227, 212, 0.14);
-    --line-strong: rgba(233, 227, 212, 0.24);
+    color-scheme: light;
+    /* Hairline / border colour — dark-on-light. */
+    --line: rgba(24, 24, 27, 0.1);
+    --line-strong: rgba(24, 24, 27, 0.16);
   }
 
   html,
@@ -17,110 +17,88 @@
   }
 
   body {
-    @apply bg-ink-900 text-bone font-sans antialiased;
-    /* Warm olive-charcoal stage — flat, no glow. */
-    background-color: #16150f;
+    @apply text-ink-900 font-sans antialiased;
+    /* Clean off-white page. */
+    background-color: #f6f6f5;
     overscroll-behavior: none;
   }
 
-  /* Sharp, high-contrast focus ring (no soft glow). */
   :focus-visible {
-    @apply outline-none ring-2 ring-royal ring-offset-2 ring-offset-ink-900;
+    @apply outline-none ring-2 ring-royal ring-offset-2;
+    --tw-ring-offset-color: #f6f6f5;
   }
 
   ::selection {
-    background: rgba(216, 84, 42, 0.3);
+    background: rgba(21, 163, 74, 0.18);
   }
 }
 
 @layer components {
   /*
-   * Translucent indigo panels on the purple stage. Flatter than the old
-   * glassmorphism — a hairline top highlight + soft ambient shadow, tinted to
-   * the indigo palette so surfaces read as one material.
-   */
-  /*
-   * Panels are defined by a warm hairline rule, not a shadow. Restrained
-   * corners; two weights (near-flat / slightly stronger edge).
+   * White cards on the off-white page, defined by a thin neutral border and a
+   * soft shadow. Two weights: flat and slightly raised.
    */
   .glass {
-    @apply rounded-lg bg-ink-800/70;
-    border: 0.5px solid var(--line);
+    @apply rounded-xl border border-black/[0.07] bg-white;
+    box-shadow: 0 1px 2px rgba(24, 24, 27, 0.04);
   }
 
   .glass-strong {
-    @apply rounded-lg bg-ink-800;
-    border: 0.5px solid var(--line-strong);
+    @apply rounded-xl border border-black/[0.08] bg-white;
+    box-shadow: 0 1px 3px rgba(24, 24, 27, 0.06), 0 8px 24px -12px rgba(24, 24, 27, 0.1);
   }
 
-  /* A warm off-white "paper" card — used sparingly for contrast pieces. */
   .card-lite {
-    @apply rounded-lg bg-paper text-ink-900;
-    border: 0.5px solid rgba(22, 21, 15, 0.14);
+    @apply rounded-xl border border-black/[0.07] bg-white text-ink-900;
+    box-shadow: 0 1px 2px rgba(24, 24, 27, 0.04);
   }
   .card-lite-hover {
-    @apply transition-transform duration-200 ease-premium active:scale-[0.99];
+    @apply transition-shadow duration-200 ease-premium;
+    @apply hover:shadow-[0_2px_6px_rgba(24,24,27,0.06),0_12px_28px_-12px_rgba(24,24,27,0.16)];
   }
 
-  /* Inputs inside a dark panel: recessed, hairline, sharp accent focus. */
+  /* Inputs on a white card: neutral fill, thin border, green focus. */
   .input-field {
-    @apply w-full rounded-md bg-ink-900/60 px-4 py-3 text-bone;
-    @apply outline-none transition-colors duration-200 placeholder:text-bone-faint;
-    @apply focus:border-royal;
-    border: 0.5px solid var(--line-strong);
+    @apply w-full rounded-lg border border-black/10 bg-[#f6f6f5] px-4 py-3 text-ink-900;
+    @apply outline-none transition-colors duration-200 placeholder:text-ink-500;
+    @apply focus:border-royal focus:bg-white;
   }
-
-  /* Inputs inside a paper card: light, dark text. */
   .input-lite {
-    @apply w-full rounded-md bg-black/[0.03] px-4 py-3 text-ink-900;
-    @apply outline-none transition-colors duration-200 placeholder:text-ink-900/35;
-    @apply focus:border-royal;
-    border: 0.5px solid rgba(22, 21, 15, 0.2);
+    @apply w-full rounded-lg border border-black/10 bg-[#f6f6f5] px-4 py-3 text-ink-900;
+    @apply outline-none transition-colors duration-200 placeholder:text-ink-500;
+    @apply focus:border-royal focus:bg-white;
   }
 
-  /* Headings are solid bone; the serif display face carries the character. */
+  /* Headings are solid near-black. */
   .text-gradient-pitch {
-    @apply text-bone;
+    @apply text-ink-900;
   }
-
   .text-gradient-gold {
     @apply text-gold;
   }
 
-  /* Hairline rule — the core structural divider. */
   .hairline {
     border-color: var(--line);
   }
 
-  /* Tap-press feedback for interactive surfaces. */
   .answer-press {
     @apply transition-transform duration-200 ease-premium active:scale-[0.97];
   }
 
-  /*
-   * Solid premium panel — for modals/sheets that float over bright or busy
-   * content where translucent glass would read as see-through. Layered depth via
-   * a lit top edge + ambient shadow, matching the glass language but opaque.
-   */
+  /* Opaque panel for modals. */
   .surface {
-    @apply rounded-lg bg-ink-800;
-    border: 0.5px solid var(--line-strong);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+    @apply rounded-xl border border-black/[0.08] bg-white;
+    box-shadow: 0 24px 60px -12px rgba(24, 24, 27, 0.25);
   }
 
-  /* Hover affordance for tappable rows — a warm wash, no lift or shadow. */
   .card-hover {
     @apply transition-colors duration-200 ease-premium;
-    @apply hover:bg-bone/[0.04] active:bg-bone/[0.02];
+    @apply hover:bg-black/[0.025] active:bg-black/[0.04];
   }
 
-  /*
-   * Broadcast "lower-third" panel — the graphic strip TV uses for scorelines and
-   * stats. A left pitch-green accent bar + a deep gradient body.
-   */
+  /* Stat/scoreline strip — thin border, a green accent bar. */
   .lower-third {
-    @apply relative overflow-hidden rounded-md bg-ink-800/70;
-    border: 0.5px solid var(--line);
+    @apply relative overflow-hidden rounded-lg border border-black/[0.07] bg-white;
   }
   .lower-third::before {
     content: '';
@@ -152,17 +130,17 @@
     font-feature-settings: 'tnum' 1, 'zero' 1, 'cv01' 1;
   }
 
-  /* Faint tactical-board grid texture for hero / result / dashboard panels. */
+  /* Faint grid texture (dark-on-light). */
   .grid-tactical {
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      linear-gradient(rgba(24, 24, 27, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(24, 24, 27, 0.04) 1px, transparent 1px);
     background-size: 28px 28px;
   }
 
   /* Loading skeleton — a calm shimmer over a neutral block. */
   .skeleton {
-    @apply rounded-lg bg-white/[0.06];
+    @apply rounded-lg bg-black/[0.06];
     position: relative;
     overflow: hidden;
   }
@@ -174,7 +152,7 @@
     background: linear-gradient(
       90deg,
       transparent,
-      rgba(255, 255, 255, 0.07),
+      rgba(24, 24, 27, 0.06),
       transparent
     );
     animation: shimmer 1.6s ease-in-out infinite;
@@ -265,22 +243,19 @@
   font-size: 118%;
 }
 
-/* High contrast — strengthen text, borders and glass surfaces. */
+/* High contrast — strengthen text and borders on the light theme. */
 .a11y-contrast body {
-  color: #ffffff;
+  color: #000000;
 }
 
 .a11y-contrast .glass,
-.a11y-contrast .glass-strong {
-  background-color: rgba(20, 22, 25, 0.96) !important;
-  backdrop-filter: none !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
+.a11y-contrast .glass-strong,
+.a11y-contrast .card-lite,
+.a11y-contrast .surface {
+  border-color: rgba(24, 24, 27, 0.4) !important;
 }
 
-.a11y-contrast .text-white\/40,
-.a11y-contrast .text-white\/45,
-.a11y-contrast .text-white\/50,
-.a11y-contrast .text-white\/55,
-.a11y-contrast .text-white\/60 {
-  color: rgba(255, 255, 255, 0.85) !important;
+.a11y-contrast .text-ink-500,
+.a11y-contrast .text-ink-600 {
+  color: #18181b !important;
 }
