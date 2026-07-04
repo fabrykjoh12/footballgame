@@ -13,8 +13,10 @@ import { play } from '../../lib/sound';
 import { teamIdentity } from '../../lib/teamIdentity';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
-import { IconBack, IconArrowRight, IconBolt, IconCheck, IconClose, IconScale } from '../ui/icons';
+import { IconArrowRight, IconBolt, IconCheck, IconClose } from '../ui/icons';
+import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
+import { modeTheme } from '../dashboard/modeTheme';
+import { AnimatedCounter } from '../dashboard/AnimatedCounter';
 
 const REVEAL_MS = 1600;
 
@@ -127,17 +129,12 @@ export function OlderYoungerGame({ onExit }: { onExit: () => void }) {
 
   return (
     <div className="flex flex-1 flex-col gap-4 py-4 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" onClick={onExit}>
-          <IconBack className="h-4 w-4" /> Quit
-        </Button>
-        <Badge tone="pitch"><IconScale className="h-4 w-4" /> Older or Younger?</Badge>
-      </div>
+      <ModeHeroBanner theme={modeTheme('olderYounger')!} onBack={onExit} compact />
 
       {/* HUD */}
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
-          <span className="nums font-display text-2xl font-bold text-pitch">{streak}</span>
+          <AnimatedCounter value={streak} className="font-display text-2xl font-bold text-pitch" />
           <span className="text-[11px] text-white/55">streak</span>
         </div>
         <span className="nums text-sm text-white/55">Best {best}</span>

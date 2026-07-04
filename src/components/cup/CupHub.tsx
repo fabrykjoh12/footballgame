@@ -15,7 +15,9 @@ import {
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { IconBack, IconTrophy, IconArrowRight, IconCheck } from '../ui/icons';
+import { IconTrophy, IconArrowRight, IconCheck } from '../ui/icons';
+import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
+import { modeTheme } from '../dashboard/modeTheme';
 
 /** Hub for themed Cup Runs: resume an active run, pick a cup, see your trophies. */
 export function CupHub({ onExit }: { onExit: () => void }) {
@@ -42,26 +44,17 @@ export function CupHub({ onExit }: { onExit: () => void }) {
 
   return (
     <div className="flex flex-1 flex-col gap-5 py-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" onClick={onExit}>
-          <IconBack className="h-4 w-4" /> Home
-        </Button>
-        {save.trophies.length > 0 && (
-          <Badge tone="gold">
-            🏆 {save.trophies.length} cup{save.trophies.length === 1 ? '' : 's'} won
-          </Badge>
-        )}
-      </div>
-
-      <div className="text-center">
-        <h1 className="font-display text-3xl font-bold tracking-tight">
-          <span className="text-gradient-pitch">Cup Runs</span>
-        </h1>
-        <p className="mx-auto mt-2 max-w-sm text-balance text-sm text-white/55">
-          Themed knockout tournaments vs the CPU. Win every tie to lift the trophy —
-          lose one and you’re out.
-        </p>
-      </div>
+      <ModeHeroBanner
+        theme={modeTheme('cup')!}
+        onBack={onExit}
+        right={
+          save.trophies.length > 0 ? (
+            <Badge tone="gold">
+              🏆 {save.trophies.length} cup{save.trophies.length === 1 ? '' : 's'} won
+            </Badge>
+          ) : undefined
+        }
+      />
 
       {/* Resume an in-progress run */}
       {active && activeDef && activeRound && (

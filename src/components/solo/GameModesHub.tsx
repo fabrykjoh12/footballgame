@@ -4,7 +4,9 @@ import { getSoloProgress, bestForMode } from '../../lib/soloProgress';
 import { SoloGame } from './SoloGame';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { IconBack, IconArrowRight } from '../ui/icons';
+import { IconArrowRight } from '../ui/icons';
+import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
+import { modeTheme } from '../dashboard/modeTheme';
 
 /** Singleplayer arcade hub: pick a mode, see your bests, play. */
 export function GameModesHub({ onExit }: { onExit: () => void }) {
@@ -26,21 +28,7 @@ export function GameModesHub({ onExit }: { onExit: () => void }) {
 
   return (
     <div className="flex flex-1 flex-col gap-5 py-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" onClick={onExit}>
-          <IconBack className="h-4 w-4" /> Home
-        </Button>
-      </div>
-
-      <div className="text-center">
-        <h1 className="font-display text-3xl font-bold tracking-tight">
-          <span className="text-gradient-pitch">Game Modes</span>
-        </h1>
-        <p className="mx-auto mt-2 max-w-sm text-balance text-sm text-white/55">
-          Solo challenges against the clock and the question bank. Your best scores
-          are saved on this device.
-        </p>
-      </div>
+      <ModeHeroBanner theme={modeTheme('modes')!} onBack={onExit} />
 
       <div className="mx-auto flex w-full max-w-md flex-col gap-3">
         {SOLO_MODE_LIST.map((m) => {

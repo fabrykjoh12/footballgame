@@ -37,6 +37,8 @@ import { Badge } from '../ui/Badge';
 import { IconBack, IconBolt, IconCheck, IconShare, IconClose } from '../ui/icons';
 import { Search, MessagesSquare, Gavel, Fingerprint, ScrollText, Users } from 'lucide-react';
 import { investigationFeedback, clueCommentary, type ClueStrength } from '../../lib/mysteryPlayer/mysteryFeedback';
+import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
+import { modeTheme } from '../dashboard/modeTheme';
 import { createPortal } from 'react-dom';
 
 const STRENGTH_STYLE: Record<ClueStrength, string> = {
@@ -123,20 +125,7 @@ function MysteryLobby({
 
   return (
     <div className="flex flex-col gap-4 py-4 animate-fade-in">
-      <button onClick={onExit} className="inline-flex items-center gap-1.5 self-start text-sm text-white/55 hover:text-white">
-        <IconBack className="h-4 w-4" /> Home
-      </button>
-
-      <div className="text-center">
-        <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold">
-          <Fingerprint className="h-3.5 w-3.5" /> Football detective
-        </div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-bone">Mystery Duel</h1>
-        <p className="mx-auto mt-3 max-w-md text-balance text-bone-dim">
-          Both managers hide a secret player. Trade scout reports to rule suspects
-          out, read the evidence, and name the right one — before they name yours.
-        </p>
-      </div>
+      <ModeHeroBanner theme={modeTheme('mystery')!} onBack={onExit} />
 
       <Card className="p-4">
         <h2 className="mb-2 text-xs font-semibold text-white/55">Opponent</h2>

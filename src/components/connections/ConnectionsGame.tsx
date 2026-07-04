@@ -20,8 +20,9 @@ import { matchIdentities, type TeamIdentity } from '../../lib/teamIdentity';
 import { play } from '../../lib/sound';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
-import { IconBack, IconCheck, IconClose, IconBolt, IconRoute, IconArrowRight } from '../ui/icons';
+import { IconCheck, IconClose, IconBolt, IconArrowRight } from '../ui/icons';
+import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
+import { modeTheme } from '../dashboard/modeTheme';
 
 const REVEAL_MS = 3000;
 
@@ -144,16 +145,7 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
 
   return (
     <div className="flex flex-1 flex-col gap-4 py-4 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" onClick={onExit}>
-          <IconBack className="h-4 w-4" /> Quit
-        </Button>
-        <div className="flex items-center gap-2">
-          <Badge tone="pitch">
-            <IconRoute className="h-4 w-4" /> {daily ? 'Daily Connections' : 'Connections'}
-          </Badge>
-        </div>
-      </div>
+      <ModeHeroBanner theme={modeTheme(daily ? 'connectionsDaily' : 'connections')!} onBack={onExit} compact />
 
       {/* HUD */}
       <Card className="flex items-center justify-between p-3">

@@ -37,11 +37,12 @@ import { Badge } from '../ui/Badge';
 import {
   IconTrophy,
   IconArrowRight,
-  IconBack,
   IconBolt,
   IconRoute,
   IconClock,
 } from '../ui/icons';
+import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
+import { modeTheme } from '../dashboard/modeTheme';
 
 export function CareerHub({ onExit }: { onExit: () => void }) {
   const { playCareer, connecting } = useGame();
@@ -95,18 +96,16 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
   return (
     <div className="flex flex-col gap-4 py-4 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between gap-2">
-        <button
-          type="button"
-          onClick={onExit}
-          className="inline-flex items-center gap-1.5 text-sm text-white/55 hover:text-white"
-        >
-          <IconBack className="h-4 w-4" /> Home
-        </button>
-        <Badge tone="gold">
-          <IconTrophy className="h-3.5 w-3.5" /> Season {career.season}
-        </Badge>
-      </div>
+      <ModeHeroBanner
+        theme={modeTheme('career')!}
+        onBack={onExit}
+        compact
+        right={
+          <Badge tone="gold">
+            <IconTrophy className="h-3.5 w-3.5" /> Season {career.season}
+          </Badge>
+        }
+      />
 
       {/* Division card — manager dashboard header */}
       <Card strong glow className="relative overflow-hidden p-5 text-center animate-rise-in">
@@ -311,27 +310,7 @@ function NewCareer({
   const valid = name.trim().length >= 1;
   return (
     <div className="flex flex-1 flex-col justify-center gap-6 py-6 animate-fade-in">
-      <button
-        type="button"
-        onClick={onExit}
-        className="inline-flex items-center gap-1.5 self-start text-sm text-white/55 hover:text-white"
-      >
-        <IconBack className="h-4 w-4" /> Home
-      </button>
-
-      <div className="text-center">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-white/65">
-          <IconTrophy className="h-3.5 w-3.5 text-gold" /> Singleplayer
-        </div>
-        <h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl">
-          <span className="text-gradient-pitch">Career Mode</span>
-        </h1>
-        <p className="mx-auto mt-3 max-w-md text-balance text-white/65">
-          Start in League Two and climb the pyramid season by season. Win your
-          fixtures, top the table, earn promotion — and chase the Premier League
-          title. The higher you rise, the harder the questions.
-        </p>
-      </div>
+      <ModeHeroBanner theme={modeTheme('career')!} onBack={onExit} />
 
       <Card strong className="mx-auto w-full max-w-md p-6 animate-rise-in">
         <label

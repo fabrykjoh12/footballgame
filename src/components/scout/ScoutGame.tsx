@@ -35,6 +35,8 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { IconBack, IconArrowRight, IconBolt, IconCheck, IconClose } from '../ui/icons';
+import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
+import { modeTheme } from '../dashboard/modeTheme';
 
 type DuelKind = 'cpu' | 'hotseat';
 type Stage =
@@ -105,24 +107,7 @@ function ScoutLobby({ onExit, onDaily, onDuel }: { onExit: () => void; onDaily: 
   const dailyDone = hasPlayedDailyScoutToday(progress);
   return (
     <div className="flex flex-1 flex-col gap-4 py-4 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" onClick={onExit}>
-          <IconBack className="h-4 w-4" /> Quit
-        </Button>
-        <Badge tone="pitch">🔍 The Scout</Badge>
-      </div>
-
-      <Card strong className="relative overflow-hidden p-5">
-        <div className="relative">
-          <h1 className="font-display text-2xl font-bold text-gradient-pitch">The Scout</h1>
-          <p className="mt-2 text-sm leading-relaxed text-white/65">
-            The opposing Director of Football signs players by a <span className="font-semibold text-white">secret rule</span>.
-            Probe any footballer — you&rsquo;ll hear <span className="text-pitch">&ldquo;fits our profile&rdquo;</span> or{' '}
-            <span className="text-danger">&ldquo;not our type&rdquo;</span> — and deduce the rule before they crack yours.
-            A wrong accusation costs you a turn.
-          </p>
-        </div>
-      </Card>
+      <ModeHeroBanner theme={modeTheme('scout')!} onBack={onExit} />
 
       <div className="flex flex-col gap-2">
         <Card className="flex items-center justify-between gap-3 p-4">
