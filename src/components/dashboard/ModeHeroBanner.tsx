@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ModeMotif } from './ModeMotif';
+import { ModeArt } from './ModeArt';
 import type { ModeTheme } from './modeTheme';
 
 /**
@@ -81,12 +81,12 @@ export function ModeHeroBanner({
           background: `radial-gradient(120% 140% at 0% 0%, ${theme.accent}26, transparent 55%), radial-gradient(120% 160% at 100% 100%, ${theme.accent2}1c, transparent 60%)`,
         }}
       />
-      {/* Motif or artwork */}
+      {/* Illustrated scene or artwork */}
       {theme.image ? (
         <img src={theme.image} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-40" />
       ) : (
-        <div className="absolute inset-0 opacity-[0.5]">
-          <ModeMotif motif={theme.motif} color={theme.accent} />
+        <div className="absolute inset-0 opacity-[0.9]">
+          <ModeArt motif={theme.motif} color={theme.accent} color2={theme.accent2} />
         </div>
       )}
       {/* Left-to-right legibility scrim */}
