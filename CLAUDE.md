@@ -25,7 +25,7 @@ time**, a lobby topic filter, a standalone **Mystery Player Duel** mode (footbal
 Guess Who; hot-seat + CPU), **user-created club identity**, **cosmetic unlocks**,
 **save export/import**, **first-run onboarding**, an accessibility/settings panel,
 deterministic per-team kit colours, a premium UI
-pass, and **433 unit tests** gating an auto-deploy pipeline.
+pass, and **460 unit tests** gating an auto-deploy pipeline.
 
 > **Central databases (NEW):** `src/data/players.ts` + `src/data/clubs.ts` +
 > `src/data/managers.ts` + `src/lib/playerDb.ts` — **299 curated players** (stable
@@ -44,7 +44,10 @@ pass, and **433 unit tests** gating an auto-deploy pipeline.
 > **Realtime hardening:** both Ably services reject spoofed actions (sender must
 > own the claimed player id). Room codes are 5 crypto-random chars. Mystery
 > **online 1v1** (`ablyMysteryService.ts`, host-authoritative + secret redaction +
-> forced manual answers) is **built but needs two-device testing**.
+> forced manual answers) is **built but needs two-device testing**. The
+> **answer-display bug is fixed** this session — `MysteryOnlineGame` now renders
+> the synced Question log + a "Latest answer" card (previously answers were
+> invisible online); the local `MysteryPlayerGame` got the same reveal.
 
 > **Difficulty (reworked):** Casual = easy+medium (18s clock) · Serious =
 > medium+hard (15s) · **Nightmare = nightmare-tagged questions ONLY + a brutal
@@ -56,6 +59,98 @@ pass, and **433 unit tests** gating an auto-deploy pipeline.
 >
 > **Content scope: men's football only.** Do not add women's football questions.
 
+## Latest session (design pass + retention spine + fixes) — READ THIS
+
+A large body of work landed since the "433-test / modes-hub" state above. All of
+it is **merged to `main` and deployed**. Test count **433 → 460**. Home bundle
+~282 kB (still code-split; now guarded — see below). No match-engine/scoring/data-
+invariant changes except the Higher/Lower content fix.
+
+**End-to-end broadcast design system.** Every core screen now shares one visual
+language: **deterministic kit colours** (`teamIdentity`/`matchIdentities`) on every
+football entity, **tabular numerals** (`.nums`), **tactical-grid texture**
+(`.grid-tactical`), correctness **accent bars**, and broadcast framing. Touched:
+home, lobby (team-vs-team matchup card), `Scoreboard`, `QuestionCard`, `ResultReveal`,
+`FinalResult` (kit-crest headline + result chip), `CareerHub` (manager dashboard +
+promotion/relegation stakes), `CupHub`/`CupResult` (knockout **bracket
+visualization**), `ConnectionsGame` (kit-crest club pairing + mystery connector),
+and all three solo modes. New reusable CSS in `globals.css`: `.surface`,
+`.card-hover`, `.lower-third`, `.nums`, `.grid-tactical`, `.skeleton`.
+`StadiumBackground` gained floodlight pools; `Button` primary/gold got lit top edges.
+
+**Home is now a matchday dashboard**, not a card wall. Structure: hero → **manager
+strip** (club identity + `@username` + friend code + lifetime record) → **Quick
+match** → **Today** (Daily Rival + Quests + Streak rewards) → **Continue** (Career)
+→ **Game modes** grid (status-tagged tiles) → Trophy/Leagues. Generic "feature
+cards" removed. **Identity unified**: with a club, the "Your name" input is
+replaced by a "Playing as {club}" row; all play actions route through one
+`playName` (club name when set, else typed name).
+
+**Username friend system (NEW).** Accounts pick a **unique `@username`** right
+after sign-up (`AccountButton` `UsernameStep`); Friends modal has a **"Search
+username"** tab (debounced Firestore prefix query) alongside friend codes. Also:
+**one-tap Invite on a friend while in a live room** (FriendsButton reads
+`useGame().room`). Backend: `firebaseBackend.ts` gained `getUserProfile`,
+`checkUsernameAvailable`, `claimUsername`, `searchUsersByUsername`; `AuthProvider`
+exposes `user.username`, `needsUsername`, `setUsername`. **Owner action required:**
+add the `/usernames/{username}` Firestore rule from `FIREBASE_SETUP.md` (create-
+only) or username claim/search fails with a permission error.
+
+**Mystery Duel answer display FIXED (both surfaces).** `MysteryOnlineGame` never
+rendered the synced `history`, so you couldn't see answers online — now it has a
+**"Latest answer" reveal card** + full **Question log** + scoreboard header +
+round-over secret reveal. The local `MysteryPlayerGame` got the same "Latest
+answer" card. (Online 1v1 still needs a real two-device pass; the *display* bug is
+resolved.)
+
+**Retention spine (phases 1–2 of 3 built, pure + tested):**
+- `lib/streakRewards.ts` — daily-streak milestone ladder (3/7/14/30 days) unlocking
+  cosmetics; a **drift-guard test** asserts each milestone's cosmetic unlocks at
+  exactly its threshold in `cosmetics.ts` (new: Streak Ember/Diagonal Cut/Legend
+  Aurora + `diagonal` pattern). `StreakRewardCard` on home; `FinalResult`
+  celebrates a crossed milestone after the Daily.
+- `lib/quests.ts` — three deterministic daily quests (one per engage/skill/daily
+  group; date-hash selection, no RNG). Progress is **derived** (baseline snapshot
+  of lifetime stats + live daily flags), so **no recording-site changes**.
+  `QuestsCard` on home; `ensureQuestsForToday()` called at boot in `main.tsx`.
+- **Phase 3 (Weekly Season) NOT built** — the planned capstone (`lib/season.ts`,
+  cross-mode weekly points + tiers + reset). This is the recommended next system.
+
+**New-player + robustness fixes:**
+- `lib/miniGameHelp.ts` — one-line rule + example per question type, auto-shown the
+  **first time this device meets each of the ten types** (render-stable claim
+  cache; `?` re-opens). A coverage test cross-checks against `scoring.BASE_POINTS`
+  so a new type can't ship without help text.
+- `lib/viewRoute.ts` — top-level views are now **URL-hash routed** (`#career`,
+  `#daily-connections`, …), so the **browser Back button works** and modes are
+  deep-linkable. `App.tsx` `Screens` syncs view↔hash; live-match flow stays
+  room-status-driven.
+- `ErrorBoundary` (provider-free) wraps the app — a render crash shows a branded
+  "Straight red card — Reload" screen instead of a white page.
+- Leaderboard modal: skeleton rows + a real inline "Sign in" button (fires a
+  `bk:open-signin` window event that `AccountButton` listens for).
+- Connections: **"Think you were right? Copy a report"** on wrong answers (grows
+  the curated accept-lists).
+- **Bundle budget CI:** `scripts/check-bundle.mjs` (+ `npm run check:bundle`, wired
+  into `deploy.yml`) fails the deploy if the entry chunk exceeds **300 kB**, so a
+  stray `data/*` import into the home path can't silently undo code-splitting.
+
+**Content:** six lopsided Higher/Lower questions (obvious blowouts mis-tagged
+hard/nightmare, e.g. Real Madrid 36 vs Valencia 6) rewritten into close, non-obvious
+matchups; all data-integrity invariants still hold.
+
+**Deploy gotcha discovered:** GitHub's own **"pages build and deployment"** workflow
+(separate from our "Deploy preview") can fail transiently ("Deployment failed, try
+again later") even when our build+publish succeeds — leaving the CDN on the OLD
+build. Symptom: shipped fixes don't appear live. Check the **Actions tab** for a red
+"pages build and deployment" and **re-run it**. Quick live-version check: the home
+hero should read "Where what you know scores goals."
+
+**New files this session:** `lib/streakRewards.ts(+test)`, `lib/quests.ts(+test)`,
+`lib/miniGameHelp.ts(+test)`, `lib/viewRoute.ts(+test)`,
+`components/home/StreakRewardCard.tsx`, `components/home/QuestsCard.tsx`,
+`components/layout/ErrorBoundary.tsx`, `scripts/check-bundle.mjs`.
+
 ## Commands
 
 ```bash
@@ -65,7 +160,8 @@ npm run build    # tsc -b && vite build  (ALWAYS run before committing UI/logic)
 npm run build:pages  # tsc -b && vite build --base=./  (relative base for Pages)
 npm run preview  # serve the production build
 npm run lint     # tsc --noEmit (type-check only)
-npm test         # vitest run (433 tests across lib/, data/, services/)
+npm test         # vitest run (460 tests across lib/, data/, services/)
+npm run check:bundle  # fail if the home entry chunk exceeds 300 kB (run after build)
 ```
 
 Gates: `npm run build` (strict `tsc`) and `npm test` (Vitest). **CI runs the
@@ -169,6 +265,12 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Area | Path |
 | --- | --- |
 | Domain types (source of truth) | `src/types/game.ts` |
+| **Daily-streak reward ladder** (pure; milestones 3/7/14/30 → cosmetics; drift-guarded vs `cosmetics.ts`) | `src/lib/streakRewards.ts`, `src/components/home/StreakRewardCard.tsx` |
+| **Daily quests** (pure; 3/day, date-hash pick, derived progress via lifetime-stat baseline) | `src/lib/quests.ts`, `src/components/home/QuestsCard.tsx` |
+| **Mini-game teach-ins** (pure; rule+example per type, first-encounter per device; coverage-tested vs `scoring.BASE_POINTS`) | `src/lib/miniGameHelp.ts`, rendered in `QuestionCard.tsx` |
+| **View↔URL-hash routing** (pure; `#career` etc., Back-button support, deep links) | `src/lib/viewRoute.ts`, wired in `src/App.tsx` |
+| **Render-crash guard** (provider-free error boundary) | `src/components/layout/ErrorBoundary.tsx` |
+| **Bundle-size budget** (fails deploy if entry chunk > 300 kB) | `scripts/check-bundle.mjs`, `deploy.yml` |
 | Scoring, goals, events, sudden-death helpers (pure) | `src/lib/scoring.ts` |
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize, tiebreakers) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
@@ -200,7 +302,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Save export/import (all `bk_`-prefixed local data → file / backup code; clear-all) | `src/lib/backup.ts`, `src/components/settings/SettingsModal.tsx` |
 | Settings & accessibility (sound, reduced-motion, high-contrast, larger-text; applied as document classes) | `src/lib/settings.ts`, `src/components/settings/` |
 | First-run onboarding (3-step intro; seen-flag, replay from Settings) | `src/lib/onboarding.ts`, `src/components/onboarding/` |
-| Friends list + friend codes + invite-to-room (local-first; Firestore online layer) | `src/lib/friends.ts`, `src/context/FriendsProvider.tsx`, `src/components/friends/` |
+| Friends: local-first codes **+ username search + in-room one-tap invite** (Firestore online layer; `/usernames/{username}` lookup) | `src/lib/friends.ts`, `src/context/FriendsProvider.tsx` (`searchUsers`/`addByUsername`), `src/components/friends/` |
 | Online leaderboard (daily + all-time, Firestore; SDK-free wrappers) | `src/lib/leaderboard.ts`, `src/components/home/TrophyCabinet.tsx` |
 | Private friend leagues (Daily-fed season tables; pure standings + Firestore) | `src/lib/leagues.ts`, `src/lib/leaguesLocal.ts`, `src/context/LeaguesProvider.tsx`, `src/components/leagues/` |
 | Live commentary text generator (pure) | `src/lib/commentary.ts` |
@@ -402,10 +504,13 @@ Append to `src/data/questions.ts`. Use a fresh id suffix to avoid collisions
 
 ## Testing
 
-`npm test` runs **433 tests** across 46 files (incl. `playerDb`, `roomCode`,
+`npm test` runs **460 tests** across 50 files (incl. `playerDb`, `roomCode`,
 `careerPath`, `managers`,
 `dailyConnections`, `olderYounger`, and the Connections DB-augmentation +
-Mystery manual-mode suites). Newer suites from the match-feel /
+Mystery manual-mode suites). Newest (this session): `streakRewards` (ladder maths
++ drift-guard vs `cosmetics`), `quests` (date-hash selection + derived progress),
+`miniGameHelp` (coverage vs `scoring.BASE_POINTS` + first-encounter semantics),
+`viewRoute` (view↔hash round-trip + junk fallback). Newer suites from the match-feel /
 identity / Mystery work: `attackFraming`, `matchTimeline`, `matchStats`,
 `answerInsight`, `punditry`, `dailyRival`, `shareCard`, `clubIdentity`,
 `careerProgression`, `feats`, `recentOpponents`, `cosmetics`, `backup`,
@@ -537,7 +642,9 @@ Gotchas:
   domains (for Google + email-link redirects); (3) create Firestore + publish the
   **expanded** security rules so cross-device **sync** AND the friends/leaderboard
   features turn on — the rules now cover `progress/{uid}` (private sync),
-  `users/{uid}` (+ `friends`/`invites` sub-collections), `friendCodes/{code}`, and
+  `users/{uid}` (+ `friends`/`invites` sub-collections), `friendCodes/{code}`,
+  **`usernames/{username}` (NEW — create-only; required for the username picker +
+  search, else `permission-denied`)**, and
   `leaderboards/{board}/entries/{uid}` (sign-in works without them — those
   features just no-op). Steps + the full ruleset in `FIREBASE_SETUP.md`. The owner is doing
   all setup **web-only** (no terminal); the Firestore *Rules* editor is the
