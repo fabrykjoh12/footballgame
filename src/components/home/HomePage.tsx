@@ -111,17 +111,13 @@ export function HomePage({
   return (
     <div className="flex flex-1 flex-col gap-7 py-6">
       {/* Hero */}
-      <div className="text-center animate-fade-in">
-        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
-          <IconBolt className="h-3.5 w-3.5 text-royal-glow" />
-          Ten mini-games · a new fixture every day
-        </div>
-        <h1 className="font-display text-4xl font-bold leading-none tracking-tight sm:text-5xl">
-          <span className="text-gradient-pitch">Ball Knowledge</span>
+      <div className="animate-fade-in">
+        <h1 className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+          Ball Knowledge
         </h1>
-        <p className="mx-auto mt-3 max-w-md text-balance text-white/60">
-          Where what you know scores goals. Real 1v1 football duels — ten
-          questions, ninety minutes, one scoreline.
+        <p className="mt-2 max-w-md text-[15px] leading-relaxed text-white/55">
+          1v1 football quiz duels. Ten questions, one scoreline — play a friend
+          or the CPU.
         </p>
         {/* First-run teaser: show what a finished match looks like. */}
         {!club && stats.matchesPlayed === 0 && <MatchPreviewCard />}
@@ -209,9 +205,7 @@ export function HomePage({
             <div className="flex min-w-0 items-center gap-2.5">
               <ClubBadge identity={club} size={30} />
               <div className="min-w-0">
-                <div className="text-[10px] uppercase tracking-wider text-white/40">
-                  Playing as
-                </div>
+                <div className="text-xs text-white/45">Playing as</div>
                 <div className="truncate text-sm font-semibold">{club.name}</div>
               </div>
             </div>
@@ -223,7 +217,7 @@ export function HomePage({
           <>
             <label
               htmlFor="player-name"
-              className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/50"
+              className="mb-2 block text-sm font-medium text-white/60"
             >
               Your name
             </label>
@@ -347,10 +341,10 @@ export function HomePage({
         <SectionLabel hint="Singleplayer">{career ? 'Continue' : 'New challenge'}</SectionLabel>
         <Card className="p-4">
           <div className="mb-2 flex items-center gap-2">
-            <IconTrophy className="h-5 w-5 text-pitch" />
-            <h2 className="font-display text-base font-bold">Career Mode</h2>
+            <IconTrophy className="h-5 w-5 text-gold" />
+            <h2 className="text-[15px] font-bold text-white">Career mode</h2>
             {career && (
-              <span className="ml-auto rounded-full border border-pitch/30 bg-pitch/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-pitch">
+              <span className="nums ml-auto rounded-full border border-white/12 bg-white/5 px-2 py-0.5 text-[11px] font-medium text-white/70">
                 S{career.season} · {divisionByTier(career.tier).name}
               </span>
             )}
@@ -429,49 +423,37 @@ export function HomePage({
   );
 }
 
-/** A decorative "matchday card" preview shown on the hero. License-free. */
+/** A small "final score" preview shown to first-time visitors. */
 function MatchPreviewCard() {
   return (
-    <div className="mx-auto mt-6 w-full max-w-xs animate-rise-in [animation-delay:120ms]">
-      <div className="glass relative overflow-hidden rounded-2xl border border-white/10 p-4 text-center shadow-elev-1">
-        {/* Tactical-board texture behind the scoreline. */}
-        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-40" aria-hidden />
-        <div className="relative">
-        <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-gold">
-          Full time
-        </div>
-        <div className="mt-2 flex items-center justify-center gap-2.5 font-display font-bold">
+    <div className="mt-5 w-full max-w-xs animate-fade-in">
+      <div className="glass rounded-2xl p-4">
+        <div className="text-xs font-medium text-white/45">Full time</div>
+        <div className="mt-1.5 flex items-center gap-2.5 font-display font-bold">
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-pitch" aria-hidden />
+            <span className="h-2.5 w-2.5 rounded-full bg-danger" aria-hidden />
             <span className="text-sm text-white/90">Sara FC</span>
           </span>
-          <span className="nums text-xl text-pitch">3–2</span>
+          <span className="nums text-xl">3–2</span>
           <span className="flex items-center gap-1.5">
             <span className="text-sm text-white/90">Jonas United</span>
             <span className="h-2.5 w-2.5 rounded-full bg-sky-400" aria-hidden />
           </span>
         </div>
-        <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-2.5 py-0.5 text-[11px] font-semibold text-gold">
-          ⏱️ 90+2' Late Winner
+        <div className="mt-1.5 text-xs text-white/45">
+          Won 90+2&rsquo; · 8/10 correct · best category Transfers
         </div>
-        <div className="mt-2 text-[11px] text-white/45">8/10 correct · Best: Transfers</div>
-        </div>
-        {/* Sweeping shine */}
-        <div className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent motion-safe:animate-[shine_3.2s_ease-in-out_infinite]" />
       </div>
     </div>
   );
 }
 
-/** A small dashboard section header: label + hairline + optional hint. */
+/** A small dashboard section header: label + optional hint. */
 function SectionLabel({ children, hint }: { children: ReactNode; hint?: string }) {
   return (
-    <div className="mb-2 flex items-center gap-3">
-      <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-white/55">{children}</h2>
-      <span className="h-px flex-1 bg-white/[0.07]" />
-      {hint && (
-        <span className="text-[10px] font-medium uppercase tracking-wide text-white/35">{hint}</span>
-      )}
+    <div className="mb-3 flex items-baseline justify-between gap-3">
+      <h2 className="text-[15px] font-bold text-white">{children}</h2>
+      {hint && <span className="text-xs text-white/40">{hint}</span>}
     </div>
   );
 }
@@ -491,7 +473,7 @@ function StatPill({
       <div className={`nums font-display text-lg font-bold ${tone === 'gold' ? 'text-gold' : 'text-pitch'}`}>
         {value}
       </div>
-      <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/40">{label}</div>
+      <div className="mt-0.5 text-[11px] text-white/45">{label}</div>
     </div>
   );
 }
@@ -514,12 +496,13 @@ function ModeTile({
   name: string;
   sub: string;
   tag?: string;
-  /** Legacy prop from the old dark tiles — ignored by the white card. */
+  /** Legacy props from the old dark tiles — no longer rendered. */
   tagTone?: string;
   /** Icon-badge accent colour (hex). */
   accent?: string;
   onClick: () => void;
 }) {
+  void tag;
   void tagTone;
   return (
     <button
@@ -534,15 +517,8 @@ function ModeTile({
         {emoji}
       </span>
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
-          <span className="truncate text-[15px] font-bold leading-tight text-ink-900">{name}</span>
-          {tag && (
-            <span className="shrink-0 rounded-full bg-royal/12 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-royal">
-              {tag}
-            </span>
-          )}
-        </div>
-        <span className="mt-0.5 block truncate text-xs leading-tight text-ink-900/55">{sub}</span>
+        <span className="block truncate text-[15px] font-bold leading-tight text-ink-900">{name}</span>
+        <span className="mt-0.5 block truncate text-[13px] leading-tight text-ink-900/55">{sub}</span>
       </div>
       <span className="shrink-0 rounded-lg bg-royal px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_2px_10px_-2px_rgba(91,75,214,0.6)] transition-transform duration-200 group-hover:-translate-y-0.5">
         Play

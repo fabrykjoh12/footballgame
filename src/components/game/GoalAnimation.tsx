@@ -57,7 +57,7 @@ export function GoalAnimation() {
       <div className="absolute inset-0 animate-fade-in bg-ink-900/55 backdrop-blur-sm" />
       <div className="relative px-6 text-center animate-goal-pop">
         {player && (
-          <div className="mb-1 text-sm font-semibold uppercase tracking-[0.25em] text-white/70">
+          <div className="mb-1 text-sm font-semibold text-white/70">
             {teamName(player.name)}
           </div>
         )}

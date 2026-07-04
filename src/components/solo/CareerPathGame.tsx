@@ -103,7 +103,7 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>🧭</div>
         <div>
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">Career Path</div>
+          <div className="text-xs font-bold text-white/40">Career Path</div>
           <h1 className="nums mt-1 font-display text-3xl font-bold text-gradient-pitch">{streak} solved</h1>
           <p className="nums mt-1 text-sm text-white/55">{score.toLocaleString()} pts · best streak {best}</p>
         </div>
@@ -151,7 +151,7 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="nums font-display text-2xl font-bold text-pitch">{score.toLocaleString()}</span>
-          <span className="text-[11px] uppercase tracking-wide text-white/40">pts</span>
+          <span className="text-[11px] text-white/40">pts</span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           {streak >= 2 && (
@@ -163,9 +163,8 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
 
       {/* Club chain */}
       <Card strong className="relative overflow-hidden p-4">
-        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
         <div className="relative">
-        <div className="mb-2 text-center text-xs uppercase tracking-wide text-white/40">Which player is this?</div>
+        <div className="mb-2 text-center text-xs text-white/40">Which player is this?</div>
         <ol className="flex flex-col gap-1.5">
           {player.clubs.map((club, i) => {
             const shown = showAll || i < revealed;

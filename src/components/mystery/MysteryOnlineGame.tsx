@@ -161,7 +161,7 @@ export function MysteryOnlineGame({
     if (iAnswer) {
       body = (
         <Card strong className="p-4 text-center animate-rise-in">
-          <div className="text-xs uppercase tracking-wide text-white/40">{opp?.name} asks you about {mySecret?.name ?? 'your player'}</div>
+          <div className="text-xs text-white/40">{opp?.name} asks you about {mySecret?.name ?? 'your player'}</div>
           <p className="mt-1 font-display text-lg font-bold">{text}</p>
           <p className="mt-1 text-[11px] text-white/40">Answer honestly about your own secret player.</p>
           <div className="mt-3 flex justify-center gap-2">
@@ -175,7 +175,7 @@ export function MysteryOnlineGame({
       // I'm the asker — show what I asked while I wait, so the flow is clear.
       body = (
         <Card className="p-4 text-center animate-rise-in">
-          <div className="text-xs uppercase tracking-wide text-white/40">You asked</div>
+          <div className="text-xs text-white/40">You asked</div>
           <p className="mt-1 font-display text-lg font-bold">{text}</p>
           <div className="mt-3 flex items-center justify-center gap-2 text-sm text-white/55">
             <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/15 border-t-pitch" />
@@ -215,11 +215,11 @@ export function MysteryOnlineGame({
       <div className="flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-2">
           <Card className="p-3">
-            <div className="text-[10px] uppercase tracking-wide text-white/40">Your secret</div>
+            <div className="text-[11px] text-white/40">Your secret</div>
             <div className="font-display text-base font-bold text-pitch">{mySecret?.name ?? '—'}</div>
           </Card>
           <Card className="p-3 text-right">
-            <div className="text-[10px] uppercase tracking-wide text-white/40">Candidates left</div>
+            <div className="text-[11px] text-white/40">Candidates left</div>
             <div className="font-display text-base font-bold">{candidates.length}</div>
           </Card>
         </div>
@@ -260,7 +260,7 @@ export function MysteryOnlineGame({
         <Card className="flex items-center justify-between p-3">
           <Side name={me?.name ?? 'You'} you score={s.matchScore[localId]} active={myTurn} format={s.settings.format} />
           <div className="px-2 text-center">
-            <div className="text-[10px] uppercase tracking-wide text-white/30">
+            <div className="text-[11px] text-white/30">
               {s.settings.format === 'single' ? 'Mystery Duel' : s.settings.format.toUpperCase()}
             </div>
             <div className="font-display text-sm font-bold text-white/70">vs</div>
@@ -282,7 +282,7 @@ export function MysteryOnlineGame({
       {/* Full question + answer history (the deduction log). */}
       {inPlay && (
         <Card className="p-4">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/70">Question log</h2>
+          <h2 className="mb-2 text-sm font-semibold text-white/70">Question log</h2>
           {s.history.length === 0 ? (
             <p className="text-xs text-white/40">No questions yet — ask away and watch the answers land here.</p>
           ) : (
@@ -367,7 +367,7 @@ function LatestAnswer({
   const mine = last.askerId === localId;
   return (
     <Card strong className="p-3 animate-rise-in">
-      <div className="text-[10px] uppercase tracking-wide text-white/40">
+      <div className="text-[11px] text-white/40">
         {mine ? 'You learned' : `${nameOf(last.askerId)} asked`}
       </div>
       <div className="mt-0.5 flex items-baseline justify-between gap-2">

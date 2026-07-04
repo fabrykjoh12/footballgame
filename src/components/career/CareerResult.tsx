@@ -83,7 +83,7 @@ export function CareerResult() {
       <Card strong glow className="overflow-hidden p-6 text-center animate-rise-in">
         <div className="mb-2 inline-flex items-center gap-2 text-gold">
           <IconTrophy className="h-5 w-5" />
-          <span className="text-xs font-bold uppercase tracking-[0.2em]">Full time</span>
+          <span className="text-xs font-bold">Full time</span>
         </div>
         <div className="font-display text-2xl font-bold leading-tight sm:text-3xl">
           <span className={outcome === 'win' ? 'text-gradient-gold' : 'text-white/80'}>
@@ -115,7 +115,7 @@ export function CareerResult() {
 
       {career && (
         <Card className="p-4">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-white/70">
+          <h2 className="mb-3 text-sm font-semibold text-white/70">
             Updated table
           </h2>
           <LeagueTable state={career} />

@@ -100,7 +100,7 @@ export function CommentaryTicker() {
     >
       <span
         aria-hidden
-        className="inline-flex shrink-0 items-center gap-1 rounded-md bg-pitch/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-pitch"
+        className="inline-flex shrink-0 items-center gap-1 rounded-md bg-pitch/15 px-1.5 py-0.5 text-[11px] font-bold text-pitch"
       >
         <span className="h-1.5 w-1.5 rounded-full bg-pitch motion-safe:animate-pulse" />
         Live

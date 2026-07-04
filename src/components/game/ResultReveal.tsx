@@ -79,9 +79,8 @@ export function ResultReveal({
     <div className="flex flex-col gap-4 animate-slide-up">
       {/* Correct answer */}
       <Card strong className="relative overflow-hidden p-5 text-center">
-        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
         <div className="relative">
-          <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.2em] text-pitch">
+          <div className="inline-flex items-center gap-1.5 text-xs text-pitch">
             <IconCheck className="h-3.5 w-3.5" /> Correct answer
           </div>
           <div className="my-1.5 font-display text-2xl font-bold text-pitch sm:text-3xl">

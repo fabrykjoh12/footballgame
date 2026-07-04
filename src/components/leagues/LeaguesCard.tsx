@@ -23,8 +23,8 @@ export function LeaguesCard() {
     <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
       <div className="mb-2 flex items-center gap-2">
         <IconTrophy className="h-5 w-5 text-gold" />
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-          Friend Leagues
+        <h2 className="text-sm font-semibold text-white/80">
+          Friend leagues
         </h2>
         {online && leagues.length > 0 && (
           <span className="ml-auto text-xs font-bold text-gold">{leagues.length}</span>
@@ -151,7 +151,7 @@ function LeaguesModal({ onClose }: { onClose: () => void }) {
                   </Button>
                 </div>
 
-                <div className="my-3 flex items-center gap-3 text-[11px] uppercase tracking-widest text-white/30">
+                <div className="my-3 flex items-center gap-3 text-[11px] text-white/30">
                   <span className="h-px flex-1 bg-white/10" />
                   or join
                   <span className="h-px flex-1 bg-white/10" />

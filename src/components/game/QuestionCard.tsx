@@ -122,7 +122,7 @@ export function QuestionCard({
       )}
       {question.type === 'guess_year' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
+          <h2 className="mb-2 text-sm font-semibold text-white/60">
             In which year?
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -132,7 +132,7 @@ export function QuestionCard({
       )}
       {question.type === 'transfer_fee' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
+          <h2 className="mb-2 text-sm font-semibold text-white/60">
             What was the fee?
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -142,7 +142,7 @@ export function QuestionCard({
       )}
       {question.type === 'pitch_position' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
+          <h2 className="mb-2 text-sm font-semibold text-white/60">
             Where did they play?
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -152,7 +152,7 @@ export function QuestionCard({
       )}
       {question.type === 'odd_one_out' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
+          <h2 className="mb-2 text-sm font-semibold text-white/60">
             Odd one out
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -162,7 +162,7 @@ export function QuestionCard({
       )}
       {question.type === 'spot_the_lie' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
+          <h2 className="mb-2 text-sm font-semibold text-white/60">
             Spot the lie
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -172,7 +172,7 @@ export function QuestionCard({
       )}
       {question.type === 'guess_the_number' && (
         <div className="mb-4">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/60">
+          <h2 className="mb-2 text-sm font-semibold text-white/60">
             Guess the number — closest wins
           </h2>
           <p className="text-lg font-semibold leading-snug sm:text-xl">
@@ -276,7 +276,7 @@ function WhoAmIBody({
   return (
     <div className="mb-4">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-white/60">
+        <h2 className="text-sm font-semibold text-white/60">
           Guess the player
         </h2>
         <Badge tone="gold"><span className="nums">up to {potential} pts</span></Badge>
@@ -313,7 +313,7 @@ function CareerPathBody({
 }) {
   return (
     <div className="mb-4">
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-white/60">
+      <h2 className="mb-3 text-sm font-semibold text-white/60">
         Whose career path is this?
       </h2>
       <div className="flex flex-wrap items-center gap-1.5">
@@ -387,7 +387,7 @@ function HigherLowerPicker({
         </span>
         <span className="font-semibold leading-tight">{name}</span>
         {chosen && (
-          <span className="text-[10px] font-bold uppercase tracking-wide text-pitch">
+          <span className="text-[11px] font-bold text-pitch">
             Your pick
           </span>
         )}
@@ -560,7 +560,7 @@ function PitchGrid({
             onClick={() => onAnswer(zone)}
             aria-pressed={chosen}
             className={[
-              'answer-press flex w-full items-center justify-center py-4 text-sm font-semibold uppercase tracking-[0.15em]',
+              'answer-press flex w-full items-center justify-center py-4 text-sm font-semibold',
               i > 0 ? 'border-t border-dashed border-white/15' : '',
               chosen ? 'bg-pitch/20 text-pitch' : 'text-white/70 hover:bg-white/[0.05]',
               disabled && !chosen ? 'opacity-55' : '',

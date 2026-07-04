@@ -81,7 +81,7 @@ export function MatchTimeline() {
           {(pressure || dramatic || stoppage) && (
             <span
               className={[
-                'rounded-sm px-1 py-0.5 text-[8px] font-bold uppercase tracking-wider',
+                'rounded-sm px-1 py-0.5 text-[8px] font-bold',
                 stoppage
                   ? 'bg-gold/20 text-gold'
                   : dramatic
@@ -107,7 +107,7 @@ export function MatchTimeline() {
         {/* Current-minute knob */}
         <div
           className={[
-            'absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-ink-900 shadow-glow motion-safe:transition-[left] motion-safe:duration-500 motion-safe:ease-premium',
+            'absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-ink-900 motion-safe:transition-[left] motion-safe:duration-500 motion-safe:ease-premium',
             knobColor,
             dramatic || stoppage ? 'motion-safe:animate-pulse' : '',
           ].join(' ')}

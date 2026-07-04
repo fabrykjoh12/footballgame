@@ -231,7 +231,7 @@ function SoloHud({
     <Card className="flex items-center justify-between p-3">
       <div className="flex items-baseline gap-1.5">
         <span className="font-display text-2xl font-bold text-pitch">{score.toLocaleString()}</span>
-        <span className="text-[11px] uppercase tracking-wide text-white/40">pts</span>
+        <span className="text-[11px] text-white/40">pts</span>
       </div>
 
       <div className="flex items-center gap-3 text-sm">
@@ -313,7 +313,7 @@ function SoloResult({
         {cfg.icon}
       </div>
       <div>
-        <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">{cfg.label} — full time</div>
+        <div className="text-xs font-bold text-white/40">{cfg.label} — full time</div>
         <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">{headline}</h1>
         {run?.isBest && (
           <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm font-semibold text-gold">
@@ -349,7 +349,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
       <div className="font-display text-xl font-bold text-pitch">{value}</div>
-      <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/40">{label}</div>
+      <div className="mt-0.5 text-[11px] text-white/40">{label}</div>
     </div>
   );
 }

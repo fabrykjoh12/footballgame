@@ -17,10 +17,7 @@ export function QuestsCard() {
     <Card className="p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-lg" aria-hidden>🎯</span>
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-white/70">
-            Daily quests
-          </h3>
+          <h3 className="text-[15px] font-bold text-white">Daily quests</h3>
         </div>
         <span
           className={[

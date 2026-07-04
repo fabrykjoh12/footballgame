@@ -79,7 +79,6 @@ export function LobbyPage() {
 
       {/* Broadcast matchup card */}
       <Card strong className="relative overflow-hidden p-5 animate-rise-in">
-        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.35]" aria-hidden />
         {/* Kit-colour wash from each touchline. */}
         <div
           className="pointer-events-none absolute inset-y-0 left-0 w-1/3 opacity-60"
@@ -93,8 +92,8 @@ export function LobbyPage() {
         />
 
         <div className="relative">
-          <div className="mb-4 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-gold">
-            Matchday · {canStart ? 'Ready' : 'Team sheet'}
+          <div className="mb-4 text-center text-[11px] font-bold text-gold">
+            Matchday · {canStart ? 'ready' : 'team sheet'}
           </div>
           <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-2">
             <TeamColumn
@@ -105,7 +104,7 @@ export function LobbyPage() {
             />
             <div className="flex flex-col items-center pt-3">
               <span className="font-display text-2xl font-black italic text-white/25">VS</span>
-              <span className="mt-1 nums text-[10px] font-semibold uppercase tracking-wide text-white/35">
+              <span className="mt-1 nums text-[11px] font-semibold text-white/35">
                 {room.settings.questionCount} Qs
               </span>
             </div>
@@ -128,7 +127,7 @@ export function LobbyPage() {
         <div className="lower-third px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <div className="text-[10px] uppercase tracking-[0.2em] text-white/40">
+              <div className="text-[11px] text-white/40">
                 Room code
               </div>
               <div className="nums font-mono text-3xl font-bold tracking-[0.25em] text-gradient-pitch">
@@ -155,7 +154,7 @@ export function LobbyPage() {
       {/* Match settings */}
       <Card className="p-4">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-white/70">
+          <h2 className="text-sm font-semibold text-white/70">
             Match mode
           </h2>
           {!isHost && (
@@ -178,7 +177,7 @@ export function LobbyPage() {
                 className={[
                   'answer-press rounded-xl border p-3 text-left transition-colors',
                   selected
-                    ? 'border-pitch/60 bg-pitch/10 shadow-glow'
+                    ? 'border-pitch/60 bg-pitch/10'
                     : 'border-white/10 bg-white/[0.03] hover:bg-white/[0.06]',
                   !isHost ? 'cursor-default opacity-90' : '',
                 ].join(' ')}
@@ -199,7 +198,7 @@ export function LobbyPage() {
         {/* Topics (soft filter) */}
         <div className="mt-4 border-t border-white/10 pt-3">
           <div className="mb-2 flex items-center justify-between">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-white/70">
+            <h3 className="text-sm font-semibold text-white/70">
               Topics
             </h3>
             <span className="text-xs text-white/40">

@@ -80,7 +80,7 @@ export function OlderYoungerGame({ onExit }: { onExit: () => void }) {
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>🎂</div>
         <div>
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">Older or Younger?</div>
+          <div className="text-xs font-bold text-white/40">Older or Younger?</div>
           <h1 className="nums mt-1 font-display text-3xl font-bold text-gradient-pitch">{streak} in a row</h1>
           {isBest && (
             <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-sm font-semibold text-gold">
@@ -138,7 +138,7 @@ export function OlderYoungerGame({ onExit }: { onExit: () => void }) {
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="nums font-display text-2xl font-bold text-pitch">{streak}</span>
-          <span className="text-[11px] uppercase tracking-wide text-white/40">streak</span>
+          <span className="text-[11px] text-white/40">streak</span>
         </div>
         <span className="nums text-sm text-white/55">Best {best}</span>
       </Card>
@@ -161,7 +161,7 @@ export function OlderYoungerGame({ onExit }: { onExit: () => void }) {
           </span>
         </div>
       ) : (
-        <p className="text-center text-xs uppercase tracking-wide text-white/40">Is the next player older or younger?</p>
+        <p className="text-center text-xs text-white/40">Is the next player older or younger?</p>
       )}
 
       {/* The challenger */}
@@ -198,7 +198,7 @@ function PlayerCard({ name, club, year }: { name: string; club: string; year: nu
         </div>
       </div>
       <div className="shrink-0 text-right">
-        <div className="text-[10px] uppercase tracking-wide text-white/40">Born</div>
+        <div className="text-[11px] text-white/40">Born</div>
         <div className="nums font-display text-2xl font-bold text-pitch">{year ?? '????'}</div>
       </div>
     </Card>
@@ -209,7 +209,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg bg-white/[0.03] p-2 text-center">
       <div className="nums font-display text-xl font-bold">{value}</div>
-      <div className="text-[10px] uppercase tracking-wide text-white/40">{label}</div>
+      <div className="text-[11px] text-white/40">{label}</div>
     </div>
   );
 }

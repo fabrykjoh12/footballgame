@@ -40,7 +40,7 @@ export function InviteFriends({ roomCode }: { roomCode: string }) {
 
   return (
     <Card className="p-4">
-      <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/70">
+      <h2 className="mb-2 text-sm font-semibold text-white/70">
         Invite a friend
       </h2>
       <ul className="flex flex-col gap-1.5">

@@ -115,8 +115,8 @@ export function GamePage() {
       <CommentaryTicker />
 
       {stoppageRound > 0 && (
-        <div className="flex items-center justify-center gap-2 rounded-xl border border-gold/40 bg-gold/10 px-3 py-2 text-center text-sm font-bold uppercase tracking-wider text-gold motion-safe:animate-pulse">
-          ⏱ Stoppage Time — Sudden Death
+        <div className="flex items-center justify-center gap-2 rounded-xl border border-gold/40 bg-gold/10 px-3 py-2 text-center text-sm font-bold text-gold motion-safe:animate-pulse">
+          ⏱ Stoppage time — Sudden death
           {stoppageRound > 1 ? ` · Round ${stoppageRound}` : ''}
         </div>
       )}
@@ -180,7 +180,7 @@ export function GamePage() {
           aria-label="Match paused"
           className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-ink-900/90 px-6 text-center backdrop-blur-sm"
         >
-          <div className="font-display text-xs uppercase tracking-[0.3em] text-pitch">
+          <div className="font-display text-xs text-pitch">
             Paused
           </div>
           <div className="font-display text-3xl font-bold text-white">Match suspended</div>
@@ -191,7 +191,7 @@ export function GamePage() {
             type="button"
             autoFocus
             onClick={() => void resumeMatch()}
-            className="rounded-xl bg-pitch px-8 py-3.5 font-display text-base font-bold text-ink-900 shadow-glow transition hover:brightness-110"
+            className="rounded-xl bg-pitch px-8 py-3.5 font-display text-base font-bold text-ink-900 transition hover:brightness-110"
           >
             Resume
           </button>
@@ -212,7 +212,7 @@ function Kickoff({
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 py-16 text-center animate-scale-in">
       <div className="relative grid h-20 w-20 place-items-center">
-        <span className="absolute inset-0 animate-pulse-glow rounded-full bg-pitch/20" />
+        <span className="absolute inset-0 rounded-full bg-pitch/20" />
         <svg viewBox="0 0 24 24" className="h-12 w-12 animate-spin-slow text-pitch" aria-hidden>
           <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.6" />
           <path

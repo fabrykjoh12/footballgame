@@ -117,7 +117,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Accessibility / display */}
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/45">
+        <h3 className="mb-2 text-xs font-semibold text-white/45">
           Accessibility
         </h3>
         <div className="mb-4 space-y-2">
@@ -148,7 +148,7 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Save management */}
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/45">
+        <h3 className="mb-2 text-xs font-semibold text-white/45">
           Your save
         </h3>
         <Card className="mb-3 p-3">

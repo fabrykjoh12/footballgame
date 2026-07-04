@@ -95,14 +95,13 @@ export function CupResult() {
     <div className="flex flex-col gap-4 py-4 animate-fade-in">
       {/* Scoreline — broadcast cup-tie panel */}
       <Card strong glow className="relative overflow-hidden p-6 text-center animate-rise-in">
-        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
         <div className="relative">
           {status === 'won' && (
             <div className="mb-1 text-5xl motion-safe:animate-goal-pop" aria-hidden>🏆</div>
           )}
           <div className="mb-3 inline-flex items-center gap-2 text-gold">
             <IconTrophy className="h-4 w-4" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.25em]">
+            <span className="text-[11px] font-bold">
               {resolved ? `${resolved.def.name} · ${resolved.playedRound.name}` : 'Full time'}
             </span>
           </div>

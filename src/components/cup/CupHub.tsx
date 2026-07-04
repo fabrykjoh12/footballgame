@@ -195,7 +195,7 @@ function CupBracket({
               {r.opponent.charAt(0).toUpperCase()}
             </span>
             <div className="min-w-0 flex-1">
-              <div className="text-[10px] uppercase tracking-wide text-white/40">{r.name}</div>
+              <div className="text-[11px] text-white/40">{r.name}</div>
               <div className="truncate font-display text-sm font-bold">{teamName(r.opponent)}</div>
             </div>
             {current ? (
@@ -205,7 +205,7 @@ function CupBracket({
                 <IconCheck className="h-4 w-4" />
               </span>
             ) : (
-              <span className="text-[10px] uppercase tracking-wide text-white/35">{r.mode}</span>
+              <span className="text-[11px] text-white/35">{r.mode}</span>
             )}
           </li>
         );

@@ -39,8 +39,8 @@ export function Scoreboard({
             </span>
           </div>
           {questionNumber != null && totalQuestions != null && (
-            <div className="nums mt-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40">
-              Q {questionNumber}/{totalQuestions}
+            <div className="nums mt-0.5 text-[11px] font-medium text-white/45">
+              Question {questionNumber}/{totalQuestions}
             </div>
           )}
         </div>

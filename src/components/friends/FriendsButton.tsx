@@ -182,7 +182,7 @@ function FriendsModal({ onClose }: { onClose: () => void }) {
 
         {/* Your code */}
         <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-3 text-center">
-          <div className="text-[11px] uppercase tracking-wider text-white/40">Your friend code</div>
+          <div className="text-[11px] text-white/40">Your friend code</div>
           <div className="mt-1 flex items-center justify-center gap-2">
             <span className="font-mono text-lg font-bold tracking-widest text-pitch">
               {formatFriendCode(myCode)}
@@ -424,7 +424,7 @@ function FriendsModal({ onClose }: { onClose: () => void }) {
         {/* Recent opponents */}
         {recent.length > 0 && (
           <div className="mt-4">
-            <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/40">
+            <h3 className="mb-2 text-[11px] font-semibold text-white/40">
               Recent opponents
             </h3>
             <ul className="flex max-h-40 flex-col gap-1.5 overflow-y-auto">

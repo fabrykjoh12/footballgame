@@ -159,7 +159,7 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="nums font-display text-2xl font-bold text-pitch">{score.toLocaleString()}</span>
-          <span className="text-[11px] uppercase tracking-wide text-white/40">pts</span>
+          <span className="text-[11px] text-white/40">pts</span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           {streak >= 2 && (
@@ -238,9 +238,8 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
 
       {/* The two clubs — a connection to solve */}
       <Card strong glow className="relative overflow-hidden p-6 text-center animate-rise-in">
-        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
         <div className="relative">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/45">
+          <p className="text-xs font-bold text-white/45">
             Name a player who played for both
           </p>
           <div className="mt-4 grid grid-cols-[1fr_auto_1fr] items-start gap-1">
@@ -348,7 +347,7 @@ function ConnectionsResult({ run, onExit }: { run: FinishedRun | null; onExit: (
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>{solved ? '🔗' : '🫥'}</div>
         <div>
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">Daily Connections</div>
+          <div className="text-xs font-bold text-white/40">Daily Connections</div>
           <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">
             {solved ? 'Solved!' : 'Missed today'}
           </h1>
@@ -372,7 +371,7 @@ function ConnectionsResult({ run, onExit }: { run: FinishedRun | null; onExit: (
         🔗
       </div>
       <div>
-        <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">Connections — full time</div>
+        <div className="text-xs font-bold text-white/40">Connections — full time</div>
         <h1 className="nums mt-1 font-display text-3xl font-bold text-gradient-pitch">
           {correct}/{total} correct
         </h1>
@@ -402,7 +401,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
       <div className="nums font-display text-xl font-bold text-pitch">{value}</div>
-      <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/40">{label}</div>
+      <div className="mt-0.5 text-[11px] text-white/40">{label}</div>
     </div>
   );
 }

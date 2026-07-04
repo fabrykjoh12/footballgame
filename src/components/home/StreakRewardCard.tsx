@@ -23,10 +23,7 @@ export function StreakRewardCard() {
     <Card className="p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <span className="text-lg" aria-hidden>🔥</span>
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-white/70">
-            Streak rewards
-          </h3>
+          <h3 className="text-[15px] font-bold text-white">Streak rewards</h3>
         </div>
         <span className="nums rounded-full border border-gold/30 bg-gold/10 px-2.5 py-0.5 text-xs font-bold text-gold">
           {streak} day{streak === 1 ? '' : 's'}

@@ -203,7 +203,7 @@ function AuthModal({ onClose }: { onClose: () => void }) {
               </Button>
             </div>
 
-            <div className="my-4 flex items-center gap-3 text-[11px] uppercase tracking-widest text-white/30">
+            <div className="my-4 flex items-center gap-3 text-[11px] text-white/30">
               <span className="h-px flex-1 bg-white/10" />
               or
               <span className="h-px flex-1 bg-white/10" />
@@ -212,7 +212,7 @@ function AuthModal({ onClose }: { onClose: () => void }) {
             {/* Email + password */}
             <label
               htmlFor="auth-email"
-              className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/50"
+              className="mb-1.5 block text-xs font-semibold text-white/50"
             >
               Email
             </label>
@@ -231,7 +231,7 @@ function AuthModal({ onClose }: { onClose: () => void }) {
             />
             <label
               htmlFor="auth-password"
-              className="mb-1.5 mt-3 block text-xs font-semibold uppercase tracking-wider text-white/50"
+              className="mb-1.5 mt-3 block text-xs font-semibold text-white/50"
             >
               Password
             </label>
@@ -343,7 +343,7 @@ function UsernameStep({
       <div className="mt-5">
         <label
           htmlFor="username-pick"
-          className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-white/50"
+          className="mb-1.5 block text-xs font-semibold text-white/50"
         >
           Username
         </label>

@@ -110,7 +110,7 @@ function RoleChip({
 function Fame({ label }: { label: 'Famous' | 'Known' | 'Deep Cut' }) {
   const tone =
     label === 'Famous' ? 'text-gold' : label === 'Known' ? 'text-pitch' : 'text-sky-300';
-  return <span className={['shrink-0 text-[9px] font-bold uppercase tracking-wide', tone].join(' ')}>{label}</span>;
+  return <span className={['shrink-0 text-[11px] font-bold', tone].join(' ')}>{label}</span>;
 }
 
 /** Abstract, license-free position silhouette. */

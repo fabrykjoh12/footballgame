@@ -113,7 +113,6 @@ function ScoutLobby({ onExit, onDaily, onDuel }: { onExit: () => void; onDaily: 
       </div>
 
       <Card strong className="relative overflow-hidden p-5">
-        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
         <div className="relative">
           <h1 className="font-display text-2xl font-bold text-gradient-pitch">The Scout</h1>
           <p className="mt-2 text-sm leading-relaxed text-white/65">
@@ -180,7 +179,7 @@ function EvidenceRow({ probe }: { probe: ScoutProbe }) {
     >
       {probe.fits ? <IconCheck className="h-3.5 w-3.5 shrink-0 text-pitch" /> : <IconClose className="h-3.5 w-3.5 shrink-0 text-danger" />}
       <span className="min-w-0 truncate">{probe.playerName}</span>
-      <span className={probe.fits ? 'ml-auto shrink-0 text-[10px] font-semibold uppercase tracking-wide text-pitch' : 'ml-auto shrink-0 text-[10px] uppercase tracking-wide text-white/35'}>
+      <span className={probe.fits ? 'ml-auto shrink-0 text-[11px] font-semibold text-pitch' : 'ml-auto shrink-0 text-[11px] text-white/35'}>
         {probe.fits ? 'Fits' : 'Not our type'}
       </span>
     </li>
@@ -344,7 +343,7 @@ function RulePicker({
                 onClick={() => setArmedId(c.id)}
               >
                 <span className="min-w-0 truncate">{c.label}</span>
-                <span className="shrink-0 text-[10px] uppercase tracking-wide text-white/30">{c.kind}</span>
+                <span className="shrink-0 text-[11px] text-white/30">{c.kind}</span>
               </button>
             )}
           </li>
@@ -405,7 +404,7 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>🔍</div>
         <div>
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">The Scout · Daily rule</div>
+          <div className="text-xs font-bold text-white/40">The Scout · Daily rule</div>
           <h1 className="mt-1 font-display text-2xl font-bold text-white/90">
             {progress.daily.lastSolved ? 'Cracked today’s rule' : 'Today’s rule got away'}
           </h1>
@@ -432,7 +431,7 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>{solved ? '🕵️' : '🙈'}</div>
         <div>
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">The Scout · Daily rule</div>
+          <div className="text-xs font-bold text-white/40">The Scout · Daily rule</div>
           <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">
             {solved ? `Cracked in ${probes.length} probe${probes.length === 1 ? '' : 's'}` : 'Case closed — unsolved'}
           </h1>
@@ -465,7 +464,7 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="nums font-display text-2xl font-bold text-pitch">{probes.length}</span>
-          <span className="text-[11px] uppercase tracking-wide text-white/40">probes</span>
+          <span className="text-[11px] text-white/40">probes</span>
         </div>
         <span className="nums text-sm text-white/55">
           {accusationsLeft} accusation{accusationsLeft === 1 ? '' : 's'} left
@@ -473,9 +472,8 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
       </Card>
 
       <Card strong className="relative overflow-hidden p-4">
-        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
         <div className="relative">
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/45">Today&rsquo;s secret recruitment rule</div>
+          <div className="text-xs font-bold text-white/45">Today&rsquo;s secret recruitment rule</div>
           <p className="mt-1 text-sm text-white/65">
             Probe players to hear <span className="text-pitch">fits</span> / <span className="text-danger">not our type</span>, then accuse the rule.
             It&rsquo;s one of <span className="nums font-semibold text-white/90">{catalog.length}</span> in the book.
@@ -494,7 +492,7 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
 
       {probes.length > 0 && (
         <div>
-          <div className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-white/40">Evidence</div>
+          <div className="mb-1.5 text-[11px] font-bold text-white/40">Evidence</div>
           <ul className="flex flex-col gap-1">
             {[...probes].reverse().map((p) => (
               <EvidenceRow key={p.playerId} probe={p} />
@@ -505,7 +503,7 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
 
       <Card className="p-3">
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-[11px] font-bold uppercase tracking-wide text-white/40">Accuse the rule</span>
+          <span className="text-[11px] font-bold text-white/40">Accuse the rule</span>
           {wrong.length > 0 && <span className="text-[11px] text-danger/90">Wrong: {wrong.length}</span>}
         </div>
         <RulePicker
@@ -678,7 +676,7 @@ function ScoutDuel({
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>{humanWon ? '🏆' : '🕵️'}</div>
         <div>
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">The Scout</div>
+          <div className="text-xs font-bold text-white/40">The Scout</div>
           <h1 className="mt-1 font-display text-3xl font-bold text-gradient-pitch">{nameOf(winner)} cracked the rule</h1>
           <p className="nums mt-1 text-sm text-white/55">
             in {round.probes[winner].length} probe{round.probes[winner].length === 1 ? '' : 's'}
@@ -810,7 +808,7 @@ function ScoutDuel({
       <div className="grid grid-cols-2 gap-2">
         {(['A', 'B'] as const).map((side) => (
           <div key={side}>
-            <div className="mb-1.5 flex items-center justify-between text-[11px] font-bold uppercase tracking-wide text-white/40">
+            <div className="mb-1.5 flex items-center justify-between text-[11px] font-bold text-white/40">
               <span>{possessive(side)} evidence</span>
               {round.accusations[side].length > 0 && (
                 <span className="normal-case text-danger/80">{round.accusations[side].length} wrong</span>

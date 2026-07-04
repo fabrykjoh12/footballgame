@@ -22,7 +22,7 @@ interface AnswerOptionProps {
 const STATE_CLASSES: Record<AnswerState, string> = {
   idle: 'border-white/10 bg-white/[0.04] hover:bg-white/[0.09] hover:border-white/20',
   selected: 'border-pitch/70 bg-pitch/10 ring-2 ring-pitch/40',
-  correct: 'border-good/70 bg-good/15 ring-2 ring-good/50 animate-pulse-glow',
+  correct: 'border-good/70 bg-good/15 ring-2 ring-good/50',
   incorrect: 'border-danger/70 bg-danger/15 animate-shake',
   muted: 'border-white/10 bg-white/[0.02] opacity-55',
 };
@@ -74,7 +74,7 @@ export function AnswerOption({
       </span>
       <span className="flex-1 font-medium leading-tight">{text}</span>
       {tag && (
-        <span className="shrink-0 rounded-md bg-white/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/70">
+        <span className="shrink-0 rounded-md bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-white/70">
           {tag}
         </span>
       )}

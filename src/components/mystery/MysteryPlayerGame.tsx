@@ -132,7 +132,7 @@ function MysteryLobby({
       </div>
 
       <Card className="p-4">
-        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-white/45">Opponent</h2>
+        <h2 className="mb-2 text-xs font-semibold text-white/45">Opponent</h2>
         <div className="grid grid-cols-2 gap-2">
           <Seg active={opponent === 'cpu'} onClick={() => setOpponent('cpu')}>vs CPU Scout</Seg>
           <Seg active={opponent === 'hotseat'} onClick={() => setOpponent('hotseat')}>Pass & Play</Seg>
@@ -140,7 +140,7 @@ function MysteryLobby({
       </Card>
 
       <Card className="p-4">
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wide text-white/45">House rules</h2>
+        <h2 className="mb-3 text-xs font-semibold text-white/45">House rules</h2>
         <div className="flex flex-col gap-3 text-sm">
           <Row label="Timer">
             <Seg small active={!settings.timerOn} onClick={() => set({ timerOn: false })}>Off</Seg>
@@ -358,7 +358,7 @@ function MysteryRunner({
       <div className="flex flex-1 flex-col items-center justify-center gap-6 py-16 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>🤝</div>
         <div>
-          <div className="text-xs uppercase tracking-[0.2em] text-white/40">Pass the device</div>
+          <div className="text-xs text-white/40">Pass the device</div>
           <h1 className="mt-1 font-display text-2xl font-bold">{p.name}, ready to {verb}?</h1>
         </div>
         <Button size="lg" onClick={() => setRevealedFor(activePersonId)}>Reveal my screen</Button>
@@ -375,7 +375,7 @@ function MysteryRunner({
           <IconBack className="h-4 w-4" /> Quit duel
         </button>
         <div className="text-center">
-          <div className="text-xs uppercase tracking-[0.2em] text-white/40">{picker.name}</div>
+          <div className="text-xs text-white/40">{picker.name}</div>
           <h1 className="font-display text-2xl font-bold">Choose your mystery player</h1>
           <p className="mt-1 text-xs text-white/45">Pick anyone — obscure picks are allowed (and sneaky).</p>
         </div>
@@ -426,7 +426,7 @@ function MysteryRunner({
         <Card strong className="p-4">
           {manualPrompt ? (
             <div className="text-center">
-              <div className="text-xs uppercase tracking-wide text-white/40">
+              <div className="text-xs text-white/40">
                 {playerById(manualPrompt.askerId).name} asks you
               </div>
               <p className="mt-1 font-display text-lg font-bold">{manualPrompt.text}</p>
@@ -440,11 +440,11 @@ function MysteryRunner({
             <>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-[10px] uppercase tracking-wide text-white/40">Your secret</div>
+                  <div className="text-[11px] text-white/40">Your secret</div>
                   <div className="font-display text-lg font-bold text-pitch">{mySecret?.name ?? '—'}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-[10px] uppercase tracking-wide text-white/40">Turn</div>
+                  <div className="text-[11px] text-white/40">Turn</div>
                   <div className="font-semibold">
                     {turnPlayer.isCpu ? `${turnPlayer.name} thinking…` : turnPlayer.name}
                   </div>
@@ -492,7 +492,7 @@ function MysteryRunner({
         {/* Latest answer — the result of the question just asked. */}
         {lastEntry && (
           <Card strong className="p-3 animate-rise-in">
-            <div className="text-[10px] uppercase tracking-wide text-white/40">Latest answer</div>
+            <div className="text-[11px] text-white/40">Latest answer</div>
             <div className="mt-0.5 flex items-baseline justify-between gap-2">
               <span className="min-w-0 truncate text-sm">
                 <span className="text-white/45">{playerById(lastEntry.askerId).name}: </span>
@@ -507,7 +507,7 @@ function MysteryRunner({
 
         {/* History */}
         <Card className="p-4">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/70">Question history</h2>
+          <h2 className="mb-2 text-sm font-semibold text-white/70">Question history</h2>
           {s.history.length === 0 ? (
             <p className="text-xs text-white/40">No questions yet — fire away.</p>
           ) : (
@@ -626,7 +626,7 @@ function GuessModal({
         </div>
         {chosenP ? (
           <div className="text-center">
-            <div className="text-xs uppercase tracking-wide text-white/40">Final guess</div>
+            <div className="text-xs text-white/40">Final guess</div>
             <div className="mt-1 font-display text-2xl font-bold text-pitch">{chosenP.name}</div>
             <p className="mt-3 text-xs text-white/55">If you’re wrong: {penaltyText[penalty]}</p>
             <div className="mt-4 flex gap-2">
@@ -693,10 +693,10 @@ function MysteryWin({
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-5 py-12 text-center animate-fade-in">
-      <div className="text-xs font-bold uppercase tracking-[0.3em] text-gold">Mystery solved</div>
+      <div className="text-xs font-bold text-gold">Mystery solved</div>
       <h1 className="font-display text-3xl font-bold text-gradient-pitch">{winner.name} win!</h1>
       <Card className="w-full max-w-xs p-4">
-        <div className="text-[10px] uppercase tracking-wide text-white/40">The mystery player was</div>
+        <div className="text-[11px] text-white/40">The mystery player was</div>
         <div className="mt-1 font-display text-xl font-bold text-pitch">{solved?.name ?? '—'}</div>
         <div className="mt-3 grid grid-cols-2 gap-2">
           <Stat label="Questions" value={String(questionsUsed)} />
@@ -725,7 +725,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
       <div className="font-display text-xl font-bold text-pitch">{value}</div>
-      <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/40">{label}</div>
+      <div className="mt-0.5 text-[11px] text-white/40">{label}</div>
     </div>
   );
 }

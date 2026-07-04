@@ -110,9 +110,8 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
 
       {/* Division card — manager dashboard header */}
       <Card strong glow className="relative overflow-hidden p-5 text-center animate-rise-in">
-        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
         <div className="relative">
-          <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
+          <div className="text-[11px] font-bold text-white/40">
             Now managing
           </div>
           <div className="mt-2 flex items-center justify-center gap-2.5">
@@ -174,12 +173,11 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
         <Card className="p-4">
           <div className="mb-3 flex items-center gap-2">
             <IconClock className="h-5 w-5 text-pitch" />
-            <h2 className="nums text-sm font-semibold uppercase tracking-wide text-white/80">
+            <h2 className="nums text-sm font-semibold text-white/80">
               Next fixture — Round {career.round + 1}
             </h2>
           </div>
           <div className="relative mb-4 overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] p-3">
-            <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.4]" aria-hidden />
             <div className="relative flex items-center justify-center gap-3">
               <ClubChip name={career.managerName} you />
               <span className="font-display text-lg font-black italic text-white/30">VS</span>
@@ -219,7 +217,7 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
 
       {/* League table */}
       <Card className="p-4">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-white/70">
+        <h2 className="mb-3 text-sm font-semibold text-white/70">
           {division.name} table
         </h2>
         <LeagueTable state={career} />
@@ -228,7 +226,7 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
       {/* Trophy cabinet */}
       {career.trophies.length > 0 && (
         <Card className="p-4">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-white/70">
+          <h2 className="mb-3 text-sm font-semibold text-white/70">
             Trophy cabinet
           </h2>
           <div className="flex flex-col gap-2">
@@ -338,7 +336,7 @@ function NewCareer({
       <Card strong className="mx-auto w-full max-w-md p-6 animate-rise-in">
         <label
           htmlFor="career-name"
-          className="mb-2 block text-xs font-semibold uppercase tracking-wider text-white/50"
+          className="mb-2 block text-xs font-semibold text-white/50"
         >
           Manager / club name
         </label>
@@ -375,7 +373,7 @@ function BoardCard({ career }: { career: CareerState }) {
   return (
     <Card className="p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-white/70">
+        <h2 className="text-sm font-semibold text-white/70">
           The boardroom
         </h2>
         <Badge tone="gold">
@@ -443,7 +441,7 @@ function MiniStat({
   return (
     <div className="rounded-xl border border-white/10 bg-white/[0.03] p-2 text-center">
       <div className={`nums font-display text-lg font-bold ${color}`}>{value}</div>
-      <div className="mt-0.5 text-[10px] uppercase tracking-wide text-white/40">
+      <div className="mt-0.5 text-[11px] text-white/40">
         {label}
       </div>
     </div>
@@ -462,7 +460,7 @@ function ClubChip({ name, you = false }: { name: string; you?: boolean }) {
       <span className="text-center text-sm font-semibold leading-tight">
         {teamName(name)}
       </span>
-      {you && <span className="text-[10px] uppercase tracking-wide text-pitch">You</span>}
+      {you && <span className="text-[11px] text-pitch">You</span>}
     </div>
   );
 }

@@ -15,12 +15,10 @@
 
   body {
     @apply bg-ink-900 text-white font-sans antialiased;
-    /* Deep indigo/purple stage — a soft top glow over a dark base, kept even on
-     * overscroll. */
-    background-color: #140a33;
-    background-image:
-      radial-gradient(120% 80% at 50% -10%, rgba(124, 110, 240, 0.22), transparent 60%),
-      radial-gradient(100% 60% at 50% 110%, rgba(91, 75, 214, 0.12), transparent 60%);
+    /* Deep indigo/purple stage — a single quiet top-down gradient, no glow
+     * soup. Kept even on overscroll. */
+    background-color: #171034;
+    background-image: linear-gradient(180deg, #241a52 0%, #191140 34%, #150e33 100%);
     background-attachment: fixed;
     overscroll-behavior: none;
   }
@@ -42,24 +40,13 @@
    * the indigo palette so surfaces read as one material.
    */
   .glass {
-    @apply rounded-2xl border border-white/10 bg-white/[0.05] backdrop-blur-md;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      0 1px 2px rgba(10, 6, 30, 0.4),
-      0 10px 32px rgba(10, 6, 30, 0.4);
+    @apply rounded-2xl border border-white/[0.09] bg-[#221a4d]/70;
+    box-shadow: 0 1px 2px rgba(10, 6, 30, 0.35);
   }
 
   .glass-strong {
-    @apply rounded-3xl border border-white/[0.12] bg-white/[0.07] backdrop-blur-lg;
-    background-image: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.06),
-      rgba(255, 255, 255, 0) 40%
-    );
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      0 2px 6px rgba(10, 6, 30, 0.4),
-      0 24px 56px rgba(10, 6, 30, 0.5);
+    @apply rounded-2xl border border-white/[0.1] bg-[#251d54]/85;
+    box-shadow: 0 1px 3px rgba(10, 6, 30, 0.4);
   }
 
   /*
@@ -90,15 +77,14 @@
     @apply focus:border-royal/50 focus:bg-white;
   }
 
-  /* Gradient title text — white → lavender, reads bright on the purple stage. */
+  /* Headings are solid, confident type now — the old gradient fills read as a
+   * template flourish. Kept as classes so call-sites don't all need touching. */
   .text-gradient-pitch {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(120deg, #ffffff 0%, #cbc2ff 55%, #a99bff 100%);
+    @apply text-white;
   }
 
   .text-gradient-gold {
-    @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(120deg, #fff3c4 0%, #ffd24a 60%, #e0b020 100%);
+    @apply text-gold;
   }
 
   /* Tap-press feedback for interactive surfaces. */

@@ -11,7 +11,7 @@ export function TimerBar({
   const danger = secondsLeft <= 5;
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between text-[11px] uppercase tracking-wide text-white/45">
+      <div className="mb-1 flex items-center justify-between text-[11px] text-white/45">
         <span className="flex items-center gap-1">
           <IconClock className="h-3.5 w-3.5" /> Stoppage time
         </span>
@@ -35,7 +35,7 @@ export function TimerBar({
         <div
           className={[
             'h-full rounded-full transition-[width] duration-100 ease-linear',
-            danger ? 'bg-danger shadow-[0_0_12px_rgba(255,77,94,0.6)]' : 'bg-pitch shadow-glow',
+            danger ? 'bg-danger shadow-[0_0_12px_rgba(255,77,94,0.6)]' : 'bg-pitch',
           ].join(' ')}
           style={{ width: `${Math.max(0, Math.min(1, fraction)) * 100}%` }}
         />

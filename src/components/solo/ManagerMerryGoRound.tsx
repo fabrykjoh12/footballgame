@@ -88,7 +88,7 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
       <div className="flex flex-1 flex-col items-center justify-center gap-5 py-10 text-center animate-fade-in">
         <div className="text-5xl" aria-hidden>🎩</div>
         <div>
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-white/40">Manager Merry-go-round</div>
+          <div className="text-xs font-bold text-white/40">Manager Merry-go-round</div>
           <h1 className="nums mt-1 font-display text-3xl font-bold text-gradient-pitch">{streak} in a row</h1>
           <p className="nums mt-1 text-sm text-white/55">Best streak {best}</p>
         </div>
@@ -134,16 +134,15 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
       <Card className="flex items-center justify-between p-3">
         <div className="flex items-baseline gap-1.5">
           <span className="nums font-display text-2xl font-bold text-pitch">{streak}</span>
-          <span className="text-[11px] uppercase tracking-wide text-white/40">streak</span>
+          <span className="text-[11px] text-white/40">streak</span>
         </div>
         <span className="nums text-sm text-white/55">Best {best}</span>
       </Card>
 
       {/* The two clubs */}
       <Card strong className="relative overflow-hidden p-5 text-center">
-        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
         <div className="relative">
-          <div className="mb-4 text-xs font-bold uppercase tracking-[0.2em] text-white/45">
+          <div className="mb-4 text-xs font-bold text-white/45">
             Name a manager who managed both
           </div>
           {(() => {

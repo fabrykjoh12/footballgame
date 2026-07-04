@@ -49,7 +49,7 @@ export function CosmeticsModal({ onClose }: { onClose: () => void }) {
           Purely cosmetic — earned by playing. They never affect a match.
         </p>
 
-        <h3 className="mb-2 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-white/45">
+        <h3 className="mb-2 flex items-center justify-between text-xs font-semibold text-white/45">
           <span>Stadium accent</span>
           <span className="text-white/30">
             {unlockedAccents}/{ACCENTS.length}
@@ -88,7 +88,7 @@ export function CosmeticsModal({ onClose }: { onClose: () => void }) {
           })}
         </div>
 
-        <h3 className="mb-2 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-white/45">
+        <h3 className="mb-2 flex items-center justify-between text-xs font-semibold text-white/45">
           <span>Pitch pattern</span>
           <span className="text-white/30">
             {unlockedPatterns}/{PATTERNS.length}

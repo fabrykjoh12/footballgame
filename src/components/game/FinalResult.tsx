@@ -130,11 +130,10 @@ export function FinalResult() {
 
       {/* Headline — broadcast full-time panel */}
       <Card strong glow className="relative overflow-hidden p-6 text-center animate-rise-in">
-        <div className="grid-tactical pointer-events-none absolute inset-0 opacity-[0.3]" aria-hidden />
         <div className="relative">
           <div className="mb-4 inline-flex items-center gap-2 text-gold">
             <IconTrophy className="h-4 w-4" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.3em]">Full time</span>
+            <span className="text-[11px] font-bold">Full time</span>
           </div>
 
           {/* Team — score — team */}
@@ -257,7 +256,7 @@ export function FinalResult() {
       {/* Streak-reward milestone crossed by today's Daily */}
       {streakUnlock && (
         <Card className="border-gold/30 p-4 text-center animate-rise-in">
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-gold">
+          <div className="text-xs font-bold text-gold">
             Streak reward unlocked
           </div>
           <p className="mt-2 text-sm text-white/85">
@@ -272,7 +271,7 @@ export function FinalResult() {
       {/* Newly-unlocked achievements */}
       {unlocked.length > 0 && (
         <Card className="border-gold/30 p-4 text-center animate-rise-in">
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-gold">
+          <div className="text-xs font-bold text-gold">
             Achievement{unlocked.length > 1 ? 's' : ''} unlocked
           </div>
           <div className="mt-2 flex flex-wrap justify-center gap-2">
@@ -407,7 +406,7 @@ function StatsCard({
       </div>
 
       <div className="mb-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
-        <div className="text-[10px] uppercase tracking-wide text-white/40">Title</div>
+        <div className="text-[11px] text-white/40">Title</div>
         <div className="flex items-center gap-1.5 font-semibold text-gold">
           <span aria-hidden>{title.emoji}</span> {title.title}
         </div>
@@ -473,7 +472,7 @@ function MatchHonours({
     <div className="grid grid-cols-2 gap-3">
       {motm && (
         <Card className="border-gold/30 p-4">
-          <div className="text-[10px] uppercase tracking-[0.18em] text-gold/80">
+          <div className="text-[11px] text-gold/80">
             Man of the Match
           </div>
           <div className="mt-1 truncate font-display text-lg font-bold text-gold">
@@ -487,7 +486,7 @@ function MatchHonours({
       )}
       {biggest && bigPlayer && (
         <Card className="p-4">
-          <div className="text-[10px] uppercase tracking-[0.18em] text-white/40">
+          <div className="text-[11px] text-white/40">
             Biggest moment
           </div>
           <div className="mt-1 font-display text-lg font-bold text-white">
@@ -514,7 +513,7 @@ function KnowledgeShareBar({
   const [idA, idB] = matchIdentities(a.name, b.name);
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between text-[10px] font-medium uppercase tracking-wide text-white/40">
+      <div className="mb-1 flex items-center justify-between text-[11px] font-medium text-white/40">
         <span className="nums">{shareA}% {teamName(a.name)}</span>
         <span>Knowledge</span>
         <span className="nums">{teamName(b.name)} {shareB}%</span>
@@ -545,7 +544,7 @@ function TimelineReplay({
     <div>
       <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-white/35">
         <span>0'</span>
-        <span className="uppercase tracking-wide">Match replay</span>
+        <span>Match replay</span>
         <span>90'</span>
       </div>
       <div className="relative h-2 rounded-full bg-white/10">

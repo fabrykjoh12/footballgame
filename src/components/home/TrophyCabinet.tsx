@@ -25,9 +25,7 @@ export function TrophyCabinet() {
     <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
       <div className="mb-2 flex items-center gap-2">
         <IconTrophy className="h-5 w-5 text-gold" />
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-          Trophy Cabinet
-        </h2>
+        <h2 className="text-[15px] font-bold text-white">Trophy cabinet</h2>
         <span className="ml-auto text-xs font-bold text-gold">
           {earned}/{ACHIEVEMENTS.length}
         </span>

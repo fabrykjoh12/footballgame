@@ -89,17 +89,15 @@ export function DailyRivalCard({
     <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
       <div className="mb-2 flex items-center gap-2">
         <IconClock className="h-5 w-5 text-gold" />
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-white/80">
-          Daily Rival
-        </h2>
+        <h2 className="text-[15px] font-bold text-white">Daily rival</h2>
         {daily.streak > 0 && (
-          <span className="ml-auto text-xs font-bold text-gold">🔥 {daily.streak}-day streak</span>
+          <span className="nums ml-auto text-xs font-semibold text-gold">{daily.streak}-day streak</span>
         )}
       </div>
 
       {/* Fixture header */}
       <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2.5">
-        <div className="text-[10px] uppercase tracking-[0.15em] text-white/40">{fixture}</div>
+        <div className="text-xs text-white/40">{fixture}</div>
         <div className="mt-0.5 font-display text-lg font-bold">
           {teamName(name.trim() || 'You')}{' '}
           <span className="text-white/40">vs</span>{' '}
@@ -123,7 +121,7 @@ export function DailyRivalCard({
         <>
           <div className="mt-3 flex items-center justify-between gap-2">
             <div>
-              <div className="text-[10px] uppercase tracking-wide text-white/40">Full time</div>
+              <div className="text-[11px] text-white/40">Full time</div>
               <div className="font-display text-2xl font-bold">
                 <span className="text-pitch">
                   {daily.lastGoalsFor}–{daily.lastGoalsAgainst}
@@ -136,7 +134,7 @@ export function DailyRivalCard({
               </div>
             </div>
             <div className="text-right">
-              <div className="text-[10px] uppercase tracking-wide text-white/40">Score</div>
+              <div className="text-[11px] text-white/40">Score</div>
               <div className="font-mono text-lg font-bold text-white/85">
                 {daily.lastScore.toLocaleString()}
               </div>
