@@ -4,42 +4,39 @@ export default {
   theme: {
     extend: {
       colors: {
-        // FotMob-style dark: near-black stage, dark-grey cards, one bright green
-        // accent. `royal` is the accent token; `ink` is the dark SURFACE scale
-        // (bg/cards/insets). Text uses `text-white/NN`.
+        // Premium football command-center dark. `royal` is the green accent;
+        // `ink` is the surface scale (page → surface 1/2/3); text uses white/NN.
         royal: {
-          DEFAULT: '#2bd576', // bright green accent
-          dark: '#20b863',
-          glow: '#47e58f',
-          soft: '#33cf7f',
+          DEFAULT: '#2ED573', // accent green
+          dark: '#24b662',
+          glow: '#57e595',
+          soft: '#2ED573',
         },
         pitch: {
-          DEFAULT: '#2bd576', // success / correct
-          dark: '#20b863',
-          glow: '#47e58f',
+          DEFAULT: '#2ED573',
+          dark: '#24b662',
+          glow: '#57e595',
         },
         ink: {
-          // Dark surface scale.
-          900: '#0e0e10', // page backdrop
-          800: '#1a1a1d', // card
-          700: '#232327', // inset / raised
-          600: '#2d2d32',
-          500: '#3a3a40',
-          400: '#54545b',
+          900: '#08090B', // page background
+          800: '#101114', // surface 1 (cards)
+          700: '#17191F', // surface 2 (raised / inset)
+          600: '#20232A', // surface 3 (hover / active)
+          500: '#2a2e37',
+          400: '#3a3f4a',
         },
-        // Foreground helpers (kept so any lingering bone/* class still reads).
-        bone: {
-          DEFAULT: '#f4f4f5',
-          dim: '#a1a1aa',
-          faint: '#71717a',
-        },
-        paper: '#1a1a1d', // "card" surface (dark)
+        bone: { DEFAULT: '#F4F4F5', dim: '#A1A1AA', faint: '#71717A' },
+        paper: '#101114',
         gold: {
-          DEFAULT: '#e0b23c', // amber (trophies)
-          dark: '#c2942a',
+          DEFAULT: '#F5C542', // trophies / streaks / rivals
+          dark: '#d9a825',
         },
-        danger: '#f05252',
-        good: '#2bd576',
+        brand: {
+          blue: '#3B82F6',
+          purple: '#8B5CF6',
+        },
+        danger: '#EF4444',
+        good: '#2ED573',
       },
       fontFamily: {
         // Clean sans-serif throughout; mono reserved for codes/figures.

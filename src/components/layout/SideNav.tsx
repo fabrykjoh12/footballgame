@@ -1,15 +1,16 @@
 /**
- * The mode navigation used by the app shell — a grouped vertical list rendered
- * both in the desktop sidebar and the mobile slide-in drawer. Each item routes
- * to a top-level `View`; the active one is highlighted.
+ * Sidebar navigation — Home plus the grouped game modes, sharing icons/labels
+ * with the home dashboard via the central mode catalogue.
  */
-
+import { Home, type LucideIcon } from 'lucide-react';
+import { SidebarItem } from './SidebarItem';
+import { VERSUS_MODES, DAILY_MODES, SOLO_MODES, COMPETE_MODES } from '../dashboard/modes';
 import type { View } from '../../lib/viewRoute';
 
 interface NavItem {
   view: View;
   label: string;
-  icon: string;
+  icon: LucideIcon;
 }
 
 interface NavGroup {
@@ -17,28 +18,15 @@ interface NavGroup {
   items: NavItem[];
 }
 
-const NAV: NavGroup[] = [
-  { items: [{ view: 'home', label: 'Home', icon: '🏠' }] },
-  {
-    heading: 'Modes',
-    items: [
-      { view: 'scout', label: 'The Scout', icon: '🔍' },
-      { view: 'mystery', label: 'Mystery Duel', icon: '🕵️' },
-      { view: 'connections', label: 'Connections', icon: '🔗' },
-      { view: 'connectionsDaily', label: 'Daily Connections', icon: '📅' },
-      { view: 'careerPath', label: 'Career Path', icon: '🧭' },
-      { view: 'olderYounger', label: 'Older or Younger?', icon: '🎂' },
-      { view: 'managers', label: 'Managers', icon: '🎩' },
-      { view: 'modes', label: 'Arcade', icon: '⚡' },
-    ],
-  },
-  {
-    heading: 'Compete',
-    items: [
-      { view: 'career', label: 'Career', icon: '🏟️' },
-      { view: 'cup', label: 'Cup Runs', icon: '🏆' },
-    ],
-  },
+const toItems = (modes: { view: View; label: string; icon: LucideIcon }[]): NavItem[] =>
+  modes.map((m) => ({ view: m.view, label: m.label, icon: m.icon }));
+
+const GROUPS: NavGroup[] = [
+  { items: [{ view: 'home', label: 'Home', icon: Home }] },
+  { heading: 'Head to head', items: toItems(VERSUS_MODES) },
+  { heading: 'Daily', items: toItems(DAILY_MODES) },
+  { heading: 'Solo', items: toItems(SOLO_MODES) },
+  { heading: 'Compete', items: toItems(COMPETE_MODES) },
 ];
 
 export function SideNav({
@@ -46,40 +34,26 @@ export function SideNav({
   onNavigate,
 }: {
   view: View;
-  /** Called with the chosen view (the shell navigates + closes the drawer). */
   onNavigate: (view: View) => void;
 }) {
   return (
-    <nav className="flex flex-col gap-6" aria-label="Game modes">
-      {NAV.map((group, gi) => (
-        <div key={group.heading ?? `g${gi}`} className="flex flex-col gap-0.5">
+    <nav className="flex flex-col gap-5" aria-label="Game modes">
+      {GROUPS.map((group, gi) => (
+        <div key={group.heading ?? `g${gi}`} className="flex flex-col gap-1">
           {group.heading && (
-            <div className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wide text-white/55">
+            <div className="mb-1 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-bone-faint">
               {group.heading}
             </div>
           )}
-          {group.items.map((item) => {
-            const active = view === item.view;
-            return (
-              <button
-                key={item.view}
-                type="button"
-                onClick={() => onNavigate(item.view)}
-                aria-current={active ? 'page' : undefined}
-                className={[
-                  'flex items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors',
-                  active
-                    ? 'bg-royal/10 font-semibold text-royal'
-                    : 'font-medium text-white/65 hover:bg-white/[0.04] hover:text-white',
-                ].join(' ')}
-              >
-                <span className="w-5 shrink-0 text-center text-base leading-none" aria-hidden>
-                  {item.icon}
-                </span>
-                <span className="truncate">{item.label}</span>
-              </button>
-            );
-          })}
+          {group.items.map((item) => (
+            <SidebarItem
+              key={item.view}
+              icon={item.icon}
+              label={item.label}
+              active={view === item.view}
+              onClick={() => onNavigate(item.view)}
+            />
+          ))}
         </div>
       ))}
     </nav>

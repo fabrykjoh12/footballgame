@@ -16,9 +16,14 @@
   }
 
   body {
-    @apply bg-ink-900 text-white font-sans antialiased;
-    /* FotMob-style near-black stage. */
-    background-color: #0e0e10;
+    @apply bg-ink-900 text-bone font-sans antialiased;
+    /* Deep stage + subtle stadium-light radial gradients (fixed, no scroll). */
+    background-color: #08090b;
+    background-image:
+      radial-gradient(1200px 600px at 15% -10%, rgba(46, 213, 115, 0.06), transparent 60%),
+      radial-gradient(1000px 560px at 100% 0%, rgba(59, 130, 246, 0.05), transparent 55%),
+      radial-gradient(900px 700px at 50% 120%, rgba(245, 197, 66, 0.03), transparent 60%);
+    background-attachment: fixed;
     overscroll-behavior: none;
   }
 
@@ -27,7 +32,7 @@
   }
 
   ::selection {
-    background: rgba(43, 213, 118, 0.28);
+    background: rgba(46, 213, 115, 0.26);
   }
 }
 
@@ -37,18 +42,29 @@
    * the FotMob look. Two weights: card and slightly raised.
    */
   .glass {
-    @apply rounded-xl border border-white/[0.06] bg-ink-800;
+    @apply rounded-2xl border border-white/[0.07] bg-ink-800;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset, 0 8px 24px -16px rgba(0, 0, 0, 0.8);
   }
 
   .glass-strong {
-    @apply rounded-xl border border-white/[0.07] bg-ink-800;
+    @apply rounded-2xl border border-white/[0.08] bg-ink-800;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 16px 40px -24px rgba(0, 0, 0, 0.9);
   }
 
   .card-lite {
-    @apply rounded-xl border border-white/[0.06] bg-ink-800 text-white;
+    @apply rounded-2xl border border-white/[0.07] bg-ink-800 text-white;
   }
   .card-lite-hover {
     @apply transition-colors duration-200 ease-premium hover:bg-ink-700;
+  }
+
+  /* Premium hover-lift for interactive cards. */
+  .lift {
+    @apply transition-[transform,border-color,background-color,box-shadow] duration-200 ease-premium;
+    @apply hover:-translate-y-0.5 hover:border-white/[0.12] hover:bg-ink-700 active:translate-y-0;
+  }
+  .lift:hover {
+    box-shadow: 0 12px 30px -18px rgba(0, 0, 0, 0.9);
   }
 
   /* Inputs inside a dark card: darker fill, subtle border, green focus. */

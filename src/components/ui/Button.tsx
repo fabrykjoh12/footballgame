@@ -15,8 +15,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * colour transition; each variant is a fill or a hairline outline.
  */
 const VARIANTS: Record<Variant, string> = {
-  // Bright green fill, dark text — the FotMob-style primary action.
-  primary: 'bg-royal text-ink-900 font-semibold enabled:hover:bg-royal-glow',
+  // Bright green fill, dark text — the primary action, with a soft green lift.
+  primary:
+    'bg-royal text-ink-900 font-semibold shadow-[0_6px_20px_-8px_rgba(46,213,115,0.7)] enabled:hover:bg-royal-glow enabled:hover:shadow-[0_10px_28px_-8px_rgba(46,213,115,0.8)] motion-safe:enabled:hover:-translate-y-0.5',
   // Dark chip with a subtle border — the secondary.
   secondary: [
     'bg-white/[0.06] text-white font-medium border border-white/10',
@@ -62,4 +63,12 @@ export function Button({
       {children}
     </button>
   );
+}
+
+/** Convenience wrappers so intent reads clearly at call sites. */
+export function PrimaryButton(props: Omit<ButtonProps, 'variant'>) {
+  return <Button variant="primary" {...props} />;
+}
+export function SecondaryButton(props: Omit<ButtonProps, 'variant'>) {
+  return <Button variant="secondary" {...props} />;
 }

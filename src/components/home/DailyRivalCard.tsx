@@ -27,10 +27,13 @@ export function DailyRivalCard({
   name,
   connecting,
   onPlay,
+  featured = false,
 }: {
   name: string;
   connecting: boolean;
   onPlay: (name: string) => void;
+  /** Home-page hero treatment: gold accent border + "Featured" tag. */
+  featured?: boolean;
 }) {
   const [daily] = useState(() => getDailyState());
   const today = todayString();
@@ -86,10 +89,17 @@ export function DailyRivalCard({
   };
 
   return (
-    <Card className="mx-auto w-full max-w-md p-4 animate-fade-in">
-      <div className="mb-2 flex items-center gap-2">
-        <IconClock className="h-5 w-5 text-gold" />
+    <Card className={`w-full p-4 animate-fade-in ${featured ? 'border-gold/25 bg-gradient-to-br from-gold/[0.06] to-transparent' : ''}`}>
+      <div className="mb-2.5 flex items-center gap-2">
+        <span className="grid h-8 w-8 place-items-center rounded-lg bg-gold/15 text-gold">
+          <IconClock className="h-[18px] w-[18px]" />
+        </span>
         <h2 className="text-[15px] font-bold text-white">Daily rival</h2>
+        {featured && (
+          <span className="rounded-full border border-gold/30 bg-gold/12 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-gold">
+            Featured
+          </span>
+        )}
         {daily.streak > 0 && (
           <span className="nums ml-auto text-xs font-semibold text-gold">{daily.streak}-day streak</span>
         )}
