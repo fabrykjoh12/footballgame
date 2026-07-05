@@ -75,6 +75,31 @@ export function acceptedPlayersFor(conn: Connection): string[] {
   return out;
 }
 
+/** How many distinct players are a valid answer to this puzzle. */
+export function possibleAnswerCount(conn: Connection): number {
+  return acceptedPlayersFor(conn).length;
+}
+
+/** Points awarded on top for finding a valid but uncurated "deep cut". */
+export const RARE_BONUS = 300;
+
+/**
+ * A "rare" answer is one that's valid only via the player database — it isn't in
+ * the puzzle's curated headline `accept`/alias list. These are the deep cuts, so
+ * they earn a bonus. Common (curated) answers are the obvious names.
+ */
+export function isRareAnswer(input: string | null | undefined, conn: Connection): boolean {
+  if (!matchesConnection(input, conn)) return false;
+  const n = normalizeName(input as string);
+  const curated = [...conn.accept, ...(conn.aliases ?? [])];
+  for (const player of curated) {
+    const pn = normalizeName(player);
+    if (!pn) continue;
+    if (n === pn || pn.endsWith(' ' + n)) return false; // matched a curated name → common
+  }
+  return true; // valid (via DB) but not curated → a rare find
+}
+
 /**
  * Does `input` name an accepted player for this puzzle? Forgiving: matches a
  * full name, a trailing portion (surname or multi-word surname like
@@ -212,6 +237,10 @@ export interface ConnectionGrade {
   isCorrect: boolean;
   breakdown: PointsBreakdown;
   newStreak: number;
+  /** Answered a valid-but-uncurated deep cut. */
+  rare: boolean;
+  /** Bonus points awarded for a rare find (0 unless `rare`). */
+  rareBonus: number;
 }
 
 /** Grade one typed answer. `timeLeftFraction` in [0,1] drives the speed bonus. */
@@ -223,16 +252,26 @@ export function gradeConnection(
 ): ConnectionGrade {
   const isCorrect = matchesConnection(input, conn);
   if (!isCorrect) {
-    return { isCorrect: false, breakdown: { base: 0, speedBonus: 0, streakBonus: 0, total: 0 }, newStreak: 0 };
+    return {
+      isCorrect: false,
+      breakdown: { base: 0, speedBonus: 0, streakBonus: 0, total: 0 },
+      newStreak: 0,
+      rare: false,
+      rareBonus: 0,
+    };
   }
   const base = BASE_BY_DIFFICULTY[conn.difficulty];
   const speedBonus = Math.round(MAX_SPEED_BONUS * Math.max(0, Math.min(1, timeLeftFraction)));
   const newStreak = streak + 1;
   const streakBonus = newStreak >= 4 ? STREAK_BONUS_MAX : STREAK_BONUS[newStreak] ?? 0;
+  const rare = isRareAnswer(input, conn);
+  const rareBonus = rare ? RARE_BONUS : 0;
   return {
     isCorrect: true,
-    breakdown: { base, speedBonus, streakBonus, total: base + speedBonus + streakBonus },
+    breakdown: { base, speedBonus, streakBonus, total: base + speedBonus + streakBonus + rareBonus },
     newStreak,
+    rare,
+    rareBonus,
   };
 }
 

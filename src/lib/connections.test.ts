@@ -6,6 +6,9 @@ import {
   suggestNames,
   pickConnections,
   gradeConnection,
+  possibleAnswerCount,
+  isRareAnswer,
+  RARE_BONUS,
   recordConnectionsResult, // not unit-tested (storage), imported to ensure it builds
   CONNECTIONS_RUN_LENGTH,
   type Connection,
@@ -154,6 +157,41 @@ describe('gradeConnection', () => {
     const g = gradeConnection(ARS_BAR, 'Henry', 0, 4); // newStreak = 5
     expect(g.breakdown.streakBonus).toBe(150);
     expect(g.breakdown.speedBonus).toBe(0);
+  });
+
+  it('a common (curated) answer earns no rare bonus, and total sums its parts', () => {
+    const g = gradeConnection(ARS_BAR, 'Henry', 1, 1);
+    expect(g.rare).toBe(false);
+    expect(g.rareBonus).toBe(0);
+    expect(g.breakdown.total).toBe(
+      g.breakdown.base + g.breakdown.speedBonus + g.breakdown.streakBonus,
+    );
+  });
+
+  it('a valid-but-uncurated deep cut is rare and earns the bonus', () => {
+    // Find an answer that's valid only via the player DB (not curated).
+    const deepCut = acceptedPlayersFor(ARS_BAR).find((n) => isRareAnswer(n, ARS_BAR));
+    if (!deepCut) return; // no DB-only answers for this puzzle — nothing to assert
+    expect(isRareAnswer(deepCut, ARS_BAR)).toBe(true);
+    const g = gradeConnection(ARS_BAR, deepCut, 0, 0);
+    expect(g.rare).toBe(true);
+    expect(g.rareBonus).toBe(RARE_BONUS);
+    expect(g.breakdown.total).toBe(
+      g.breakdown.base + g.breakdown.speedBonus + g.breakdown.streakBonus + RARE_BONUS,
+    );
+  });
+});
+
+describe('possibleAnswerCount + isRareAnswer', () => {
+  it('counts the full accepted set (curated ∪ database)', () => {
+    const all = acceptedPlayersFor(ARS_BAR);
+    expect(possibleAnswerCount(ARS_BAR)).toBe(all.length);
+    expect(all.length).toBeGreaterThanOrEqual(ARS_BAR.accept.length);
+  });
+
+  it('an invalid answer is never rare', () => {
+    expect(isRareAnswer('Lionel Messi', ARS_BAR)).toBe(false);
+    expect(isRareAnswer(null, ARS_BAR)).toBe(false);
   });
 });
 

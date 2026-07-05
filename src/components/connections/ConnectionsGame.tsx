@@ -3,6 +3,8 @@ import {
   pickConnections,
   gradeConnection,
   acceptedPlayersFor,
+  possibleAnswerCount,
+  normalizeName,
   suggestNames,
   recentConnectionIds,
   recordSeenConnections,
@@ -72,6 +74,8 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
     () => (phase === 'question' ? suggestNames(input) : []),
     [input, phase],
   );
+
+  const answerCount = useMemo(() => (puzzle ? possibleAnswerCount(puzzle) : 0), [puzzle]);
 
   const submit = (raw: string | null) => {
     if (phase !== 'question' || !puzzle) return;
@@ -187,23 +191,39 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
               : 'border-danger/40 bg-danger/10 text-danger',
           ].join(' ')}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {grade.isCorrect ? <IconCheck className="h-4 w-4" /> : <IconClose className="h-4 w-4" />}
             {grade.isCorrect ? (
               <span className="nums">Correct! +{grade.breakdown.total.toLocaleString()}</span>
             ) : (
               <span>{submitted == null ? 'Out of time' : 'Not quite'}</span>
             )}
+            {grade.isCorrect && grade.rare && (
+              <span className="nums inline-flex items-center gap-1 rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 text-[11px] font-bold text-gold">
+                💎 Rare find +{grade.rareBonus}
+              </span>
+            )}
           </div>
           <p className="mt-1 font-normal text-white/70">
-            Accepted:{' '}
-            <span className="font-semibold text-white">
-              {(() => {
-                const all = acceptedPlayersFor(puzzle);
-                const shown = all.slice(0, 8);
-                return shown.join(', ') + (all.length > shown.length ? ', …' : '');
-              })()}
-            </span>
+            {(() => {
+              const all = acceptedPlayersFor(puzzle);
+              const mine = normalizeName(submitted ?? '');
+              const others = all.filter((n) => {
+                const nn = normalizeName(n);
+                return grade.isCorrect && mine ? nn !== mine && !nn.endsWith(' ' + mine) : true;
+              });
+              const shown = others.slice(0, 8);
+              const label = grade.isCorrect && submitted ? 'Also valid' : 'Accepted';
+              if (shown.length === 0) return <span className="text-white/55">The only accepted answer.</span>;
+              return (
+                <>
+                  {label}:{' '}
+                  <span className="font-semibold text-white">
+                    {shown.join(', ') + (others.length > shown.length ? ', …' : '')}
+                  </span>
+                </>
+              );
+            })()}
           </p>
           {puzzle.note && <p className="mt-0.5 text-xs font-normal text-white/55">{puzzle.note}</p>}
           {/* Accept-lists are hand-curated — give wrong answers a recourse. */}
@@ -239,6 +259,10 @@ export function ConnectionsGame({ onExit, daily = false }: { onExit: () => void;
             <Connector />
             <ClubChip name={puzzle.clubB} identity={idB} />
           </div>
+          <p className="nums mt-4 text-[11px] text-white/45">
+            <span className="font-semibold text-white/65">{answerCount}</span>{' '}
+            {answerCount === 1 ? 'player fits' : 'players fit'} — you only need one
+          </p>
         </div>
       </Card>
 
