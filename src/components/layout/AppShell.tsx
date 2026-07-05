@@ -17,7 +17,7 @@ import type { View } from '../../lib/viewRoute';
  * match is live so the game gets the full width.
  */
 export function AppShell({ children }: { children: ReactNode }) {
-  const { connectionState, room } = useGame();
+  const { connectionState, room, leaveRoom } = useGame();
   const { view, navigate } = useNav();
   const [soundOn, setSoundOn] = useLocalStorage('bk_sound', true);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -46,7 +46,12 @@ export function AppShell({ children }: { children: ReactNode }) {
       <StadiumBackground />
 
       <TopBar
-        onHome={() => go('home')}
+        onHome={() => {
+          // A live match renders off room status, not the view — leave it too
+          // so the brand always returns to the main page.
+          if (room) void leaveRoom();
+          go('home');
+        }}
         soundOn={soundOn}
         onToggleSound={toggleSound}
         onOpenMenu={() => setDrawerOpen(true)}

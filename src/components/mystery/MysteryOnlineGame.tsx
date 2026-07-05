@@ -7,6 +7,7 @@ import type { ConnectionState } from '../../types/game';
 import type { MysteryState, RoomSettings, VerifiedQuestion } from '../../lib/mysteryPlayer/mysteryPlayerTypes';
 import { PlayerSearch } from './PlayerSearch';
 import { QuestionBuilder } from './QuestionBuilder';
+import { FreeQuestionModal } from './FreeQuestionModal';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -36,6 +37,7 @@ export function MysteryOnlineGame({
   const [conn, setConn] = useState<ConnectionState>('connected');
   const [err, setErr] = useState('');
   const [builder, setBuilder] = useState(false);
+  const [freeOpen, setFreeOpen] = useState(false);
   const [guessing, setGuessing] = useState(false);
 
   useEffect(() => {
@@ -211,17 +213,22 @@ export function MysteryOnlineGame({
   } else {
     // active
     const candidates = currentCandidates(s, localId);
+    const showCandidates = s.settings.candidateHelper;
+    const allowVerified = s.settings.questionMode !== 'free';
+    const allowCustom = s.settings.questionMode !== 'verified';
     body = (
       <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-2 gap-2">
+        <div className={showCandidates ? 'grid grid-cols-2 gap-2' : ''}>
           <Card className="p-3">
             <div className="text-[11px] text-white/55">Your secret</div>
             <div className="font-display text-base font-bold text-pitch">{mySecret?.name ?? '—'}</div>
           </Card>
-          <Card className="p-3 text-right">
-            <div className="text-[11px] text-white/55">Candidates left</div>
-            <div className="font-display text-base font-bold">{candidates.length}</div>
-          </Card>
+          {showCandidates && (
+            <Card className="p-3 text-right">
+              <div className="text-[11px] text-white/55">Candidates left</div>
+              <div className="font-display text-base font-bold">{candidates.length}</div>
+            </Card>
+          )}
         </div>
         {myTurn ? (
           guessing ? (
@@ -231,9 +238,16 @@ export function MysteryOnlineGame({
               <Button variant="ghost" size="sm" onClick={() => setGuessing(false)}>Cancel</Button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2">
-              <Button onClick={() => setBuilder(true)}>Ask a question</Button>
-              <Button variant="secondary" onClick={() => setGuessing(true)}>Make a guess</Button>
+            <div className="flex flex-col gap-2">
+              <div className={allowVerified && allowCustom ? 'grid grid-cols-2 gap-2' : ''}>
+                {allowVerified && <Button fullWidth onClick={() => setBuilder(true)}>Ask a preset</Button>}
+                {allowCustom && (
+                  <Button variant={allowVerified ? 'secondary' : 'primary'} fullWidth onClick={() => setFreeOpen(true)}>
+                    Ask custom
+                  </Button>
+                )}
+              </div>
+              <Button variant="secondary" fullWidth onClick={() => setGuessing(true)}>Make a guess</Button>
             </div>
           )
         ) : (
@@ -313,6 +327,12 @@ export function MysteryOnlineGame({
         <QuestionBuilder
           onAsk={(q: VerifiedQuestion) => { svc?.ask(q); setBuilder(false); }}
           onClose={() => setBuilder(false)}
+        />
+      )}
+      {freeOpen && myTurn && s.phase === 'active' && (
+        <FreeQuestionModal
+          onAsk={(text) => { svc?.askText(text); setFreeOpen(false); }}
+          onClose={() => setFreeOpen(false)}
         />
       )}
     </div>

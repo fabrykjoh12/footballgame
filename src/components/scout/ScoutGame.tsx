@@ -313,7 +313,9 @@ export function RulePicker({
   onPick: (id: string) => void;
 }) {
   const [filter, setFilter] = useState('');
-  const [detective, setDetective] = useState(true);
+  // Off by default: with it on, the list auto-narrows to the one consistent
+  // rule and effectively hands you the answer. It's an opt-in deduction aid.
+  const [detective, setDetective] = useState(false);
   const [armedId, setArmedId] = useState<string | null>(null);
 
   const consistent = useMemo(
@@ -349,7 +351,7 @@ export function RulePicker({
           </label>
         )}
       </div>
-      {consistent && (
+      {consistent && detective && (
         <p className="nums text-[11px] text-white/55" role="status">
           {consistent.size} of {catalog.length} rules still match the evidence.
         </p>
