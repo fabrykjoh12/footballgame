@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import type { Player, PlayerResult, QuestionResult } from '../../types/game';
+import { useEffect, useState, type ReactNode } from 'react';
+import type { Player, PlayerResult, QuestionResult, QuestionType } from '../../types/game';
 import { RESULT_AUTOADVANCE_MS } from '../../services/matchEngine';
 import { teamName } from '../../lib/teamName';
 import { describeAttack, type AttackTone } from '../../lib/attackFraming';
@@ -8,6 +8,47 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { IconCheck, IconClose, IconArrowRight } from '../ui/icons';
+
+/**
+ * How the reveal frames the "answer" per mini-game. Most types reveal a plain
+ * correct answer, but a couple read better with their own language: Spot the
+ * Lie surfaces the *false* claim (a VAR call), Odd One Out names the exception
+ * and then the link the others share.
+ */
+function revealFraming(type: QuestionType): {
+  eyebrow: string;
+  icon: ReactNode;
+  explainLabel: string | null;
+  tone: string;
+  valueTone: string;
+} {
+  switch (type) {
+    case 'spot_the_lie':
+      return {
+        eyebrow: 'VAR — the false claim',
+        icon: <span aria-hidden>🚩</span>,
+        explainLabel: 'Why it’s false:',
+        tone: 'text-danger',
+        valueTone: 'text-danger',
+      };
+    case 'odd_one_out':
+      return {
+        eyebrow: 'The odd one out',
+        icon: <span aria-hidden>🎯</span>,
+        explainLabel: 'What links the others:',
+        tone: 'text-gold',
+        valueTone: 'text-gold',
+      };
+    default:
+      return {
+        eyebrow: 'Correct answer',
+        icon: <IconCheck className="h-3.5 w-3.5" />,
+        explainLabel: null,
+        tone: 'text-pitch',
+        valueTone: 'text-pitch',
+      };
+  }
+}
 
 interface ResultRevealProps {
   result: QuestionResult;
@@ -77,23 +118,33 @@ export function ResultReveal({
 
   return (
     <div className="flex flex-col gap-4 animate-slide-up">
-      {/* Correct answer */}
-      <Card strong className="relative overflow-hidden p-5 text-center">
-        <div className="relative">
-          <div className="inline-flex items-center gap-1.5 text-xs text-pitch">
-            <IconCheck className="h-3.5 w-3.5" /> Correct answer
-          </div>
-          <div className="my-1.5 font-display text-2xl font-bold text-pitch sm:text-3xl">
-            {result.correctAnswer}
-          </div>
+      {/* Correct answer — framed by the mini-game type */}
+      {(() => {
+        const reveal = revealFraming(result.questionType);
+        return (
+          <Card strong className="relative overflow-hidden p-5 text-center">
+            <div className="relative">
+              <div className={['inline-flex items-center gap-1.5 text-xs', reveal.tone].join(' ')}>
+                {reveal.icon} {reveal.eyebrow}
+              </div>
+              <div className={['my-1.5 font-display text-2xl font-bold sm:text-3xl', reveal.valueTone].join(' ')}>
+                {result.correctAnswer}
+              </div>
 
-          {result.revealValues && <RevealValues result={result} />}
+              {result.revealValues && <RevealValues result={result} />}
 
-          <p className="mx-auto mt-2 max-w-prose text-sm text-white/65">
-            {result.explanation}
-          </p>
-        </div>
-      </Card>
+              {result.explanation && (
+                <p className="mx-auto mt-2 max-w-prose text-sm text-white/65">
+                  {reveal.explainLabel && (
+                    <span className="font-semibold text-white/80">{reveal.explainLabel} </span>
+                  )}
+                  {result.explanation}
+                </p>
+              )}
+            </div>
+          </Card>
+        );
+      })()}
 
       {/* Per-player breakdown */}
       <div className="grid grid-cols-2 gap-3">
