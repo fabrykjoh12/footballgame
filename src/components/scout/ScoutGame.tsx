@@ -37,11 +37,14 @@ import { Badge } from '../ui/Badge';
 import { IconBack, IconArrowRight, IconBolt, IconCheck, IconClose } from '../ui/icons';
 import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
 import { modeTheme } from '../dashboard/modeTheme';
+import { ScoutOnlineGame } from './ScoutOnlineGame';
+import { isAblyConfigured } from '../../lib/realtimeConfig';
 
 type DuelKind = 'cpu' | 'hotseat';
 type Stage =
   | { name: 'lobby' }
   | { name: 'daily' }
+  | { name: 'online' }
   | { name: 'setup'; kind: DuelKind; picking: 'A' | 'B'; secretA?: string }
   | { name: 'duel'; kind: DuelKind; round: ScoutRound };
 
@@ -60,6 +63,9 @@ export function ScoutGame({ daily = false, onExit }: { daily?: boolean; onExit: 
 
   if (stage.name === 'daily') {
     return <DailyScout catalog={catalog} onExit={onExit} onLobby={daily ? onExit : () => setStage({ name: 'lobby' })} />;
+  }
+  if (stage.name === 'online') {
+    return <ScoutOnlineGame name={scoutPlayerName()} onExit={() => setStage({ name: 'lobby' })} />;
   }
   if (stage.name === 'setup') {
     return (
@@ -95,14 +101,40 @@ export function ScoutGame({ daily = false, onExit }: { daily?: boolean; onExit: 
     );
   }
 
-  return <ScoutLobby onExit={onExit} onDaily={() => setStage({ name: 'daily' })} onDuel={(kind) => setStage({ name: 'setup', kind, picking: 'A' })} />;
+  return (
+    <ScoutLobby
+      onExit={onExit}
+      onDaily={() => setStage({ name: 'daily' })}
+      onDuel={(kind) => setStage({ name: 'setup', kind, picking: 'A' })}
+      onOnline={() => setStage({ name: 'online' })}
+    />
+  );
+}
+
+/** The player's saved display name (or a friendly default) for online play. */
+function scoutPlayerName(): string {
+  try {
+    return (localStorage.getItem('bk_name') || '').trim() || 'Scout';
+  } catch {
+    return 'Scout';
+  }
 }
 
 /* ------------------------------------------------------------------ */
 /* Lobby                                                               */
 /* ------------------------------------------------------------------ */
 
-function ScoutLobby({ onExit, onDaily, onDuel }: { onExit: () => void; onDaily: () => void; onDuel: (kind: DuelKind) => void }) {
+function ScoutLobby({
+  onExit,
+  onDaily,
+  onDuel,
+  onOnline,
+}: {
+  onExit: () => void;
+  onDaily: () => void;
+  onDuel: (kind: DuelKind) => void;
+  onOnline: () => void;
+}) {
   const progress = useMemo(() => getScoutProgress(), []);
   const dailyDone = hasPlayedDailyScoutToday(progress);
   return (
@@ -136,6 +168,19 @@ function ScoutLobby({ onExit, onDaily, onDuel }: { onExit: () => void; onDaily: 
             Play <IconArrowRight className="h-4 w-4" />
           </Button>
         </Card>
+        {isAblyConfigured && (
+          <Card className="flex items-center justify-between gap-3 p-4">
+            <div>
+              <div className="flex items-center gap-1.5 text-sm font-bold text-white">
+                Play a friend online <Badge tone="pitch">1v1</Badge>
+              </div>
+              <p className="text-xs text-white/55">Cross-device duel with a room code</p>
+            </div>
+            <Button size="sm" onClick={onOnline}>
+              🌐 Play <IconArrowRight className="h-4 w-4" />
+            </Button>
+          </Card>
+        )}
         <Card className="flex items-center justify-between gap-3 p-4">
           <div>
             <div className="text-sm font-bold text-white">Pass &amp; play</div>
@@ -154,7 +199,7 @@ function ScoutLobby({ onExit, onDaily, onDuel }: { onExit: () => void; onDaily: 
 /* Shared pieces                                                       */
 /* ------------------------------------------------------------------ */
 
-function EvidenceRow({ probe }: { probe: ScoutProbe }) {
+export function EvidenceRow({ probe }: { probe: ScoutProbe }) {
   return (
     <li
       className={[
@@ -172,7 +217,7 @@ function EvidenceRow({ probe }: { probe: ScoutProbe }) {
 }
 
 /** Typed probe input with roster suggestions. */
-function ProbeInput({
+export function ProbeInput({
   disabled,
   probedIds,
   onProbe,
@@ -252,7 +297,7 @@ function ProbeInput({
  * Filterable rule list used for both picking a secret and accusing. With the
  * detective panel on, rules that contradict the evidence are hidden.
  */
-function RulePicker({
+export function RulePicker({
   catalog,
   evidence,
   excludedIds,
