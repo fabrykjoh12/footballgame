@@ -28,6 +28,7 @@ import {
   rivalProfile,
   type Objective,
 } from '../../lib/careerProgression';
+import { seasonStorylines, type StoryTone } from '../../lib/careerStorylines';
 import { teamName } from '../../lib/teamName';
 import { teamIdentity } from '../../lib/teamIdentity';
 import { LeagueTable } from './LeagueTable';
@@ -161,6 +162,9 @@ export function CareerHub({ onExit }: { onExit: () => void }) {
           )}
         </div>
       </Card>
+
+      {/* Season storylines — the narrative beats of the campaign */}
+      <StorylineCard career={career} />
 
       {/* Board: manager reputation, confidence + season objectives */}
       <BoardCard career={career} />
@@ -337,6 +341,43 @@ function NewCareer({
           <IconBolt className="h-4 w-4" /> Begin in League Two
         </Button>
       </Card>
+    </div>
+  );
+}
+
+const STORY_TONE: Record<StoryTone, { border: string; chip: string; text: string }> = {
+  derby: { border: 'border-gold/40', chip: 'bg-gold/15 text-gold', text: 'text-gold' },
+  promotion: { border: 'border-pitch/40', chip: 'bg-pitch/15 text-pitch', text: 'text-pitch' },
+  relegation: { border: 'border-danger/40', chip: 'bg-danger/15 text-danger', text: 'text-danger' },
+  title: { border: 'border-gold/40', chip: 'bg-gold/15 text-gold', text: 'text-gold' },
+  pressure: { border: 'border-danger/40', chip: 'bg-danger/15 text-danger', text: 'text-danger' },
+  form: { border: 'border-white/15', chip: 'bg-white/10 text-white/80', text: 'text-white/80' },
+  neutral: { border: 'border-white/12', chip: 'bg-white/10 text-white/70', text: 'text-white/75' },
+};
+
+/** The season's narrative beats — the top couple of storylines, most urgent first. */
+function StorylineCard({ career }: { career: CareerState }) {
+  const stories = seasonStorylines(career).slice(0, 2);
+  if (stories.length === 0) return null;
+  return (
+    <div className="flex flex-col gap-2">
+      {stories.map((s) => {
+        const tone = STORY_TONE[s.tone];
+        return (
+          <div
+            key={s.id}
+            className={['rounded-xl border bg-white/[0.02] p-3.5 animate-rise-in', tone.border].join(' ')}
+          >
+            <div className="flex items-center gap-2">
+              <span className={['rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide', tone.chip].join(' ')}>
+                Storyline
+              </span>
+              <h3 className={['font-display text-sm font-bold', tone.text].join(' ')}>{s.headline}</h3>
+            </div>
+            <p className="mt-1.5 text-xs leading-relaxed text-white/60">{s.detail}</p>
+          </div>
+        );
+      })}
     </div>
   );
 }

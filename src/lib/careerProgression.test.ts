@@ -43,6 +43,20 @@ describe('rivalProfile', () => {
     expect(a.strongestCategory).not.toBe(a.weakestCategory);
     expect(a.personality.length).toBeGreaterThan(0);
   });
+
+  it('never crashes on any seed (bit-shifted hashes can be negative)', () => {
+    // A regression guard: a negative index into the template pools used to
+    // return undefined and throw on `.replace`.
+    for (let seed = 0; seed < 400; seed++) {
+      const c = createCareer('Riverside Athletic', seed);
+      const rival = c.teams.find((t) => !t.isYou)!;
+      const p = rivalProfile(rival, c.seed);
+      expect(p.personality).toBeTruthy();
+      expect(p.playStyle).toBeTruthy();
+      expect(p.personality).not.toContain('{strong}');
+      expect(p.personality).not.toContain('{weak}');
+    }
+  });
 });
 
 describe('seasonRival', () => {

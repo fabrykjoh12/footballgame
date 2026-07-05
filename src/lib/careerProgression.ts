@@ -73,7 +73,10 @@ const PERSONA_TEMPLATES = [
 ];
 
 function pickFrom<T>(arr: T[], h: number): T {
-  return arr[h % arr.length];
+  // `h` can be negative (bit-shifted hashes go through Int32 conversion), so
+  // normalise into [0, len) — a bare `h % len` would index negatively → undefined.
+  const i = ((Math.trunc(h) % arr.length) + arr.length) % arr.length;
+  return arr[i];
 }
 
 /** Deterministic personality for a rival club (stable per team + season seed). */
