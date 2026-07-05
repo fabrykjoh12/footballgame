@@ -5,6 +5,8 @@ import { CATEGORY_OPTIONS } from '../../lib/categories';
 import type { Category, Player } from '../../types/game';
 import { teamName } from '../../lib/teamName';
 import { matchIdentities, type TeamIdentity } from '../../lib/teamIdentity';
+import { profileForName, type BotProfile } from '../../lib/botProfiles';
+import { QUESTION_TYPE_LABEL } from '../../lib/matchReport';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
@@ -121,6 +123,14 @@ export function LobbyPage() {
           </div>
         </div>
       </Card>
+
+      {/* Scouting report on a CPU rival — read their strengths before kick-off. */}
+      {(() => {
+        const opp = room.players.find((p) => p.id !== localPlayerId);
+        if (!opp || !opp.isBot) return null;
+        const oppIdentity = hostPlayer && opp.id === hostPlayer.id ? idHost : idGuest;
+        return <RivalScoutCard name={opp.name} identity={oppIdentity} />;
+      })()}
 
       {/* Room code — only needed to invite a human (remote). */}
       {remote && (
@@ -300,6 +310,53 @@ function TeamColumn({
         </div>
       </div>
     </div>
+  );
+}
+
+/** Pre-match scouting report on the CPU rival — their persona + where they're strong/weak. */
+function RivalScoutCard({ name, identity }: { name: string; identity: TeamIdentity }) {
+  const profile: BotProfile = profileForName(name);
+  const chips = (types: BotProfile['strong'], tone: 'good' | 'bad') =>
+    types.map((t) => (
+      <span
+        key={t}
+        className={[
+          'rounded-full border px-2.5 py-1 text-[11px] font-medium',
+          tone === 'good'
+            ? 'border-pitch/35 bg-pitch/10 text-pitch'
+            : 'border-danger/35 bg-danger/10 text-danger',
+        ].join(' ')}
+      >
+        {QUESTION_TYPE_LABEL[t] ?? t}
+      </span>
+    ));
+  return (
+    <Card className="p-4">
+      <div className="flex items-center gap-3">
+        <span
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-xl font-display text-base font-black"
+          style={{ backgroundColor: identity.soft, color: identity.color, boxShadow: `inset 0 0 0 2px ${identity.ring}` }}
+          aria-hidden
+        >
+          {name.charAt(0).toUpperCase()}
+        </span>
+        <div className="min-w-0">
+          <div className="text-[11px] font-bold uppercase tracking-wide text-white/45">Scouting report</div>
+          <div className="truncate font-display text-base font-bold">{profile.persona}</div>
+        </div>
+      </div>
+      <p className="mt-2.5 text-sm text-white/65">{profile.tagline}</p>
+      <div className="mt-3 flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] font-semibold text-white/45">Strong at</span>
+          {chips(profile.strong, 'good')}
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] font-semibold text-white/45">Weak at</span>
+          {chips(profile.weak, 'bad')}
+        </div>
+      </div>
+    </Card>
   );
 }
 

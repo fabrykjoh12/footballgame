@@ -27,6 +27,7 @@ import { recentlySeenIds } from '../lib/questionHistory';
 import { uid } from '../lib/id';
 import { MatchEngine } from './matchEngine';
 import { decideBotAnswer } from './botPlayer';
+import { profileForName } from '../lib/botProfiles';
 
 const BOT_NAMES = ['CPU United', 'Bot Rovers', 'AI Athletic', 'Pixel City'];
 const BOT_JOIN_DELAY_MS = 1500;
@@ -267,7 +268,9 @@ export class LocalGameService implements GameService {
     if (alreadyAnswered) return;
 
     this.scheduledBotQuestionId = question.id;
-    const decision = decideBotAnswer(question, room.settings.questionDurationMs);
+    const botPlayer = room.players.find((p) => p.id === this.botPlayerId);
+    const profile = botPlayer ? profileForName(botPlayer.name) : undefined;
+    const decision = decideBotAnswer(question, room.settings.questionDurationMs, profile);
     this.botPending = { decision, answerAt: Date.now() + decision.delayMs };
     this.armBotTimer();
   }

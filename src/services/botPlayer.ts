@@ -7,6 +7,7 @@
  */
 
 import type { Difficulty, Question, SubmitAnswerInput } from '../types/game';
+import { botAccuracyFor, type BotProfile } from '../lib/botProfiles';
 
 const ACCURACY_BY_DIFFICULTY: Record<Difficulty, number> = {
   easy: 0.82,
@@ -44,12 +45,17 @@ export interface BotDecision extends SubmitAnswerInput {
 export function decideBotAnswer(
   question: Question,
   totalTimeMs: number,
+  profile?: BotProfile,
 ): BotDecision {
-  const accuracy = ACCURACY_BY_DIFFICULTY[question.difficulty] ?? 0.5;
+  const base = ACCURACY_BY_DIFFICULTY[question.difficulty] ?? 0.5;
+  const accuracy = profile ? botAccuracyFor(base, profile, question.type) : base;
   const willBeCorrect = Math.random() < accuracy;
 
+  // A rival's pace shifts how long it deliberates (clamped to leave a buffer).
+  const pace = profile?.pace ?? 1;
   const maxThink = Math.max(MIN_THINK_MS + 500, totalTimeMs - END_BUFFER_MS);
-  const delayMs = randBetween(MIN_THINK_MS, maxThink);
+  const paced = Math.min(maxThink, Math.max(MIN_THINK_MS, randBetween(MIN_THINK_MS, maxThink) * pace));
+  const delayMs = Math.round(paced);
 
   const clueStage =
     question.type === 'who_am_i'
