@@ -48,7 +48,7 @@ export const SOLO_MODES: Record<SoloMode, SoloModeConfig> = {
   time_attack: {
     id: 'time_attack',
     label: 'Time Attack',
-    description: '60 seconds on the clock. Bank as many points as you can — wrong answers cost you nothing but time.',
+    description: '60 seconds on the clock. Build a combo for big multipliers — a wrong answer breaks it and costs 3 seconds.',
     icon: '⏱️',
     perQuestionMs: 12000,
     totalTimeMs: 60000,
@@ -229,4 +229,54 @@ export function gradeSoloAnswer(
 export function clueStageForElapsed(question: Question, elapsedMs: number): number {
   if (question.type !== 'who_am_i') return 0;
   return Math.min(Math.floor(elapsedMs / 5000), question.clues.length - 1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Time Attack — combo multiplier + wrong-answer time penalty (pure)   */
+/* ------------------------------------------------------------------ */
+
+/** Combo tiers: a longer correct streak multiplies the points banked. */
+export const COMBO_STEPS = [
+  { streak: 10, mult: 2 },
+  { streak: 5, mult: 1.5 },
+  { streak: 3, mult: 1.2 },
+] as const;
+
+/** A wrong answer in Time Attack breaks the combo and burns clock. */
+export const WRONG_TIME_PENALTY_MS = 3000;
+
+/** Points multiplier for the current correct streak (1 below the first tier). */
+export function comboMultiplier(streak: number): number {
+  for (const step of COMBO_STEPS) if (streak >= step.streak) return step.mult;
+  return 1;
+}
+
+/** Display label for an active combo (e.g. "x1.5"), or null when there's none. */
+export function comboLabel(streak: number): string | null {
+  const mult = comboMultiplier(streak);
+  return mult > 1 ? `x${mult.toFixed(1)}` : null;
+}
+
+/* ------------------------------------------------------------------ */
+/* Survival — milestone moments (pure)                                 */
+/* ------------------------------------------------------------------ */
+
+export interface SurvivalMilestone {
+  at: number;
+  label: string;
+  blurb: string;
+}
+
+/** Celebratory beats as a Survival run stretches on. */
+export const SURVIVAL_MILESTONES: SurvivalMilestone[] = [
+  { at: 5, label: 'Warmed up', blurb: 'Five survived — settled into the rhythm.' },
+  { at: 10, label: 'On fire', blurb: 'Ten deep and still standing.' },
+  { at: 25, label: 'European night', blurb: 'Twenty-five — the crowd is up on its feet.' },
+  { at: 50, label: 'Legendary run', blurb: 'Fifty survived. One for the history books.' },
+  { at: 100, label: 'Immortal', blurb: 'One hundred. Simply untouchable.' },
+];
+
+/** The milestone crossed at exactly this survived-count, if any. */
+export function survivalMilestoneAt(survived: number): SurvivalMilestone | null {
+  return SURVIVAL_MILESTONES.find((m) => m.at === survived) ?? null;
 }

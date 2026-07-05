@@ -13,14 +13,21 @@ export function GameModesHub({ onExit }: { onExit: () => void }) {
   const [mode, setMode] = useState<SoloMode | null>(null);
   // Re-read bests whenever we return to the list (a run may have set a new one).
   const [progress, setProgress] = useState(() => getSoloProgress());
+  // Bumped to remount SoloGame for an instant fresh run ("Play again").
+  const [runId, setRunId] = useState(0);
 
   if (mode) {
     return (
       <SoloGame
+        key={runId}
         mode={mode}
         onExit={() => {
           setProgress(getSoloProgress());
           setMode(null);
+        }}
+        onReplay={() => {
+          setProgress(getSoloProgress());
+          setRunId((n) => n + 1);
         }}
       />
     );

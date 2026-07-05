@@ -6,8 +6,13 @@ import {
   pickSoloQuestions,
   gradeSoloAnswer,
   clueStageForElapsed,
+  comboMultiplier,
+  comboLabel,
+  survivalMilestoneAt,
+  WRONG_TIME_PENALTY_MS,
   type SoloMode,
   type SoloGrade,
+  type SurvivalMilestone,
 } from '../../lib/soloModes';
 import { recordSoloResult, buildSoloShareText } from '../../lib/soloProgress';
 import { recentlySeenIds, recordSeenQuestions } from '../../lib/questionHistory';
@@ -39,7 +44,7 @@ interface FinishedRun {
  * — it owns its own state + timers and reuses the shared QuestionCard and scoring
  * rules, so it never touches the 1v1 match engine.
  */
-export function SoloGame({ mode, onExit }: { mode: SoloMode; onExit: () => void }) {
+export function SoloGame({ mode, onExit, onReplay }: { mode: SoloMode; onExit: () => void; onReplay?: () => void }) {
   const cfg = SOLO_MODES[mode];
   const questions = useMemo(() => pickSoloQuestions(mode, undefined, recentlySeenIds()), [mode]);
 
@@ -54,6 +59,11 @@ export function SoloGame({ mode, onExit }: { mode: SoloMode; onExit: () => void 
   const [answeredClue, setAnsweredClue] = useState(0);
   const [endAfterReveal, setEndAfterReveal] = useState(false);
   const [finished, setFinished] = useState<FinishedRun | null>(null);
+  /** Points actually banked on the last answer (after any combo multiplier). */
+  const [lastGain, setLastGain] = useState(0);
+  const [lastMult, setLastMult] = useState(1);
+  /** Survival milestone just crossed, shown on the reveal. */
+  const [milestone, setMilestone] = useState<SurvivalMilestone | null>(null);
 
   const [qStartedAt, setQStartedAt] = useState(() => Date.now());
   const runStartedAt = useRef(Date.now());
@@ -79,9 +89,26 @@ export function SoloGame({ mode, onExit }: { mode: SoloMode; onExit: () => void 
     setPicked(selected);
     setGrade(g);
     setAnsweredClue(clueStage);
-    setScore((s) => s + g.breakdown.total);
+
+    // Time Attack: a correct answer banks points × combo multiplier; a wrong one
+    // (an actual pick, not a timeout) breaks the combo and burns clock.
+    const mult = mode === 'time_attack' && g.isCorrect ? comboMultiplier(g.newStreak) : 1;
+    const gained = Math.round(g.breakdown.total * mult);
+    setLastGain(gained);
+    setLastMult(mult);
+    setScore((s) => s + gained);
     setStreak(g.newStreak);
-    if (g.isCorrect) setCorrect((c) => c + 1);
+    if (mode === 'time_attack' && !g.isCorrect && selected != null) {
+      runStartedAt.current -= WRONG_TIME_PENALTY_MS; // shift the clock start = lose 3s
+    }
+
+    if (g.isCorrect) {
+      const nextCorrect = correct + 1;
+      setCorrect(nextCorrect);
+      setMilestone(mode === 'survival' ? survivalMilestoneAt(nextCorrect) : null);
+    } else {
+      setMilestone(null);
+    }
 
     const livesLeft = !g.isCorrect && cfg.lives != null ? lives - 1 : lives;
     if (!g.isCorrect && cfg.lives != null) setLives(livesLeft);
@@ -136,12 +163,12 @@ export function SoloGame({ mode, onExit }: { mode: SoloMode; onExit: () => void 
   }, [phase, mode, score, correct, index, questions, cfg.length]);
 
   if (phase === 'finished') {
-    return <SoloResult mode={mode} run={finished} onExit={onExit} />;
+    return <SoloResult mode={mode} run={finished} onExit={onExit} onReplay={onReplay} />;
   }
 
   if (!question) {
     // Pool exhausted (a very long survival run) — treat as a win.
-    return <SoloResult mode={mode} run={finished} onExit={onExit} />;
+    return <SoloResult mode={mode} run={finished} onExit={onExit} onReplay={onReplay} />;
   }
 
   return (
@@ -174,6 +201,19 @@ export function SoloGame({ mode, onExit }: { mode: SoloMode; onExit: () => void 
         />
       </div>
 
+      {/* Survival milestone — a celebratory beat as the run stretches on */}
+      {phase === 'reveal' && milestone && (
+        <div
+          role="status"
+          className="flex items-center gap-2 rounded-xl border border-gold/40 bg-gold/10 px-3 py-2 text-sm font-semibold text-gold animate-scale-in"
+        >
+          <span aria-hidden>🔥</span>
+          <span>
+            {milestone.label} — <span className="font-normal text-gold/85">{milestone.blurb}</span>
+          </span>
+        </div>
+      )}
+
       {/* Reveal banner */}
       {phase === 'reveal' && grade && (
         <div
@@ -187,10 +227,20 @@ export function SoloGame({ mode, onExit }: { mode: SoloMode; onExit: () => void 
         >
           {grade.isCorrect ? <IconCheck className="h-4 w-4" /> : <IconClose className="h-4 w-4" />}
           {grade.isCorrect ? (
-            <span>Correct! +{grade.breakdown.total.toLocaleString()}</span>
+            <span className="flex items-center gap-1.5">
+              Correct! +{lastGain.toLocaleString()}
+              {mode === 'time_attack' && lastMult > 1 && (
+                <span className="rounded-full bg-gold/20 px-1.5 py-0.5 text-[11px] font-bold text-gold">
+                  combo ×{lastMult.toFixed(1)}
+                </span>
+              )}
+            </span>
           ) : (
             <span>
               {picked == null ? 'Out of time' : 'Wrong'} — answer: {question.correctAnswer}
+              {mode === 'time_attack' && picked != null && (
+                <span className="ml-1 text-danger/80">(−3s)</span>
+              )}
             </span>
           )}
         </div>
@@ -245,6 +295,11 @@ function SoloHud({
             {'❤️'.repeat(Math.max(0, Math.min(lives, 5)))} · {survived} survived
           </span>
         )}
+        {mode === 'time_attack' && comboLabel(streak) && (
+          <span className="rounded-full border border-gold/40 bg-gold/10 px-2 py-0.5 text-xs font-bold text-gold">
+            combo {comboLabel(streak)}
+          </span>
+        )}
         {mode === 'time_attack' && (
           <span
             className={[
@@ -269,10 +324,12 @@ function SoloResult({
   mode,
   run,
   onExit,
+  onReplay,
 }: {
   mode: SoloMode;
   run: FinishedRun | null;
   onExit: () => void;
+  onReplay?: () => void;
 }) {
   const cfg = SOLO_MODES[mode];
   const score = run?.score ?? 0;
@@ -333,11 +390,16 @@ function SoloResult({
       </Card>
 
       <div className="flex w-full max-w-xs flex-col gap-2">
+        {onReplay && (
+          <Button size="lg" fullWidth onClick={onReplay}>
+            <IconBolt className="h-4 w-4" /> Play again
+          </Button>
+        )}
         <Button variant="secondary" fullWidth onClick={share}>
           {shared ? <IconCheck className="h-4 w-4 text-pitch" /> : <IconShare className="h-4 w-4" />}
           {shared ? 'Shared!' : 'Share result'}
         </Button>
-        <Button size="lg" fullWidth onClick={onExit}>
+        <Button variant={onReplay ? 'ghost' : 'primary'} size="lg" fullWidth onClick={onExit}>
           Back to modes
         </Button>
       </div>

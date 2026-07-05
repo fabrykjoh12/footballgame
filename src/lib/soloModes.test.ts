@@ -1,6 +1,49 @@
 import { describe, it, expect } from 'vitest';
-import { pickSoloQuestions, gradeSoloAnswer, clueStageForElapsed, SOLO_MODE_LIST } from './soloModes';
+import {
+  pickSoloQuestions,
+  gradeSoloAnswer,
+  clueStageForElapsed,
+  SOLO_MODE_LIST,
+  comboMultiplier,
+  comboLabel,
+  survivalMilestoneAt,
+  SURVIVAL_MILESTONES,
+} from './soloModes';
 import type { Question } from '../types/game';
+
+describe('comboMultiplier', () => {
+  it('ramps at 3, 5 and 10 in a row', () => {
+    expect(comboMultiplier(0)).toBe(1);
+    expect(comboMultiplier(2)).toBe(1);
+    expect(comboMultiplier(3)).toBe(1.2);
+    expect(comboMultiplier(4)).toBe(1.2);
+    expect(comboMultiplier(5)).toBe(1.5);
+    expect(comboMultiplier(9)).toBe(1.5);
+    expect(comboMultiplier(10)).toBe(2);
+    expect(comboMultiplier(25)).toBe(2);
+  });
+
+  it('labels only an active combo', () => {
+    expect(comboLabel(2)).toBeNull();
+    expect(comboLabel(3)).toBe('x1.2');
+    expect(comboLabel(10)).toBe('x2.0');
+  });
+});
+
+describe('survivalMilestoneAt', () => {
+  it('fires exactly on a milestone count, not between', () => {
+    expect(survivalMilestoneAt(4)).toBeNull();
+    expect(survivalMilestoneAt(5)?.label).toBe('Warmed up');
+    expect(survivalMilestoneAt(10)?.label).toBe('On fire');
+    expect(survivalMilestoneAt(11)).toBeNull();
+    expect(survivalMilestoneAt(50)?.label).toBe('Legendary run');
+  });
+
+  it('milestones ascend', () => {
+    const ats = SURVIVAL_MILESTONES.map((m) => m.at);
+    expect([...ats].sort((a, b) => a - b)).toEqual(ats);
+  });
+});
 
 describe('SOLO_MODE_LIST', () => {
   it('has the three arcade modes with unique ids', () => {
