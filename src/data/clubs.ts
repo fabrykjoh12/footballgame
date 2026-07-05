@@ -219,6 +219,92 @@ export const CLUBS: ClubInfo[] = [
   { name: 'New York Cosmos', country: 'United States', league: 'NASL', aliases: ['Cosmos'] },
   { name: 'Nancy', country: 'France', league: 'Ligue 1', aliases: ['AS Nancy'] },
   { name: 'Budapest Honvéd', country: 'Hungary', league: 'Nemzeti Bajnokság I', aliases: ['Honvéd', 'Honved', 'Budapest Honved'] },
+
+  /* ================= Expansion batch ================= */
+  /* ---------------- England ---------------- */
+  { name: 'Sunderland', country: 'England', league: 'Premier League', aliases: ['The Black Cats'] },
+  { name: 'Ipswich Town', country: 'England', league: 'Premier League', aliases: ['Ipswich'] },
+  { name: 'Norwich City', country: 'England', league: 'Premier League', aliases: ['Norwich', 'The Canaries'] },
+  { name: 'Middlesbrough', country: 'England', league: 'Premier League', aliases: ['Boro'] },
+  { name: 'West Bromwich Albion', country: 'England', league: 'Premier League', aliases: ['West Brom', 'WBA'] },
+  { name: 'Stoke City', country: 'England', league: 'Premier League', aliases: ['Stoke'] },
+  { name: 'Burnley', country: 'England', league: 'Premier League', aliases: ['The Clarets'] },
+  { name: 'Watford', country: 'England', league: 'Premier League' },
+  { name: 'Bournemouth', country: 'England', league: 'Premier League', aliases: ['AFC Bournemouth'] },
+  { name: 'Sheffield United', country: 'England', league: 'Premier League', aliases: ['Sheffield Utd', 'The Blades'] },
+  { name: 'Derby County', country: 'England', league: 'EFL Championship', aliases: ['Derby'] },
+  { name: 'Portsmouth', country: 'England', league: 'EFL Championship', aliases: ['Pompey'] },
+
+  /* ---------------- Spain ---------------- */
+  { name: 'Real Zaragoza', country: 'Spain', league: 'La Liga', aliases: ['Zaragoza'] },
+  { name: 'Málaga', country: 'Spain', league: 'La Liga', aliases: ['Malaga', 'Málaga CF'] },
+  { name: 'Osasuna', country: 'Spain', league: 'La Liga', aliases: ['CA Osasuna'] },
+  { name: 'Girona', country: 'Spain', league: 'La Liga', aliases: ['Girona FC'] },
+  { name: 'Levante', country: 'Spain', league: 'La Liga', aliases: ['Levante UD'] },
+  { name: 'Real Valladolid', country: 'Spain', league: 'La Liga', aliases: ['Valladolid'] },
+  { name: 'Alavés', country: 'Spain', league: 'La Liga', aliases: ['Deportivo Alavés', 'Alaves'] },
+
+  /* ---------------- Italy ---------------- */
+  { name: 'Sassuolo', country: 'Italy', league: 'Serie A', aliases: ['US Sassuolo'] },
+  { name: 'Hellas Verona', country: 'Italy', league: 'Serie A', aliases: ['Verona'] },
+  { name: 'Empoli', country: 'Italy', league: 'Serie A', aliases: ['Empoli FC'] },
+  { name: 'Perugia', country: 'Italy', league: 'Serie A', aliases: ['AC Perugia'] },
+
+  /* ---------------- Germany ---------------- */
+  { name: '1. FC Köln', country: 'Germany', league: 'Bundesliga', aliases: ['Cologne', 'FC Köln', 'FC Koln', 'Köln'] },
+  { name: 'SC Freiburg', country: 'Germany', league: 'Bundesliga', aliases: ['Freiburg'] },
+  { name: 'Mainz 05', country: 'Germany', league: 'Bundesliga', aliases: ['Mainz', '1. FSV Mainz 05'] },
+  { name: 'Union Berlin', country: 'Germany', league: 'Bundesliga', aliases: ['1. FC Union Berlin'] },
+  { name: 'Hertha Berlin', country: 'Germany', league: 'Bundesliga', aliases: ['Hertha BSC'] },
+  { name: 'VfL Bochum', country: 'Germany', league: 'Bundesliga', aliases: ['Bochum'] },
+
+  /* ---------------- France ---------------- */
+  { name: 'Auxerre', country: 'France', league: 'Ligue 1', aliases: ['AJ Auxerre'] },
+  { name: 'Montpellier', country: 'France', league: 'Ligue 1', aliases: ['Montpellier HSC'] },
+  { name: 'Strasbourg', country: 'France', league: 'Ligue 1', aliases: ['RC Strasbourg'] },
+  { name: 'Toulouse', country: 'France', league: 'Ligue 1', aliases: ['Toulouse FC'] },
+  { name: 'Sochaux', country: 'France', league: 'Ligue 1', aliases: ['FC Sochaux'] },
+
+  /* ---------------- Netherlands ---------------- */
+  { name: 'Vitesse', country: 'Netherlands', league: 'Eredivisie', aliases: ['Vitesse Arnhem'] },
+  { name: 'Heerenveen', country: 'Netherlands', league: 'Eredivisie', aliases: ['SC Heerenveen'] },
+  { name: 'Utrecht', country: 'Netherlands', league: 'Eredivisie', aliases: ['FC Utrecht'] },
+
+  /* ---------------- Portugal ---------------- */
+  { name: 'Vitória Guimarães', country: 'Portugal', league: 'Primeira Liga', aliases: ['Vitoria Guimaraes', 'Guimarães'] },
+  { name: 'Boavista', country: 'Portugal', league: 'Primeira Liga', aliases: ['Boavista FC'] },
+
+  /* ---------------- Brazil ---------------- */
+  { name: 'Botafogo', country: 'Brazil', league: 'Brazilian Série A', aliases: ['Botafogo FR'] },
+  { name: 'Atlético Mineiro', country: 'Brazil', league: 'Brazilian Série A', aliases: ['Atletico Mineiro', 'Galo'] },
+  { name: 'Athletico Paranaense', country: 'Brazil', league: 'Brazilian Série A', aliases: ['Athletico-PR', 'Atletico Paranaense'] },
+  { name: 'Bahia', country: 'Brazil', league: 'Brazilian Série A', aliases: ['EC Bahia'] },
+
+  /* ---------------- Argentina ---------------- */
+  { name: 'San Lorenzo', country: 'Argentina', league: 'Argentine Primera', aliases: ['San Lorenzo de Almagro'] },
+  { name: 'Rosario Central', country: 'Argentina', league: 'Argentine Primera' },
+  { name: 'Vélez Sarsfield', country: 'Argentina', league: 'Argentine Primera', aliases: ['Velez Sarsfield', 'Vélez'] },
+  { name: 'Argentinos Juniors', country: 'Argentina', league: 'Argentine Primera' },
+
+  /* ---------------- Rest of Europe ---------------- */
+  { name: 'Red Star Belgrade', country: 'Serbia', league: 'Serbian SuperLiga', aliases: ['Crvena Zvezda'] },
+  { name: 'Partizan', country: 'Serbia', league: 'Serbian SuperLiga', aliases: ['Partizan Belgrade'] },
+  { name: 'Sparta Prague', country: 'Czech Republic', league: 'Czech First League', aliases: ['AC Sparta Prague'] },
+  { name: 'Slavia Prague', country: 'Czech Republic', league: 'Czech First League', aliases: ['SK Slavia Prague'] },
+  { name: 'Standard Liège', country: 'Belgium', league: 'Belgian Pro League', aliases: ['Standard Liege'] },
+  { name: 'Gent', country: 'Belgium', league: 'Belgian Pro League', aliases: ['KAA Gent'] },
+  { name: 'Copenhagen', country: 'Denmark', league: 'Danish Superliga', aliases: ['FC Copenhagen', 'FCK'] },
+  { name: 'Malmö', country: 'Sweden', league: 'Allsvenskan', aliases: ['Malmo FF', 'Malmö FF'] },
+  { name: 'Rosenborg', country: 'Norway', league: 'Eliteserien', aliases: ['Rosenborg BK'] },
+  { name: 'Ferencváros', country: 'Hungary', league: 'Nemzeti Bajnokság I', aliases: ['Ferencvaros'] },
+  { name: 'Legia Warsaw', country: 'Poland', league: 'Ekstraklasa', aliases: ['Legia Warszawa'] },
+
+  /* ---------------- Americas ---------------- */
+  { name: 'Club América', country: 'Mexico', league: 'Liga MX', aliases: ['Club America', 'América'] },
+  { name: 'Guadalajara', country: 'Mexico', league: 'Liga MX', aliases: ['Chivas'] },
+  { name: 'Tigres UANL', country: 'Mexico', league: 'Liga MX', aliases: ['Tigres'] },
+  { name: 'Seattle Sounders', country: 'United States', league: 'MLS', aliases: ['Seattle Sounders FC'] },
+  { name: 'Atlanta United', country: 'United States', league: 'MLS', aliases: ['Atlanta United FC'] },
 ];
 
 /* ------------------------------------------------------------------ */
