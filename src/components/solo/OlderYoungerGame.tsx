@@ -17,6 +17,7 @@ import { IconArrowRight, IconBolt, IconCheck, IconClose } from '../ui/icons';
 import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
 import { modeTheme } from '../dashboard/modeTheme';
 import { AnimatedCounter } from '../dashboard/AnimatedCounter';
+import { refreshAchievements } from '../../lib/achievements';
 
 const REVEAL_MS = 1600;
 
@@ -73,6 +74,7 @@ export function OlderYoungerGame({ onExit }: { onExit: () => void }) {
     recorded.current = true;
     const { progress, isBest } = recordOYResult(streak);
     setBest(progress.bestStreak);
+    refreshAchievements();
     play(isBest && streak > 0 ? 'win' : 'whistle');
   }, [phase, streak]);
 

@@ -5,6 +5,8 @@ import type { ScoutSyncState } from '../../lib/scout/online';
 import { sideOf } from '../../lib/scout/online';
 import { canProbe, SCOUT_MAX_PROBES, otherSide, type ScoutSide } from '../../lib/scout/engine';
 import { scoutCatalog, scoutCategoryById } from '../../lib/scout/categories';
+import { recordScoutDuel } from '../../lib/scout/daily';
+import { refreshAchievements } from '../../lib/achievements';
 import { play } from '../../lib/sound';
 import { EvidenceRow, ProbeInput, RulePicker } from './ScoutGame';
 import { Card } from '../ui/Card';
@@ -37,6 +39,26 @@ export function ScoutOnlineGame({ name, onExit }: { name: string; onExit: () => 
       serviceRef.current = null;
     };
   }, []);
+
+  // Record the online duel's result once per round (each device logs its own
+  // win/loss), then refresh achievements — same records as the local duel.
+  const recordedRef = useRef(false);
+  useEffect(() => {
+    const round = state?.round;
+    if (!round || round.phase !== 'over') {
+      recordedRef.current = false;
+      return;
+    }
+    if (recordedRef.current) return;
+    const svc = serviceRef.current;
+    const mySide = svc && state ? sideOf(state, svc.getLocalPlayerId()) : null;
+    if (!mySide) return;
+    recordedRef.current = true;
+    const won = round.winner === mySide;
+    recordScoutDuel(won);
+    refreshAchievements();
+    play(won ? 'win' : 'whistle');
+  }, [state?.round?.phase, state]);
 
   const begin = async (mode: 'create' | 'join') => {
     setPhase('connecting');

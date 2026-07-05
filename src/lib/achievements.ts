@@ -16,11 +16,77 @@ import { getFeats } from './feats';
 
 const KEY = 'bk_achievements_v1';
 
+/**
+ * Bests across the solo / deduction modes, read straight from their storage
+ * keys. We deliberately DON'T import those modules here — several pull the
+ * player database, and `achievements` sits on the home path (Trophy Cabinet),
+ * so a static import would drag the DB into the entry bundle.
+ */
+export interface ModeProgress {
+  survivalBest: number;
+  timeAttackBest: number;
+  gauntletPerfect: boolean;
+  connectionsBestCorrect: number;
+  scoutDuelsWon: number;
+  scoutDailyStreak: number;
+  olderYoungerBest: number;
+  careerPathBest: number;
+  managersBest: number;
+}
+
+export const EMPTY_MODE_PROGRESS: ModeProgress = {
+  survivalBest: 0,
+  timeAttackBest: 0,
+  gauntletPerfect: false,
+  connectionsBestCorrect: 0,
+  scoutDuelsWon: 0,
+  scoutDailyStreak: 0,
+  olderYoungerBest: 0,
+  careerPathBest: 0,
+  managersBest: 0,
+};
+
+function readJson(key: string): Record<string, unknown> {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : null;
+    return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {};
+  } catch {
+    return {};
+  }
+}
+
+const num = (v: unknown): number => (typeof v === 'number' && Number.isFinite(v) ? v : 0);
+
+/** Snapshot every mode's stored bests without importing the heavy mode modules. */
+export function readModeProgress(): ModeProgress {
+  if (typeof localStorage === 'undefined') return EMPTY_MODE_PROGRESS;
+  const solo = readJson('bk_solo_v1');
+  const conn = readJson('bk_connections_v1');
+  const scout = readJson('bk_scout_v1');
+  const scoutDaily = (scout.daily && typeof scout.daily === 'object' ? scout.daily : {}) as Record<string, unknown>;
+  const oy = readJson('bk_older_younger_v1');
+  const careerPath = readJson('bk_career_path_v1');
+  const managers = readJson('bk_managers_v1');
+  return {
+    survivalBest: num(solo.survivalBest),
+    timeAttackBest: num(solo.timeAttackBest),
+    gauntletPerfect: solo.gauntletPerfect === true,
+    connectionsBestCorrect: num(conn.bestCorrect),
+    scoutDuelsWon: num(scout.duelsWon),
+    scoutDailyStreak: num(scoutDaily.streak),
+    olderYoungerBest: num(oy.bestStreak),
+    careerPathBest: num(careerPath.bestStreak),
+    managersBest: num(managers.bestStreak),
+  };
+}
+
 export interface AchievementContext {
   profile: ProfileStats;
   daily: DailyState;
   h2h: HeadToHeadStore;
   feats: Set<FeatId>;
+  modes: ModeProgress;
 }
 
 export interface AchievementDef {
@@ -174,6 +240,71 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     icon: '👑',
     earned: (c) => c.profile.matchesPlayed >= 50,
   },
+
+  /* ---------------- Solo & deduction modes ---------------- */
+  {
+    id: 'survivor',
+    title: 'Last Man Standing',
+    description: 'Survive 15 questions in a Survival run.',
+    icon: '🛡️',
+    earned: (c) => c.modes.survivalBest >= 15,
+  },
+  {
+    id: 'time_attacker',
+    title: 'Beat the Clock',
+    description: 'Bank 4,000 points in Time Attack.',
+    icon: '🏁',
+    earned: (c) => c.modes.timeAttackBest >= 4000,
+  },
+  {
+    id: 'gauntlet_clear',
+    title: 'Ran the Gauntlet',
+    description: 'Clear a Perfect Gauntlet — all ten correct.',
+    icon: '🧗',
+    earned: (c) => c.modes.gauntletPerfect,
+  },
+  {
+    id: 'connector',
+    title: 'The Connector',
+    description: 'Link 8 of 10 pairs in a Connections run.',
+    icon: '🔗',
+    earned: (c) => c.modes.connectionsBestCorrect >= 8,
+  },
+  {
+    id: 'super_scout',
+    title: 'Super Scout',
+    description: 'Win your first The Scout duel.',
+    icon: '🔍',
+    earned: (c) => c.modes.scoutDuelsWon >= 1,
+  },
+  {
+    id: 'master_detective',
+    title: 'Master Detective',
+    description: 'Win 5 The Scout duels.',
+    icon: '🕵️',
+    earned: (c) => c.modes.scoutDuelsWon >= 5,
+  },
+  {
+    id: 'time_traveller',
+    title: 'Time Traveller',
+    description: 'Reach a 12 streak in Older or Younger?',
+    icon: '⏳',
+    earned: (c) => c.modes.olderYoungerBest >= 12,
+  },
+  {
+    id: 'well_travelled',
+    title: 'Well Travelled',
+    description: 'Reach an 8 streak in Career Path.',
+    icon: '🧭',
+    earned: (c) => c.modes.careerPathBest >= 8,
+  },
+  {
+    id: 'merry_go_round',
+    title: 'Merry-Go-Round',
+    description: 'Reach an 8 streak in Manager Merry-go-round.',
+    icon: '📋',
+    earned: (c) => c.modes.managersBest >= 8,
+  },
 ];
 
 /** Fired when one or more achievements are freshly unlocked. */
@@ -214,6 +345,7 @@ export function currentContext(): AchievementContext {
     daily: getDailyState(),
     h2h: getHeadToHead(),
     feats: getFeats(),
+    modes: readModeProgress(),
   };
 }
 

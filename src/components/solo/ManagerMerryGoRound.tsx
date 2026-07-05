@@ -15,6 +15,7 @@ import { Button } from '../ui/Button';
 import { IconArrowRight, IconBolt, IconCheck, IconClose } from '../ui/icons';
 import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
 import { modeTheme } from '../dashboard/modeTheme';
+import { refreshAchievements } from '../../lib/achievements';
 
 const REVEAL_MS = 2400;
 
@@ -81,6 +82,7 @@ export function ManagerMerryGoRound({ onExit }: { onExit: () => void }) {
     recorded.current = true;
     const { progress, isBest } = recordManagerResult(streak);
     setBest(progress.bestStreak);
+    refreshAchievements();
     play(isBest && streak > 0 ? 'win' : 'whistle');
   }, [phase, streak]);
 

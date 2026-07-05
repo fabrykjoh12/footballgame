@@ -31,6 +31,7 @@ import {
   SCOUT_DAILY_MAX_ACCUSATIONS,
 } from '../../lib/scout/daily';
 import { play } from '../../lib/sound';
+import { refreshAchievements } from '../../lib/achievements';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -684,6 +685,7 @@ function ScoutDuel({
     recorded.current = true;
     const won = round.winner === PLAYER_SIDE;
     recordScoutDuel(won);
+    refreshAchievements();
     play(won ? 'win' : 'whistle');
   }, [round, kind]);
 

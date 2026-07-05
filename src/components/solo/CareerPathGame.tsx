@@ -16,6 +16,7 @@ import { Button } from '../ui/Button';
 import { IconArrowRight, IconBolt, IconCheck, IconClose } from '../ui/icons';
 import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
 import { modeTheme } from '../dashboard/modeTheme';
+import { refreshAchievements } from '../../lib/achievements';
 
 const REVEAL_MS = 2200;
 
@@ -96,6 +97,7 @@ export function CareerPathGame({ onExit }: { onExit: () => void }) {
     recorded.current = true;
     const { progress, isBest } = recordCareerPathResult(streak, score);
     setBest(progress.bestStreak);
+    refreshAchievements();
     play(isBest && score > 0 ? 'win' : 'whistle');
   }, [phase, streak, score]);
 
