@@ -9,6 +9,9 @@ import {
   getSoloPlayerEvents,
   accuracyPercent,
   guessAccuracy,
+  guessProximity,
+  guessProximityLabel,
+  GUESS_NUMBER_CORRECT_WITHIN,
 } from './scoring';
 
 describe('calculateBasePoints', () => {
@@ -122,6 +125,28 @@ describe('guessAccuracy (closeness for Guess the Number)', () => {
     expect(guessAccuracy(5, 0)).toBe(0);
     expect(guessAccuracy(NaN, 100)).toBe(0);
     expect(guessAccuracy(100, NaN)).toBe(0);
+  });
+});
+
+describe('guessProximity (hot/cold tiers)', () => {
+  it('maps closeness to a tier, hottest first', () => {
+    expect(guessProximity(1)).toBe('bang_on');
+    expect(guessProximity(0.92)).toBe('bang_on');
+    expect(guessProximity(0.85)).toBe('warm'); // within the 20% "correct" band
+    expect(guessProximity(0.6)).toBe('cool');
+    expect(guessProximity(0.3)).toBe('cold');
+  });
+
+  it('a "warm" tier lines up with the correct-answer band', () => {
+    // Anything counted correct (within GUESS_NUMBER_CORRECT_WITHIN) is at least warm.
+    expect(guessProximity(1 - GUESS_NUMBER_CORRECT_WITHIN)).toBe('warm');
+    expect(['bang_on', 'warm']).toContain(guessProximity(0.81));
+  });
+
+  it('every tier has a non-empty label', () => {
+    for (const t of ['bang_on', 'warm', 'cool', 'cold'] as const) {
+      expect(guessProximityLabel(t).length).toBeGreaterThan(0);
+    }
   });
 });
 

@@ -4,6 +4,7 @@ import { RESULT_AUTOADVANCE_MS } from '../../services/matchEngine';
 import { teamName } from '../../lib/teamName';
 import { describeAttack, type AttackTone } from '../../lib/attackFraming';
 import { speedComparison } from '../../lib/answerInsight';
+import { guessAccuracy, guessProximity, guessProximityLabel, type GuessProximity } from '../../lib/scoring';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -146,6 +147,17 @@ export function ResultReveal({
         );
       })()}
 
+      {/* Guess the Number — hot/cold proximity for each side's guess */}
+      {result.questionType === 'guess_the_number' && (
+        <GuessNumberReveal
+          correct={result.correctAnswer}
+          rows={[
+            local ? { label: teamName(local.name), isYou: true, guess: localRes?.selectedAnswer ?? null } : null,
+            opponent ? { label: teamName(opponent.name), isYou: false, guess: oppRes?.selectedAnswer ?? null } : null,
+          ].filter(Boolean) as GuessRow[]}
+        />
+      )}
+
       {/* Per-player breakdown */}
       <div className="grid grid-cols-2 gap-3">
         {local && (
@@ -188,6 +200,63 @@ export function ResultReveal({
         </div>
       )}
     </div>
+  );
+}
+
+interface GuessRow {
+  label: string;
+  isYou: boolean;
+  guess: string | null;
+}
+
+const PROXIMITY_STYLE: Record<GuessProximity, { text: string; bar: string }> = {
+  bang_on: { text: 'text-pitch', bar: 'bg-pitch' },
+  warm: { text: 'text-gold', bar: 'bg-gold' },
+  cool: { text: 'text-brand-blue', bar: 'bg-brand-blue' },
+  cold: { text: 'text-white/50', bar: 'bg-white/30' },
+};
+
+/** How close each side's numeric guess landed — a hot/cold proximity bar. */
+function GuessNumberReveal({ correct, rows }: { correct: string; rows: GuessRow[] }) {
+  const target = Number(correct);
+  return (
+    <Card className="p-4">
+      <div className="mb-2 text-center text-[11px] font-bold uppercase tracking-wide text-white/45">
+        How close?
+      </div>
+      <div className="flex flex-col gap-3">
+        {rows.map((r) => {
+          const g = r.guess == null ? null : Number(r.guess);
+          const has = g != null && Number.isFinite(g);
+          const acc = has ? guessAccuracy(g, target) : 0;
+          const tier = guessProximity(acc);
+          const style = PROXIMITY_STYLE[tier];
+          return (
+            <div key={r.label}>
+              <div className="mb-1 flex items-center justify-between gap-2 text-sm">
+                <span className="flex items-center gap-1.5 truncate">
+                  <span className="truncate font-semibold">{r.label}</span>
+                  {r.isYou && <span className="text-[10px] font-bold uppercase text-white/45">You</span>}
+                </span>
+                <span className="nums flex items-center gap-2">
+                  <span className="font-mono text-white/85">{has ? g : '—'}</span>
+                  {has && <span className={['text-xs font-bold', style.text].join(' ')}>{guessProximityLabel(tier)}</span>}
+                </span>
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]" aria-hidden>
+                <div
+                  className={['h-full rounded-full transition-[width] duration-500 ease-out', style.bar].join(' ')}
+                  style={{ width: `${Math.round(acc * 100)}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <p className="nums mt-3 text-center text-xs text-white/45">
+        Answer: <span className="font-semibold text-white/70">{correct}</span>
+      </p>
+    </Card>
   );
 }
 

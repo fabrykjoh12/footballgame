@@ -77,6 +77,30 @@ export function guessAccuracy(guess: number, actual: number): number {
   return Math.max(0, Math.min(1, 1 - error));
 }
 
+export type GuessProximity = 'bang_on' | 'warm' | 'cool' | 'cold';
+
+/** A hot/cold tier from a 0–1 closeness — for the Guess the Number reveal. */
+export function guessProximity(accuracy: number): GuessProximity {
+  if (accuracy >= 0.9) return 'bang_on';
+  if (accuracy >= 1 - GUESS_NUMBER_CORRECT_WITHIN) return 'warm'; // within the "correct" band
+  if (accuracy >= 0.55) return 'cool';
+  return 'cold';
+}
+
+/** Short broadcast label for a proximity tier. */
+export function guessProximityLabel(p: GuessProximity): string {
+  switch (p) {
+    case 'bang_on':
+      return 'Bang on!';
+    case 'warm':
+      return 'Warm';
+    case 'cool':
+      return 'Cool';
+    case 'cold':
+      return 'Cold';
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* Pure scoring functions                                              */
 /* ------------------------------------------------------------------ */
