@@ -155,18 +155,16 @@ export function pickMatchQuestions(
   const skip = seeded ? undefined : recent;
 
   const cats = settings.categories;
-  const selected: Question[] = [
-    ...pickOfType(pool, 'who_am_i', dist.who_am_i, allowed, rng, cats, skip),
-    ...pickOfType(pool, 'career_path', dist.career_path, allowed, rng, cats, skip),
-    ...pickOfType(pool, 'higher_lower', dist.higher_lower, allowed, rng, cats, skip),
-    ...pickOfType(pool, 'club_country', dist.club_country, allowed, rng, cats, skip),
-    ...pickOfType(pool, 'guess_year', dist.guess_year, allowed, rng, cats, skip),
-    ...pickOfType(pool, 'transfer_fee', dist.transfer_fee, allowed, rng, cats, skip),
-    ...pickOfType(pool, 'pitch_position', dist.pitch_position, allowed, rng, cats, skip),
-    ...pickOfType(pool, 'odd_one_out', dist.odd_one_out, allowed, rng, cats, skip),
-    ...pickOfType(pool, 'spot_the_lie', dist.spot_the_lie, allowed, rng, cats, skip),
-    ...pickOfType(pool, 'guess_the_number', dist.guess_the_number, allowed, rng, cats, skip),
-  ];
+  // Iterate the distribution keys so the match composition has a single source
+  // of truth (MATCH_TYPE_DISTRIBUTION). Adding a new mini-game there is enough
+  // for the picker to include it — no extra line to add here.
+  const selected: Question[] = [];
+  for (const type of Object.keys(dist) as QuestionType[]) {
+    const count = dist[type];
+    if (count > 0) {
+      selected.push(...pickOfType(pool, type, count, allowed, rng, cats, skip));
+    }
+  }
 
   // Shuffle the final order so mini-games are interleaved, then randomize each
   // question's answer positions so the correct answer isn't always in slot A.

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { pickMatchQuestions, randomizeAnswerOrder, shuffle } from './questionPicker';
-import { defaultSettings, difficultiesForMode } from './matchModes';
+import { defaultSettings, difficultiesForMode, MATCH_TYPE_DISTRIBUTION } from './matchModes';
 import type { MatchMode, MatchSettings, Question } from '../types/game';
 
 describe('shuffle', () => {
@@ -113,6 +113,27 @@ describe('pickMatchQuestions', () => {
       }
     });
   }
+});
+
+describe('pickMatchQuestions is driven by MATCH_TYPE_DISTRIBUTION', () => {
+  it('picks exactly the types (and counts) declared in the distribution', () => {
+    const qs = pickMatchQuestions(defaultSettings('serious'));
+    const counts: Record<string, number> = {};
+    for (const q of qs) counts[q.type] = (counts[q.type] ?? 0) + 1;
+    // Every declared type with a positive count is represented exactly.
+    for (const [type, want] of Object.entries(MATCH_TYPE_DISTRIBUTION)) {
+      expect(counts[type] ?? 0, type).toBe(want);
+    }
+    // And nothing outside the distribution sneaks in.
+    for (const type of Object.keys(counts)) {
+      expect(MATCH_TYPE_DISTRIBUTION, type).toHaveProperty(type);
+    }
+  });
+
+  it('picks the requested total for a scaled question count', () => {
+    const qs = pickMatchQuestions({ ...defaultSettings('casual'), questionCount: 6 });
+    expect(qs).toHaveLength(6);
+  });
 });
 
 describe('pickMatchQuestions topic filter', () => {

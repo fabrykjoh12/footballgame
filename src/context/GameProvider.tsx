@@ -26,6 +26,7 @@ import {
   type MultiplayerProvider,
 } from '../services/gameService';
 import { dailySettings, dailyRival } from '../lib/dailyChallenge';
+import { trackEvent } from '../lib/analytics';
 
 interface GameContextValue {
   room: Room | null;
@@ -185,6 +186,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     await serviceRef.current?.startMatch();
   }, []);
   const submitAnswer = useCallback(async (input: SubmitAnswerInput) => {
+    trackEvent('answer_submitted', { answered: input.selectedAnswer != null });
     await serviceRef.current?.submitAnswer(input);
   }, []);
   const nextQuestion = useCallback(async () => {
