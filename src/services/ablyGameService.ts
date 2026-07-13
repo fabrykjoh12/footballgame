@@ -29,6 +29,7 @@ import { recentlySeenIds } from '../lib/questionHistory';
 import { uid } from '../lib/id';
 import { createAblyRealtime } from '../lib/ablyClient';
 import { mapRealtimeState } from './connectionMapping';
+import { devWarn } from '../lib/devLog';
 import { MatchEngine } from './matchEngine';
 
 type ChannelEvent =
@@ -306,11 +307,28 @@ export class AblyGameService implements GameService {
     }
   }
 
+  /** Actions worth retrying + logging if they fail (vs. best-effort chatter). */
+  private static readonly CRITICAL_EVENTS: ReadonlySet<ChannelEvent> = new Set<ChannelEvent>(
+    ['answer', 'join', 'request_state', 'snapshot'],
+  );
+
   private async send(event: ChannelEvent, payload: unknown): Promise<void> {
+    const channel = this.channel;
+    if (!channel) return;
+    const critical = AblyGameService.CRITICAL_EVENTS.has(event);
     try {
-      await this.channel?.publish(event, payload);
-    } catch {
-      /* transient publish error; snapshots are idempotent */
+      await channel.publish(event, payload);
+    } catch (err) {
+      // Non-critical chatter (leave / room_full) recovers on its own — stay quiet.
+      if (!critical) return;
+      // Retry a critical action once. This is safe: snapshots are idempotent,
+      // the host dedupes answers per player, and a late retry is treated as a
+      // timeout by answerValidation — so a duplicate publish can't double-score.
+      try {
+        await channel.publish(event, payload);
+      } catch (retryErr) {
+        devWarn('ably', `failed to publish "${event}" after retry`, retryErr ?? err);
+      }
     }
   }
 

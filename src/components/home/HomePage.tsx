@@ -9,6 +9,8 @@ import { playerLevel } from '../../lib/playerLevel';
 import { currentStreak } from '../../lib/streakRewards';
 import { getCareer } from '../../lib/career';
 import { getClubIdentity, saveClubIdentity, type ClubIdentity } from '../../lib/clubIdentity';
+import { trackEvent } from '../../lib/analytics';
+import type { View } from '../../lib/viewRoute';
 import { PrimaryButton, SecondaryButton, Button } from '../ui/Button';
 import { DailyRivalCard } from './DailyRivalCard';
 import { QuestsCard } from './QuestsCard';
@@ -23,7 +25,40 @@ import { hasOnboarded } from '../../lib/onboarding';
 import { SectionHeader } from '../dashboard/SectionHeader';
 import { GameModeCard } from '../dashboard/GameModeCard';
 import { ClubProgressCard } from '../dashboard/ClubProgressCard';
+import type { ModeMeta } from '../dashboard/modes';
 import { VERSUS_MODES, DAILY_MODES, SOLO_MODES, COMPETE_MODES } from '../dashboard/modes';
+
+/** The returning-player mode groups, in dashboard order. */
+const MODE_SECTIONS: { title: string; modes: ModeMeta[] }[] = [
+  { title: 'Versus a rival', modes: VERSUS_MODES },
+  { title: 'Daily puzzles', modes: DAILY_MODES },
+  { title: 'Solo practice', modes: SOLO_MODES },
+  { title: 'Competitions', modes: COMPETE_MODES },
+];
+
+/** The core game loop, in one glanceable strip for first-time players. */
+function HowItWorks() {
+  const steps = [
+    ['10 questions', 'Ten quickfire football mini-games.'],
+    ['Fast & correct', 'Answer right, and answer quickly.'],
+    ['Points → goals', 'Every answer can change the scoreline.'],
+    ['Win & share', 'Take the match, then challenge a friend.'],
+  ];
+  return (
+    <section>
+      <SectionHeader eyebrow="How it works" />
+      <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {steps.map(([title, body], i) => (
+          <li key={title} className="rounded-xl border border-white/10 bg-ink-800 p-4">
+            <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-royal">Step {i + 1}</div>
+            <div className="mt-1 font-bold text-bone">{title}</div>
+            <p className="mt-1 text-sm text-bone-dim">{body}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
 
 export function HomePage() {
   const { createRoom, joinRoom, playDemo, playDaily, connecting, error, multiplayerAvailable } = useGame();
@@ -40,6 +75,7 @@ export function HomePage() {
   const [showOnboarding, setShowOnboarding] = useState(() => !hasOnboarded());
   const streak = currentStreak();
   const level = playerLevel(stats);
+  const isNewPlayer = stats.matchesPlayed === 0;
 
   const saveClub = (identity: ClubIdentity) => {
     saveClubIdentity(identity);
@@ -61,19 +97,53 @@ export function HomePage() {
   const codeValid = isValidRoomCode(code);
   const greetingName = club?.name || name || 'manager';
 
+  const warmUp = () => {
+    trackEvent('match_started', { vs: 'cpu', kind: 'demo' });
+    playDemo(playName);
+  };
+  const challengeFriend = () => {
+    trackEvent('friend_challenge_created', { available: multiplayerAvailable });
+    createRoom(playName);
+  };
+  const enterRoom = () => joinRoom(code, playName);
+  const startDaily = (n: string) => {
+    trackEvent('daily_started');
+    playDaily(n);
+  };
+  const openMode = (view: View) => {
+    trackEvent('mode_selected', { mode: view });
+    navigate(view);
+  };
+
   const careerBadge = career ? 'Continue' : undefined;
-  const modeCards = [...VERSUS_MODES, ...DAILY_MODES, ...SOLO_MODES, ...COMPETE_MODES];
+
+  const modeGrid = (modes: ModeMeta[]) => (
+    <div className="grid gap-3 sm:grid-cols-2">
+      {modes.map((mode) => (
+        <GameModeCard
+          key={mode.view}
+          mode={mode}
+          badge={mode.view === 'career' ? careerBadge : undefined}
+          onClick={() => openMode(mode.view)}
+        />
+      ))}
+    </div>
+  );
 
   return (
     <div className="flex flex-1 flex-col gap-8 py-7">
-      {/* Welcome */}
+      {/* Hero */}
       <header className="animate-fade-in">
-        <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-royal">Dashboard</div>
+        <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-royal">
+          {isNewPlayer ? 'Football IQ duel' : 'Dashboard'}
+        </div>
         <h1 className="mt-1.5 text-[34px] font-extrabold leading-none tracking-tight text-bone sm:text-[42px]">
-          Welcome back, {greetingName}
+          {isNewPlayer ? 'Prove your ball knowledge.' : `Welcome back, ${greetingName}`}
         </h1>
         <p className="mt-2.5 max-w-xl text-[15px] text-bone-dim">
-          Your football knowledge, scored like a match. Jump into a duel, defend your daily streak, or climb the modes.
+          {isNewPlayer
+            ? 'A 1v1 football IQ duel where every correct answer can score a goal. Warm up against the CPU, then challenge a friend.'
+            : 'Every correct answer can change the scoreline. Defend today’s fixture, or challenge a friend to a duel.'}
         </p>
 
         {/* Quick actions */}
@@ -88,14 +158,14 @@ export function HomePage() {
               className="input-field h-11 w-44"
             />
           )}
-          <PrimaryButton size="lg" disabled={!nameValid || connecting} onClick={() => playDemo(playName)}>
-            <Zap className="h-[18px] w-[18px]" strokeWidth={2.4} /> Play vs CPU
+          <PrimaryButton size="lg" disabled={!nameValid || connecting} onClick={warmUp}>
+            <Zap className="h-[18px] w-[18px]" strokeWidth={2.4} /> Warm up vs CPU
           </PrimaryButton>
-          <SecondaryButton size="lg" disabled={!nameValid || connecting} onClick={() => createRoom(playName)}>
-            <Users className="h-[18px] w-[18px]" /> Create room
+          <SecondaryButton size="lg" disabled={!nameValid || connecting} onClick={challengeFriend}>
+            <Users className="h-[18px] w-[18px]" /> Challenge a friend
           </SecondaryButton>
           <SecondaryButton size="lg" disabled={connecting} onClick={() => setShowJoin((s) => !s)}>
-            <KeyRound className="h-[18px] w-[18px]" /> Join
+            <KeyRound className="h-[18px] w-[18px]" /> Enter room
           </SecondaryButton>
         </div>
 
@@ -109,8 +179,8 @@ export function HomePage() {
               autoComplete="off"
               className="input-field flex-1 text-center font-mono uppercase tracking-[0.25em] placeholder:tracking-normal"
             />
-            <Button disabled={!nameValid || !codeValid || connecting} onClick={() => joinRoom(code, playName)}>
-              Join room
+            <Button disabled={!nameValid || !codeValid || connecting} onClick={enterRoom}>
+              Enter room
             </Button>
           </div>
         )}
@@ -127,45 +197,57 @@ export function HomePage() {
         )}
       </header>
 
-      {/* Featured: Daily Rival + Your Club */}
-      <section className="grid gap-4 lg:grid-cols-[1.55fr_1fr]">
-        <div>
-          <SectionHeader eyebrow="Today's fixture" />
-          <DailyRivalCard name={playName} connecting={connecting} onPlay={playDaily} featured />
-          <p className="mt-2 text-xs text-bone-faint">One official attempt · resets at midnight</p>
-        </div>
-        <div>
-          <SectionHeader eyebrow="Your club" />
-          <ClubProgressCard club={club} level={level} stats={stats} streak={streak} onEdit={() => setEditingClub(true)} />
-        </div>
-      </section>
+      {isNewPlayer ? (
+        /* ---------- First-time player: focused, low-clutter ---------- */
+        <>
+          <HowItWorks />
+          <section>
+            <SectionHeader eyebrow="Today's fixture" />
+            <DailyRivalCard name={playName} connecting={connecting} onPlay={startDaily} featured />
+            <p className="mt-2 text-xs text-bone-faint">One official attempt · resets at midnight</p>
+          </section>
+          <section>
+            <SectionHeader eyebrow="Your club" />
+            <ClubProgressCard club={club} level={level} stats={stats} streak={streak} onEdit={() => setEditingClub(true)} />
+          </section>
+        </>
+      ) : (
+        /* ---------- Returning player: full matchday dashboard ---------- */
+        <>
+          {/* Featured: Daily Rival + Your Club */}
+          <section className="grid gap-4 lg:grid-cols-[1.55fr_1fr]">
+            <div>
+              <SectionHeader eyebrow="Today's fixture" />
+              <DailyRivalCard name={playName} connecting={connecting} onPlay={startDaily} featured />
+              <p className="mt-2 text-xs text-bone-faint">One official attempt · resets at midnight</p>
+            </div>
+            <div>
+              <SectionHeader eyebrow="Your club" />
+              <ClubProgressCard club={club} level={level} stats={stats} streak={streak} onEdit={() => setEditingClub(true)} />
+            </div>
+          </section>
 
-      {/* Play modes */}
-      <section>
-        <SectionHeader eyebrow="Play" title="Game modes" />
-        <div className="grid gap-3 sm:grid-cols-2">
-          {modeCards.map((mode) => (
-            <GameModeCard
-              key={mode.view}
-              mode={mode}
-              badge={mode.view === 'career' ? careerBadge : undefined}
-              onClick={() => navigate(mode.view)}
-            />
+          {/* Today's progress */}
+          <section className="grid gap-4 lg:grid-cols-2">
+            <QuestsCard />
+            <StreakRewardCard />
+          </section>
+
+          {/* Modes, grouped so it's clear what's versus / daily / solo / competition */}
+          {MODE_SECTIONS.map(({ title, modes }) => (
+            <section key={title}>
+              <SectionHeader eyebrow="Play" title={title} />
+              {modeGrid(modes)}
+            </section>
           ))}
-        </div>
-      </section>
 
-      {/* Today's progress */}
-      <section className="grid gap-4 lg:grid-cols-2">
-        <QuestsCard />
-        <StreakRewardCard />
-      </section>
-
-      {/* Leaderboard & leagues */}
-      <section className="grid gap-4 lg:grid-cols-2">
-        <TrophyCabinet />
-        <LeaguesCard />
-      </section>
+          {/* Leaderboard & leagues */}
+          <section className="grid gap-4 lg:grid-cols-2">
+            <TrophyCabinet />
+            <LeaguesCard />
+          </section>
+        </>
+      )}
 
       {/* Footer utilities */}
       <div className="flex items-center gap-4 text-sm text-bone-faint">

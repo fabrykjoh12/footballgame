@@ -1,10 +1,62 @@
 import { describe, it, expect } from 'vitest';
 import { QUESTIONS } from './questions';
 
+const TYPES = new Set([
+  'who_am_i',
+  'career_path',
+  'higher_lower',
+  'club_country',
+  'guess_year',
+  'transfer_fee',
+  'pitch_position',
+  'odd_one_out',
+  'spot_the_lie',
+  'guess_the_number',
+]);
+const DIFFICULTIES = new Set(['easy', 'medium', 'hard', 'nightmare']);
+const CATEGORIES = new Set([
+  'players',
+  'clubs',
+  'countries',
+  'leagues',
+  'champions_league',
+  'world_cup',
+  'transfers',
+  'history',
+]);
+
+// TODO(pre-launch): approximate figures (transfer fees, goal tallies, caps)
+// must be source-verified before a public launch — hardcore fans lose trust
+// instantly on a wrong fact. This suite guards SHAPE, not factual accuracy.
+
 describe('question database integrity', () => {
   it('has globally unique ids', () => {
     const ids = QUESTIONS.map((q) => q.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('uses only known type / difficulty / category enums', () => {
+    for (const q of QUESTIONS) {
+      expect(TYPES.has(q.type), `${q.id} type ${q.type}`).toBe(true);
+      expect(DIFFICULTIES.has(q.difficulty), `${q.id} difficulty ${q.difficulty}`).toBe(true);
+      expect(CATEGORIES.has(q.category), `${q.id} category ${q.category}`).toBe(true);
+    }
+  });
+
+  it('has a non-empty id and explanation on every question', () => {
+    for (const q of QUESTIONS) {
+      expect(q.id.trim().length, q.id).toBeGreaterThan(0);
+      expect(q.explanation.trim().length, `${q.id} explanation`).toBeGreaterThan(0);
+    }
+  });
+
+  it('has no empty option or prompt strings', () => {
+    for (const q of QUESTIONS) {
+      if ('prompt' in q) expect((q.prompt as string).trim().length, `${q.id} prompt`).toBeGreaterThan(0);
+      if ('options' in q) {
+        for (const o of q.options) expect(o.trim().length, `${q.id} option`).toBeGreaterThan(0);
+      }
+    }
   });
 
   it('gives every multiple-choice question exactly 4 unique options incl. the answer', () => {

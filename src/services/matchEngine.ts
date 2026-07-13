@@ -32,6 +32,7 @@ import {
   guessAccuracy,
   GUESS_NUMBER_CORRECT_WITHIN,
 } from '../lib/scoring';
+import { validateAnswerInput } from '../lib/answerValidation';
 
 /** Delay before the first question after the host hits start. */
 const KICKOFF_DELAY_MS = 1400;
@@ -197,23 +198,37 @@ export class MatchEngine {
     const existing = this.room.answers[question.id] ?? [];
     if (existing.some((a) => a.playerId === playerId)) return; // one answer per player
 
+    // Never trust the raw client input: clamp the time and validate the
+    // selection against the question on the host clock before scoring.
+    const clean = validateAnswerInput(question, input, {
+      questionStartedAt: this.room.questionStartedAt,
+      questionDurationMs: this.room.settings.questionDurationMs,
+      now: Date.now(),
+    });
+    const selectedAnswer = clean.selectedAnswer;
+    const clueStage = Number.isFinite(input.clueStage)
+      ? Math.max(0, Math.floor(input.clueStage))
+      : 0;
+
     const isCorrect =
-      question.type === 'guess_the_number'
-        ? guessAccuracy(Number(input.selectedAnswer), Number(question.correctAnswer)) >=
-          1 - GUESS_NUMBER_CORRECT_WITHIN
-        : input.selectedAnswer === question.correctAnswer;
+      selectedAnswer == null
+        ? false
+        : question.type === 'guess_the_number'
+          ? guessAccuracy(Number(selectedAnswer), Number(question.correctAnswer)) >=
+            1 - GUESS_NUMBER_CORRECT_WITHIN
+          : selectedAnswer === question.correctAnswer;
     const answers = { ...this.room.answers };
     answers[question.id] = [
       ...existing,
       {
         playerId,
         questionId: question.id,
-        selectedAnswer: input.selectedAnswer,
+        selectedAnswer,
         isCorrect,
         answeredAt: Date.now(),
-        timeTakenMs: input.timeTakenMs,
+        timeTakenMs: clean.timeTakenMs,
         pointsEarned: 0, // finalised at reveal so streak order is deterministic
-        clueStage: input.clueStage,
+        clueStage,
       },
     ];
     this.room = { ...this.room, answers };

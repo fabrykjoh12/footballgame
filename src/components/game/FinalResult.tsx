@@ -12,8 +12,9 @@ import { punditVerdict } from '../../lib/punditry';
 import { matchIdentities, type TeamIdentity } from '../../lib/teamIdentity';
 import { CATEGORY_OPTIONS } from '../../lib/categories';
 import { FULL_TIME, type TimelineMark } from '../../lib/matchTimeline';
-import { buildShareText } from '../../lib/shareResult';
+import { buildShareText, shareResultText } from '../../lib/shareResult';
 import { shareResultImage } from '../../lib/shareImage';
+import { trackEvent } from '../../lib/analytics';
 import { recordMatchResult } from '../../lib/profileStats';
 import { recordDailyResult, getDailyState } from '../../lib/dailyChallenge';
 import { milestoneCrossed, type StreakMilestone } from '../../lib/streakRewards';
@@ -76,6 +77,28 @@ export function FinalResult() {
     setUnlocked(refreshAchievements());
 
     const me = room.players.find((p) => p.id === localPlayerId);
+    const opp = room.players.find((p) => p.id !== localPlayerId);
+    const outcome =
+      !me || !opp
+        ? 'unknown'
+        : me.goals === opp.goals
+          ? me.score === opp.score
+            ? 'draw'
+            : me.score > opp.score
+              ? 'win_points'
+              : 'loss_points'
+          : me.goals > opp.goals
+            ? 'win'
+            : 'loss';
+    trackEvent('match_finished', {
+      mode: room.settings.mode,
+      outcome,
+      daily: !!room.settings.isDaily,
+      career: !!room.settings.careerMatch,
+      cup: !!room.settings.cupMatch,
+    });
+    if (room.settings.isDaily) trackEvent('daily_completed', { outcome });
+
     if (user && me) {
       void submitPersonalBest({ uid: user.id, name: me.name, score: me.score });
       if (room.settings.isDaily) {
@@ -111,12 +134,11 @@ export function FinalResult() {
   );
 
   const share = async () => {
-    try {
-      await navigator.clipboard.writeText(buildShareText(room, localPlayerId));
+    const outcome = await shareResultText(buildShareText(room, localPlayerId));
+    if (outcome !== 'failed') {
+      trackEvent('result_shared', { method: outcome, kind: 'text', mode: room.settings.mode });
       setShared(true);
       setTimeout(() => setShared(false), 1800);
-    } catch {
-      /* ignore */
     }
   };
 
