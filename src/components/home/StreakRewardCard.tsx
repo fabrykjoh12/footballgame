@@ -12,15 +12,16 @@ import { Card } from '../ui/Card';
  * "X days to your next reward" progression. Purely reads `streakRewards` (pure
  * lib); unlocking happens in `cosmetics.ts` at the same thresholds.
  */
-export function StreakRewardCard() {
+export function StreakRewardCard({ embedded = false }: { embedded?: boolean }) {
   const streak = currentStreak();
   const next = nextMilestone(streak);
   const progress = streakProgress(streak);
   const remaining = daysToNextReward(streak);
   const ladder = streakLadder(streak);
 
+  const Wrapper = embedded ? 'div' : Card;
   return (
-    <Card className="p-4">
+    <Wrapper className={embedded ? '' : 'p-4'}>
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <h3 className="text-[15px] font-bold text-white">Streak rewards</h3>
@@ -75,6 +76,6 @@ export function StreakRewardCard() {
           </span>
         ))}
       </div>
-    </Card>
+    </Wrapper>
   );
 }

@@ -78,7 +78,7 @@ function TeamSide({
     <span
       aria-hidden
       className="h-2.5 w-2.5 shrink-0 rounded-full"
-      style={{ backgroundColor: identity.color, boxShadow: `0 0 8px ${identity.ring}` }}
+      style={{ backgroundColor: identity.color }}
     />
   );
   const offline = !player.connected && (

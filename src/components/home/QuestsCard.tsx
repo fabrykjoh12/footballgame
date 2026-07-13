@@ -7,14 +7,15 @@ import { Card } from '../ui/Card';
  * the day's baseline + live daily state, so it stays accurate without any
  * recording-site changes.
  */
-export function QuestsCard() {
+export function QuestsCard({ embedded = false }: { embedded?: boolean }) {
   const quests = getDailyQuests();
   if (quests.length === 0) return null;
   const done = quests.filter((q) => q.complete).length;
   const allDone = done === quests.length;
 
+  const Wrapper = embedded ? 'div' : Card;
   return (
-    <Card className="p-4">
+    <Wrapper className={embedded ? '' : 'p-4'}>
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <h3 className="text-[15px] font-bold text-white">Daily quests</h3>
@@ -78,6 +79,6 @@ export function QuestsCard() {
           🎉 All quests done — back tomorrow for three more.
         </p>
       )}
-    </Card>
+    </Wrapper>
   );
 }

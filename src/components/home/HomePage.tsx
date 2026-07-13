@@ -12,6 +12,7 @@ import { getClubIdentity, saveClubIdentity, type ClubIdentity } from '../../lib/
 import { trackEvent } from '../../lib/analytics';
 import type { View } from '../../lib/viewRoute';
 import { PrimaryButton, SecondaryButton, Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 import { DailyRivalCard } from './DailyRivalCard';
 import { QuestsCard } from './QuestsCard';
 import { StreakRewardCard } from './StreakRewardCard';
@@ -28,13 +29,20 @@ import { ClubProgressCard } from '../dashboard/ClubProgressCard';
 import type { ModeMeta } from '../dashboard/modes';
 import { VERSUS_MODES, DAILY_MODES, SOLO_MODES, COMPETE_MODES } from '../dashboard/modes';
 
-/** The returning-player mode groups, in dashboard order. */
-const MODE_SECTIONS: { title: string; modes: ModeMeta[] }[] = [
+/**
+ * Returning-player mode groups. Rival + daily play lead; the long tail of
+ * solo/competition modes sits behind a "show all" disclosure so the dashboard
+ * stays calm (the sidebar always lists everything).
+ */
+const PRIMARY_MODE_SECTIONS: { title: string; modes: ModeMeta[] }[] = [
   { title: 'Versus a rival', modes: VERSUS_MODES },
   { title: 'Daily puzzles', modes: DAILY_MODES },
+];
+const MORE_MODE_SECTIONS: { title: string; modes: ModeMeta[] }[] = [
   { title: 'Solo practice', modes: SOLO_MODES },
   { title: 'Competitions', modes: COMPETE_MODES },
 ];
+const MORE_MODE_COUNT = MORE_MODE_SECTIONS.reduce((n, s) => n + s.modes.length, 0);
 
 /** The core game loop, in one glanceable strip for first-time players. */
 function HowItWorks() {
@@ -73,6 +81,7 @@ export function HomePage() {
   const [showSettings, setShowSettings] = useState(false);
   const [showCosmetics, setShowCosmetics] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => !hasOnboarded());
+  const [showAllModes, setShowAllModes] = useState(false);
   const streak = currentStreak();
   const level = playerLevel(stats);
   const isNewPlayer = stats.matchesPlayed === 0;
@@ -227,24 +236,47 @@ export function HomePage() {
             </div>
           </section>
 
-          {/* Today's progress */}
-          <section className="grid gap-4 lg:grid-cols-2">
-            <QuestsCard />
-            <StreakRewardCard />
+          {/* Today's progress — one calm card instead of two competing panels */}
+          <section>
+            <SectionHeader eyebrow="Today" />
+            <Card className="p-4">
+              <QuestsCard embedded />
+              <div className="my-4 border-t border-white/[0.06]" aria-hidden />
+              <StreakRewardCard embedded />
+            </Card>
           </section>
 
-          {/* Modes, grouped so it's clear what's versus / daily / solo / competition */}
-          {MODE_SECTIONS.map(({ title, modes }) => (
+          {/* Modes: rival + daily up front; the long tail behind one disclosure */}
+          {PRIMARY_MODE_SECTIONS.map(({ title, modes }) => (
             <section key={title}>
               <SectionHeader eyebrow="Play" title={title} />
               {modeGrid(modes)}
             </section>
           ))}
+          {showAllModes ? (
+            MORE_MODE_SECTIONS.map(({ title, modes }) => (
+              <section key={title}>
+                <SectionHeader eyebrow="Play" title={title} />
+                {modeGrid(modes)}
+              </section>
+            ))
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowAllModes(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/10 py-3 text-sm font-semibold text-bone-dim transition-colors hover:border-white/20 hover:text-bone"
+            >
+              Show all game modes ({MORE_MODE_COUNT} more)
+            </button>
+          )}
 
-          {/* Leaderboard & leagues */}
-          <section className="grid gap-4 lg:grid-cols-2">
-            <TrophyCabinet />
-            <LeaguesCard />
+          {/* Standings */}
+          <section>
+            <SectionHeader eyebrow="Standings" />
+            <div className="grid gap-4 lg:grid-cols-2">
+              <TrophyCabinet />
+              <LeaguesCard />
+            </div>
           </section>
         </>
       )}

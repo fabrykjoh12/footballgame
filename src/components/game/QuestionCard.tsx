@@ -36,6 +36,8 @@ interface QuestionCardProps {
   hasAnswered: boolean;
   opponentAnswered: boolean;
   onAnswer: (answer: string) => void;
+  /** When set, a pause control renders in the card header. */
+  onPause?: () => void;
 }
 
 export function QuestionCard({
@@ -45,6 +47,7 @@ export function QuestionCard({
   hasAnswered,
   opponentAnswered,
   onAnswer,
+  onPause,
 }: QuestionCardProps) {
   const meta = TYPE_META[question.type];
 
@@ -64,22 +67,33 @@ export function QuestionCard({
 
   return (
     <Card strong className="p-4 sm:p-5 animate-fade-in">
-      {/* Header */}
+      {/* Header — two badges max; the category tag added noise without aiding play. */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Badge tone="pitch">
           <meta.Icon className="h-3.5 w-3.5" /> {meta.label}
         </Badge>
         <DifficultyBadge difficulty={question.difficulty} />
-        <Badge tone="muted">{question.category.replace(/_/g, ' ')}</Badge>
-        <button
-          type="button"
-          onClick={() => (showHelp ? dismissHelp() : setHelpOpenedFor(question.id))}
-          aria-label={`How to play ${meta.label}`}
-          aria-expanded={showHelp}
-          className="ml-auto grid h-6 w-6 shrink-0 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-xs font-bold text-white/55 hover:bg-white/[0.05] hover:text-white"
-        >
-          ?
-        </button>
+        <span className="ml-auto flex shrink-0 items-center gap-1.5">
+          {onPause && (
+            <button
+              type="button"
+              onClick={onPause}
+              aria-label="Pause match"
+              className="grid h-6 w-6 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-[10px] text-white/55 hover:bg-white/[0.05] hover:text-white"
+            >
+              ⏸
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => (showHelp ? dismissHelp() : setHelpOpenedFor(question.id))}
+            aria-label={`How to play ${meta.label}`}
+            aria-expanded={showHelp}
+            className="grid h-6 w-6 place-items-center rounded-full border border-white/10 bg-white/[0.04] text-xs font-bold text-white/55 hover:bg-white/[0.05] hover:text-white"
+          >
+            ?
+          </button>
+        </span>
       </div>
 
       {/* How to play — first encounter of each mini-game type */}
@@ -129,7 +143,8 @@ export function QuestionCard({
             </>
           ) : (
             <>
-              <span className="h-2 w-2 animate-pulse rounded-full bg-ink-300" />
+              {/* Static dot — an idle pulse next to a question you're reading is noise. */}
+              <span className="h-2 w-2 rounded-full bg-ink-300" />
               Opponent thinking…
             </>
           )}

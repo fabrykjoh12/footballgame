@@ -9,8 +9,9 @@ const KIND_STYLE: Record<ModeMeta['kind'], string> = {
 };
 
 /**
- * A polished game-mode card: a colour-tinted icon plate, title + kind chip,
- * one-line description, and a hover-lift with an arrow affordance.
+ * A quiet game-mode card: neutral icon plate, title + kind chip, one-line
+ * description, and a hover-lift with an arrow affordance. The kind chip is the
+ * only colour carrier — per-mode accent washes made the grid read as noise.
  */
 export function GameModeCard({
   mode,
@@ -28,20 +29,7 @@ export function GameModeCard({
       onClick={onClick}
       className="lift group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/[0.07] bg-ink-800 p-4 text-left"
     >
-      {/* faint accent wash from the mode's identity colour */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -left-8 -top-10 h-28 w-28 rounded-full opacity-20 blur-2xl transition-opacity duration-200 group-hover:opacity-30"
-        style={{ backgroundColor: mode.accent }}
-      />
-      <span
-        className="relative grid h-12 w-12 shrink-0 place-items-center rounded-xl border"
-        style={{
-          backgroundColor: `${mode.accent}1f`,
-          borderColor: `${mode.accent}40`,
-          color: mode.accent,
-        }}
-      >
+      <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/[0.05] text-bone-dim transition-colors duration-200 group-hover:text-bone">
         <Icon className="h-6 w-6" strokeWidth={2.1} />
       </span>
 
