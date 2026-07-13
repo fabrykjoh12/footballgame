@@ -89,6 +89,11 @@ export function CommentaryTicker() {
   }, [room]);
 
   if (!line) return null;
+  // Live-updating text next to a question the player is reading is direct
+  // interference — commentary belongs to the moments between questions (the
+  // gold banner already announces sudden death). The hooks above keep running
+  // so kickoff/goal tracking survives the quiet spell.
+  if (room?.status === 'in_question') return null;
 
   return (
     <div
@@ -102,7 +107,7 @@ export function CommentaryTicker() {
         aria-hidden
         className="inline-flex shrink-0 items-center gap-1 rounded-md bg-pitch/15 px-1.5 py-0.5 text-[11px] font-bold text-pitch"
       >
-        <span className="h-1.5 w-1.5 rounded-full bg-pitch motion-safe:animate-pulse" />
+        <span className="h-1.5 w-1.5 rounded-full bg-pitch" />
         Live
       </span>
       <span

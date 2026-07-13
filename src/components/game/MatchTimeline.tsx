@@ -73,6 +73,38 @@ export function MatchTimeline() {
   const knobColor = stoppage || dramatic ? 'bg-gold' : 'bg-pitch';
   const minuteColor = stoppage || dramatic ? 'text-gold' : pressure ? 'text-gold/80' : 'text-pitch';
 
+  // While a question is live the player is reading and thinking — collapse to a
+  // quiet progress whisper (bar + goal marks only). The full clock, minute
+  // label, drama badges, and chance dots return at the reveal, when the eye is
+  // free. The component stays mounted so its mark history survives.
+  if (room.status === 'in_question') {
+    return (
+      <div className="select-none" aria-hidden>
+        <div className="relative h-1 rounded-full bg-white/[0.05]">
+          <div
+            className={[
+              'absolute inset-y-0 left-0 rounded-full bg-gradient-to-r opacity-60 motion-safe:transition-[width] motion-safe:duration-500 motion-safe:ease-premium',
+              barFill,
+            ].join(' ')}
+            style={{ width: `${progress * 100}%` }}
+          />
+          {marks
+            .filter((m) => m.weight === 'goal')
+            .map((m) => (
+              <span
+                key={m.key}
+                className="absolute top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full"
+                style={{
+                  left: `${(Math.min(m.minute, FULL_TIME) / FULL_TIME) * 100}%`,
+                  backgroundColor: m.side === 'home' ? idA.color : idB.color,
+                }}
+              />
+            ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="select-none">
       <div className="mb-1 flex items-center justify-between text-[10px] font-medium text-white/40">

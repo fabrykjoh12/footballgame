@@ -90,4 +90,9 @@ describe('QuestionCard renders every question type via the registry', () => {
     const html = render(SAMPLES.club_country, { opponentAnswered: true });
     expect(html).toContain('Opponent answered');
   });
+
+  it('renders a pause control only when onPause is provided', () => {
+    expect(render(SAMPLES.club_country, { onPause: () => {} })).toContain('Pause match');
+    expect(render(SAMPLES.club_country)).not.toContain('Pause match');
+  });
 });
