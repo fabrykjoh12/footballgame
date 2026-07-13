@@ -28,6 +28,14 @@ import { ClubProgressCard } from '../dashboard/ClubProgressCard';
 import type { ModeMeta } from '../dashboard/modes';
 import { VERSUS_MODES, DAILY_MODES, SOLO_MODES, COMPETE_MODES } from '../dashboard/modes';
 
+/** The returning-player mode groups, in dashboard order. */
+const MODE_SECTIONS: { title: string; modes: ModeMeta[] }[] = [
+  { title: 'Versus a rival', modes: VERSUS_MODES },
+  { title: 'Daily puzzles', modes: DAILY_MODES },
+  { title: 'Solo practice', modes: SOLO_MODES },
+  { title: 'Competitions', modes: COMPETE_MODES },
+];
+
 /** The core game loop, in one glanceable strip for first-time players. */
 function HowItWorks() {
   const steps = [
@@ -226,22 +234,12 @@ export function HomePage() {
           </section>
 
           {/* Modes, grouped so it's clear what's versus / daily / solo / competition */}
-          <section>
-            <SectionHeader eyebrow="Play" title="Versus a rival" />
-            {modeGrid(VERSUS_MODES)}
-          </section>
-          <section>
-            <SectionHeader eyebrow="Play" title="Daily puzzles" />
-            {modeGrid(DAILY_MODES)}
-          </section>
-          <section>
-            <SectionHeader eyebrow="Play" title="Solo practice" />
-            {modeGrid(SOLO_MODES)}
-          </section>
-          <section>
-            <SectionHeader eyebrow="Play" title="Competitions" />
-            {modeGrid(COMPETE_MODES)}
-          </section>
+          {MODE_SECTIONS.map(({ title, modes }) => (
+            <section key={title}>
+              <SectionHeader eyebrow="Play" title={title} />
+              {modeGrid(modes)}
+            </section>
+          ))}
 
           {/* Leaderboard & leagues */}
           <section className="grid gap-4 lg:grid-cols-2">

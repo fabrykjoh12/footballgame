@@ -13,9 +13,12 @@ import { readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const ASSETS_DIR = 'dist/assets';
-// Entry chunk was ~284 kB at the time this guard was added; 300 kB leaves
-// headroom for organic growth while catching a data-bank import (~+400 kB).
-const BUDGET_BYTES = 300 * 1024;
+// The guard exists to catch a mode/data bank (~80–480 kB each, all normally
+// code-split) being statically pulled into the home path — NOT to police a few
+// kB of organic growth. The entry sat ~284 kB when added, then grew to ~300 kB
+// as the home + connection UX got richer; 312 kB restores real headroom while a
+// stray data/SDK import (which lands hundreds of kB) still trips it decisively.
+const BUDGET_BYTES = 312 * 1024;
 
 let files;
 try {

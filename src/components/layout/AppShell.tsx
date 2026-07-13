@@ -9,6 +9,7 @@ import { useNav } from '../../context/NavProvider';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { setSoundEnabled, play } from '../../lib/sound';
 import { IncomingInviteToast } from '../friends/IncomingInviteToast';
+import { connectionBanner } from '../../lib/connectionMessages';
 import type { View } from '../../lib/viewRoute';
 
 /**
@@ -17,8 +18,11 @@ import type { View } from '../../lib/viewRoute';
  * match is live so the game gets the full width.
  */
 export function AppShell({ children }: { children: ReactNode }) {
-  const { connectionState, room, leaveRoom } = useGame();
+  const { connectionState, room, leaveRoom, serviceMode, isHost, notice, clearNotice } = useGame();
   const { view, navigate } = useNav();
+  const banner = connectionBanner(connectionState, {
+    isGuestInMatch: serviceMode === 'remote' && !isHost && !!room,
+  });
   const [soundOn, setSoundOn] = useLocalStorage('bk_sound', true);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -58,18 +62,33 @@ export function AppShell({ children }: { children: ReactNode }) {
         showMenu={showNav}
       />
 
-      {connectionState !== 'connected' && (
+      {banner && (
         <div
           role="status"
           className={`z-10 mx-auto mt-2 w-full max-w-[1280px] rounded-lg border px-3 py-2 text-center text-sm ${
-            connectionState === 'failed'
+            banner.tone === 'error'
               ? 'border-danger/30 bg-danger/10 text-danger'
               : 'border-gold/30 bg-gold/10 text-gold animate-pulse'
           }`}
         >
-          {connectionState === 'failed'
-            ? 'Connection lost. Check your network and rejoin.'
-            : 'Reconnecting…'}
+          {banner.message}
+        </div>
+      )}
+
+      {notice && (
+        <div
+          role="status"
+          className="z-10 mx-auto mt-2 flex w-full max-w-[1280px] items-center justify-center gap-2 rounded-lg border border-royal/30 bg-royal/10 px-3 py-2 text-center text-sm text-royal"
+        >
+          <span>{notice}</span>
+          <button
+            type="button"
+            onClick={clearNotice}
+            aria-label="Dismiss"
+            className="rounded-full p-0.5 text-royal/70 hover:bg-white/10 hover:text-royal"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
         </div>
       )}
 

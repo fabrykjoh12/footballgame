@@ -27,6 +27,7 @@ import {
 } from '../services/gameService';
 import { dailySettings, dailyRival } from '../lib/dailyChallenge';
 import { trackEvent } from '../lib/analytics';
+import { demoFallbackMessage } from '../lib/connectionMessages';
 
 interface GameContextValue {
   room: Room | null;
@@ -37,6 +38,8 @@ interface GameContextValue {
   connecting: boolean;
   connectionState: ConnectionState;
   error: string | null;
+  /** Informational (not an error): e.g. an online match fell back to a CPU demo. */
+  notice: string | null;
   events: GameEvent[];
 
   localPlayer: Player | null;
@@ -65,6 +68,7 @@ interface GameContextValue {
   resumeMatch: () => Promise<void>;
   clearEvent: (nonce: number) => void;
   clearError: () => void;
+  clearNotice: () => void;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -76,6 +80,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [connecting, setConnecting] = useState(false);
   const [connectionState, setConnectionState] = useState<ConnectionState>('connected');
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [events, setEvents] = useState<GameEvent[]>([]);
 
   const serviceRef = useRef<GameService | null>(null);
@@ -105,6 +110,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
 
       setError(null);
+      setNotice(null);
       setEvents([]);
       setRoom(null);
       setConnectionState('connected');
@@ -113,6 +119,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
       const service = await createGameService(intent, opts);
       serviceRef.current = service;
       setServiceMode(service.mode);
+
+      // An intended online match (create/join) that resolves to a local service
+      // either has no backend configured, or the remote client couldn't init.
+      // Explain it rather than silently dropping the player into a CPU game.
+      if ((intent === 'create' || intent === 'join') && service.mode === 'local') {
+        setNotice(demoFallbackMessage(multiplayerAvailable));
+      }
 
       unsubsRef.current.push(
         service.onRoomUpdate((r) => {
@@ -214,6 +227,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setLocalPlayerId('');
     setEvents([]);
     setError(null);
+    setNotice(null);
     setConnectionState('connected');
   }, [teardown]);
 
@@ -221,6 +235,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setEvents((prev) => prev.filter((e) => e.nonce !== nonce));
   }, []);
   const clearError = useCallback(() => setError(null), []);
+  const clearNotice = useCallback(() => setNotice(null), []);
 
   const localPlayer = useMemo(
     () => room?.players.find((p) => p.id === localPlayerId) ?? null,
@@ -262,6 +277,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     resumeMatch,
     clearEvent,
     clearError,
+    notice,
+    clearNotice,
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
