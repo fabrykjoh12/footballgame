@@ -126,23 +126,19 @@ export function GamePage() {
 
       {status === 'in_question' && question && (
         <div className="flex flex-col gap-3">
+          {/* Question count lives on the scoreboard; keep this row to mode + pause only. */}
           <div className="flex items-center justify-between gap-2">
             <Badge tone="muted">{MATCH_MODES[room.settings.mode].label}</Badge>
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-white/55">
-                Question {Math.min(room.currentQuestionIndex + 1, total)} of {total}
-              </span>
-              {canPause && (
-                <button
-                  type="button"
-                  onClick={() => void pauseMatch()}
-                  aria-label="Pause match"
-                  className="rounded-lg border border-white/10 px-2 py-1 text-xs font-semibold text-white/65 transition hover:border-pitch/50 hover:text-pitch focus:outline-none focus-visible:ring-2 focus-visible:ring-pitch"
-                >
-                  ⏸ Pause
-                </button>
-              )}
-            </div>
+            {canPause && (
+              <button
+                type="button"
+                onClick={() => void pauseMatch()}
+                aria-label="Pause match"
+                className="rounded-lg border border-white/10 px-2 py-1 text-xs font-semibold text-white/65 transition hover:border-pitch/50 hover:text-pitch focus:outline-none focus-visible:ring-2 focus-visible:ring-pitch"
+              >
+                ⏸ Pause
+              </button>
+            )}
           </div>
           <TimerBar fraction={countdown.fraction} secondsLeft={countdown.secondsLeft} />
           <QuestionCard

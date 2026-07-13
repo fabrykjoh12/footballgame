@@ -33,18 +33,18 @@ export function Scoreboard({
         <TeamSide player={a} isLocal={a.id === localPlayerId} align="left" identity={idA} />
 
         <div className="flex flex-col items-center px-1">
-          <div className="nums flex items-center gap-2 font-display text-3xl font-bold sm:text-4xl">
+          <div className="nums flex items-baseline gap-2.5 font-display text-4xl font-black leading-none tracking-tight sm:text-5xl">
             <span style={{ color: idA.color }}>
               <AnimatedNumber value={a.goals} />
             </span>
-            <span className="text-white/40">–</span>
+            <span className="text-lg text-white/30 sm:text-xl">–</span>
             <span style={{ color: idB.color }}>
               <AnimatedNumber value={b.goals} />
             </span>
           </div>
           {questionNumber != null && totalQuestions != null && (
-            <div className="nums mt-0.5 text-[11px] font-medium text-white/55">
-              Question {questionNumber}/{totalQuestions}
+            <div className="nums mt-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-white/45">
+              Question {questionNumber} / {totalQuestions}
             </div>
           )}
         </div>
