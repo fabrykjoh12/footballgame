@@ -51,13 +51,17 @@ const STRENGTH_STYLE: Record<ClueStrength, string> = {
 
 const CPU_ID = 'cpu';
 
+/** How you want to play: online is the headline mode when Ably is configured. */
+export type MysteryMode = 'online' | 'cpu' | 'hotseat';
+
 export function MysteryPlayerGame({ onExit }: { onExit: () => void }) {
   const [name] = useLocalStorage('bk_name', '');
-  const [opponent, setOpponent] = useState<'cpu' | 'hotseat'>('cpu');
+  const [mode, setMode] = useState<MysteryMode>(isAblyConfigured ? 'online' : 'cpu');
   const [settings, setSettings] = useState<RoomSettings>(() => getMysteryStore().settings);
   const [state, setState] = useState<MysteryState | null>(null);
   const [online, setOnline] = useState(false);
   const rng = useRef(mulberry32(Math.floor(Date.now() % 0xffffffff)));
+  const opponent: 'cpu' | 'hotseat' = mode === 'hotseat' ? 'hotseat' : 'cpu';
 
   const start = () => {
     saveMysterySettings(settings);
@@ -72,14 +76,15 @@ export function MysteryPlayerGame({ onExit }: { onExit: () => void }) {
   };
 
   if (online) {
+    saveMysterySettings(settings);
     return <MysteryOnlineGame settings={settings} name={name} onExit={() => setOnline(false)} />;
   }
 
   if (!state) {
     return (
       <MysteryLobby
-        opponent={opponent}
-        setOpponent={setOpponent}
+        mode={mode}
+        setMode={setMode}
         settings={settings}
         setSettings={setSettings}
         onStart={start}
@@ -106,16 +111,16 @@ export function MysteryPlayerGame({ onExit }: { onExit: () => void }) {
 /* ------------------------------------------------------------------ */
 
 function MysteryLobby({
-  opponent,
-  setOpponent,
+  mode,
+  setMode,
   settings,
   setSettings,
   onStart,
   onOnline,
   onExit,
 }: {
-  opponent: 'cpu' | 'hotseat';
-  setOpponent: (o: 'cpu' | 'hotseat') => void;
+  mode: MysteryMode;
+  setMode: (m: MysteryMode) => void;
   settings: RoomSettings;
   setSettings: (s: RoomSettings) => void;
   onStart: () => void;
@@ -123,21 +128,34 @@ function MysteryLobby({
   onExit: () => void;
 }) {
   const set = (patch: Partial<RoomSettings>) => setSettings({ ...settings, ...patch });
+  const isOnline = mode === 'online';
 
   return (
     <div className="flex flex-col gap-4 py-4 animate-fade-in">
       <ModeHeroBanner theme={modeTheme('mystery')!} onBack={onExit} />
 
       <Card className="p-4">
-        <h2 className="mb-2 text-xs font-semibold text-white/55">Opponent</h2>
-        <div className="grid grid-cols-2 gap-2">
-          <Seg active={opponent === 'cpu'} onClick={() => setOpponent('cpu')}>vs CPU Scout</Seg>
-          <Seg active={opponent === 'hotseat'} onClick={() => setOpponent('hotseat')}>Pass & Play</Seg>
+        <h2 className="mb-2 text-xs font-semibold text-white/55">How do you want to play?</h2>
+        <div className={`grid gap-2 ${isAblyConfigured ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          {isAblyConfigured && (
+            <Seg active={isOnline} onClick={() => setMode('online')}>🌐 Online 1v1</Seg>
+          )}
+          <Seg active={mode === 'cpu'} onClick={() => setMode('cpu')}>vs CPU</Seg>
+          <Seg active={mode === 'hotseat'} onClick={() => setMode('hotseat')}>Pass &amp; Play</Seg>
         </div>
+        {isAblyConfigured && (
+          <p className="mt-2 text-[11px] text-white/55">
+            {isOnline
+              ? '🌐 A real 1v1 across devices — share a room code, both pick a secret player, ask questions by hand.'
+              : 'Playing on this device. Online 1v1 lets you duel a friend anywhere with a room code.'}
+          </p>
+        )}
       </Card>
 
       <Card className="p-4">
-        <h2 className="mb-3 text-xs font-semibold text-white/55">House rules</h2>
+        <h2 className="mb-3 text-xs font-semibold text-white/55">
+          {isOnline ? 'Room settings (yours as host)' : 'House rules'}
+        </h2>
         <div className="flex flex-col gap-3 text-sm">
           <Row label="Timer">
             <Seg small active={!settings.timerOn} onClick={() => set({ timerOn: false })}>Off</Seg>
@@ -154,18 +172,19 @@ function MysteryLobby({
           )}
           <Row label="Questions">
             <Seg small active={settings.questionMode === 'verified'} onClick={() => set({ questionMode: 'verified' })}>Verified</Seg>
-            <Seg small active={settings.questionMode === 'free'} onClick={() => set({ questionMode: 'free' })}>Free</Seg>
-            <Seg small active={settings.questionMode === 'mixed'} onClick={() => set({ questionMode: 'mixed' })}>Mixed</Seg>
+            <Seg small active={settings.questionMode === 'free'} onClick={() => set({ questionMode: 'free' })}>Custom</Seg>
+            <Seg small active={settings.questionMode === 'mixed'} onClick={() => set({ questionMode: 'mixed' })}>Both</Seg>
           </Row>
-          {settings.questionMode !== 'free' && (
+          {/* Online always answers by hand, so the auto/manual choice is local-only. */}
+          {!isOnline && settings.questionMode !== 'free' && (
             <Row label="Verified answers">
               <Seg small active={settings.answerMode === 'auto'} onClick={() => set({ answerMode: 'auto' })}>Auto</Seg>
               <Seg small active={settings.answerMode === 'manual'} onClick={() => set({ answerMode: 'manual' })}>Manual</Seg>
             </Row>
           )}
-          <Row label="Candidate helper">
-            <Seg small active={settings.candidateHelper} onClick={() => set({ candidateHelper: true })}>On</Seg>
-            <Seg small active={!settings.candidateHelper} onClick={() => set({ candidateHelper: false })}>Off</Seg>
+          <Row label="Show candidates left">
+            <Seg small active={settings.candidateHelper} onClick={() => set({ candidateHelper: true })}>Yes</Seg>
+            <Seg small active={!settings.candidateHelper} onClick={() => set({ candidateHelper: false })}>No</Seg>
           </Row>
           <Row label="Wrong guess">
             <Seg small active={settings.penalty === 'lose_turn'} onClick={() => set({ penalty: 'lose_turn' })}>Lose turn</Seg>
@@ -179,31 +198,27 @@ function MysteryLobby({
             <Seg small active={settings.format === 'bo5'} onClick={() => set({ format: 'bo5' })}>Best of 5</Seg>
           </Row>
         </div>
+        <p className="mt-3 text-[11px] text-white/45">
+          {settings.candidateHelper
+            ? 'A live count of players still matching your evidence is shown while you play.'
+            : 'No shortlist counter — pure deduction, nothing on screen to lean on.'}
+          {settings.questionMode !== 'verified' && ' Custom questions are answered by hand by your opponent.'}
+        </p>
       </Card>
 
-      {isAblyConfigured ? (
+      {isOnline ? (
         <>
           <Button size="lg" fullWidth onClick={onOnline}>
-            🌐 Play a friend online
+            🌐 Create or join a duel
           </Button>
           <p className="-mt-1 text-center text-[11px] text-white/55">
-            The best way to play — a real 1v1 across devices with a room code. Custom questions included.
+            You’ll get a room code to share. Both players answer their own questions by hand — custom questions included.
           </p>
-          <Button variant="secondary" fullWidth onClick={onStart}>
-            <IconBolt className="h-4 w-4" /> Play offline (CPU / pass &amp; play)
-          </Button>
         </>
       ) : (
         <Button size="lg" fullWidth onClick={onStart}>
-          <IconBolt className="h-4 w-4" /> Start duel
+          <IconBolt className="h-4 w-4" /> Start {mode === 'cpu' ? 'vs CPU' : 'pass & play'}
         </Button>
-      )}
-      {(settings.questionMode !== 'verified' || settings.answerMode === 'manual') && (
-        <p className="text-center text-[11px] text-white/55">
-          {settings.answerMode === 'manual'
-            ? 'Manual answers: your opponent taps Yes/No themselves — authentic Guess Who, best with a friend.'
-            : 'Free questions are answered by hand by your opponent. Use with friends.'}
-        </p>
       )}
     </div>
   );
