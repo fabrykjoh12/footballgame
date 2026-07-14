@@ -39,6 +39,7 @@ export function MysteryOnlineGame({
   const [builder, setBuilder] = useState(false);
   const [freeOpen, setFreeOpen] = useState(false);
   const [guessing, setGuessing] = useState(false);
+  const [hideCandidates, setHideCandidates] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -87,6 +88,20 @@ export function MysteryOnlineGame({
             Play a friend across devices. Both pick a secret player; take turns asking
             yes/no questions — <span className="text-white/85">you answer about your own player by hand</span>.
           </p>
+          <div className="mx-auto mt-3 flex max-w-md flex-wrap justify-center gap-1.5">
+            <Badge tone="muted">
+              {settings.questionMode === 'verified'
+                ? 'Verified questions'
+                : settings.questionMode === 'free'
+                  ? 'Custom questions'
+                  : 'Verified + custom'}
+            </Badge>
+            <Badge tone="muted">Candidates {settings.candidateHelper ? 'shown' : 'hidden'}</Badge>
+            <Badge tone="muted">
+              {settings.format === 'single' ? 'Single game' : settings.format === 'bo3' ? 'Best of 3' : 'Best of 5'}
+            </Badge>
+          </div>
+          <p className="mt-1.5 text-[11px] text-white/40">Set these on the previous screen · you host these rules.</p>
         </div>
         {err && <p className="text-center text-sm text-danger">{err}</p>}
         <Card className="flex flex-col gap-3 p-4">
@@ -213,9 +228,15 @@ export function MysteryOnlineGame({
   } else {
     // active
     const candidates = currentCandidates(s, localId);
-    const showCandidates = s.settings.candidateHelper;
+    // The room setting decides if the shortlist counter is available at all; each
+    // player can then hide it on their own device (a personal display choice).
+    const candidatesAvailable = s.settings.candidateHelper;
+    const showCandidates = candidatesAvailable && !hideCandidates;
+    // Online always answers by hand, so custom questions are always askable —
+    // they're the social heart of a friend duel. Verified presets still respect
+    // the room's question mode.
     const allowVerified = s.settings.questionMode !== 'free';
-    const allowCustom = s.settings.questionMode !== 'verified';
+    const allowCustom = true;
     body = (
       <div className="flex flex-col gap-3">
         <div className={showCandidates ? 'grid grid-cols-2 gap-2' : ''}>
@@ -225,11 +246,29 @@ export function MysteryOnlineGame({
           </Card>
           {showCandidates && (
             <Card className="p-3 text-right">
-              <div className="text-[11px] text-white/55">Candidates left</div>
+              <div className="flex items-center justify-end gap-1.5">
+                <span className="text-[11px] text-white/55">Candidates left</span>
+                <button
+                  type="button"
+                  onClick={() => setHideCandidates(true)}
+                  className="text-[10px] text-white/40 underline-offset-2 hover:text-white/70 hover:underline"
+                >
+                  hide
+                </button>
+              </div>
               <div className="font-display text-base font-bold">{candidates.length}</div>
             </Card>
           )}
         </div>
+        {candidatesAvailable && hideCandidates && (
+          <button
+            type="button"
+            onClick={() => setHideCandidates(false)}
+            className="self-start text-[11px] text-white/45 underline-offset-2 hover:text-white/75 hover:underline"
+          >
+            Show candidates left
+          </button>
+        )}
         {myTurn ? (
           guessing ? (
             <div className="flex flex-col gap-2">

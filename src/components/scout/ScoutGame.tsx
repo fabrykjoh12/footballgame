@@ -11,7 +11,6 @@ import {
   startScoutRound,
   probeRule,
   accuseRule,
-  consistentCategories,
   canProbe,
   otherSide,
   SCOUT_MAX_PROBES,
@@ -295,67 +294,43 @@ export function ProbeInput({
 }
 
 /**
- * Filterable rule list used for both picking a secret and accusing. With the
- * detective panel on, rules that contradict the evidence are hidden.
+ * Filterable rule list used for both picking a secret and accusing. It never
+ * cross-references the evidence for you — deducing which rule fits from your
+ * probes is the whole game, so the list only ever text-filters.
  */
 export function RulePicker({
   catalog,
-  evidence,
   excludedIds,
   actionLabel,
   onPick,
 }: {
   catalog: ScoutCategory[];
-  /** Probes to reason against; omit for secret-picking (no evidence yet). */
-  evidence?: ScoutProbe[];
   excludedIds?: ReadonlySet<string>;
   actionLabel: string;
   onPick: (id: string) => void;
 }) {
   const [filter, setFilter] = useState('');
-  // Off by default: with it on, the list auto-narrows to the one consistent
-  // rule and effectively hands you the answer. It's an opt-in deduction aid.
-  const [detective, setDetective] = useState(false);
   const [armedId, setArmedId] = useState<string | null>(null);
-
-  const consistent = useMemo(
-    () => (evidence ? new Set(consistentCategories(evidence, catalog, PLAYERS).map((c) => c.id)) : null),
-    [evidence, catalog],
-  );
 
   const shown = useMemo(() => {
     const q = filter.trim().toLowerCase();
     return catalog.filter((c) => {
       if (excludedIds?.has(c.id)) return false;
-      if (consistent && detective && !consistent.has(c.id)) return false;
       return q === '' || c.label.toLowerCase().includes(q);
     });
-  }, [catalog, filter, detective, consistent, excludedIds]);
+  }, [catalog, filter, excludedIds]);
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <input
-          type="text"
-          className="input-field flex-1"
-          placeholder="Filter rules…"
-          aria-label="Filter the rule list"
-          autoComplete="off"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        />
-        {consistent && (
-          <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-[11px] text-white/55">
-            <input type="checkbox" checked={detective} onChange={(e) => setDetective(e.target.checked)} className="accent-pitch" />
-            Detective panel
-          </label>
-        )}
-      </div>
-      {consistent && detective && (
-        <p className="nums text-[11px] text-white/55" role="status">
-          {consistent.size} of {catalog.length} rules still match the evidence.
-        </p>
-      )}
+      <input
+        type="text"
+        className="input-field"
+        placeholder="Filter rules…"
+        aria-label="Filter the rule list"
+        autoComplete="off"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+      />
       <ul className="flex max-h-56 flex-col gap-1 overflow-y-auto pr-1">
         {shown.map((c) => (
           <li key={c.id}>
@@ -541,7 +516,6 @@ function DailyScout({ catalog, onExit, onLobby }: { catalog: ScoutCategory[]; on
         </div>
         <RulePicker
           catalog={catalog}
-          evidence={probes}
           excludedIds={new Set(wrong)}
           actionLabel="Accuse"
           onPick={(id) => {
@@ -817,7 +791,6 @@ function ScoutDuel({
               <p className="mb-2 text-[11px] text-white/55">A wrong accusation costs your next turn.</p>
               <RulePicker
                 catalog={catalog}
-                evidence={round.probes[acting]}
                 excludedIds={new Set(round.accusations[acting].map((a) => a.categoryId))}
                 actionLabel="Accuse"
                 onPick={(id) => {

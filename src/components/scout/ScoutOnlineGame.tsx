@@ -296,7 +296,6 @@ export function ScoutOnlineGame({ name, onExit }: { name: string; onExit: () => 
               <p className="mb-2 text-[11px] text-white/55">A wrong accusation costs your next turn.</p>
               <RulePicker
                 catalog={catalog}
-                evidence={round.probes[mySide]}
                 excludedIds={new Set(round.accusations[mySide].map((a) => a.categoryId))}
                 actionLabel="Accuse"
                 onPick={(id) => { play('click'); svc.accuse(id); setTab('probe'); }}
