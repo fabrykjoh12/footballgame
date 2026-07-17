@@ -23,7 +23,9 @@ export type View =
   | 'careerPath'
   | 'managers'
   | 'scout'
-  | 'scoutDaily';
+  | 'scoutDaily'
+  | 'rondo'
+  | 'rondoDaily';
 
 /** Kebab-case slugs so shared links read cleanly. Home is the bare URL. */
 const VIEW_TO_SLUG: Record<View, string> = {
@@ -39,6 +41,8 @@ const VIEW_TO_SLUG: Record<View, string> = {
   managers: 'managers',
   scout: 'scout',
   scoutDaily: 'daily-scout',
+  rondo: 'rondo',
+  rondoDaily: 'daily-rondo',
 };
 
 const SLUG_TO_VIEW: Record<string, View> = Object.fromEntries(

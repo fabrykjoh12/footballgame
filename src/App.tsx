@@ -26,6 +26,7 @@ const OlderYoungerGame = lazy(() => import('./components/solo/OlderYoungerGame')
 const CareerPathGame = lazy(() => import('./components/solo/CareerPathGame').then((m) => ({ default: m.CareerPathGame })));
 const ManagerMerryGoRound = lazy(() => import('./components/solo/ManagerMerryGoRound').then((m) => ({ default: m.ManagerMerryGoRound })));
 const ScoutGame = lazy(() => import('./components/scout/ScoutGame').then((m) => ({ default: m.ScoutGame })));
+const RondoGame = lazy(() => import('./components/rondo/RondoGame').then((m) => ({ default: m.RondoGame })));
 
 // Top-level singleplayer views live in lib/viewRoute (typed + hash-mapped).
 
@@ -84,6 +85,8 @@ function activeScreen(
   if (view === 'managers') return <ManagerMerryGoRound onExit={() => setView('home')} />;
   if (view === 'scout') return <ScoutGame key="scout" onExit={() => setView('home')} />;
   if (view === 'scoutDaily') return <ScoutGame key="scout-daily" daily onExit={() => setView('home')} />;
+  if (view === 'rondo') return <RondoGame key="rondo" onExit={() => setView('home')} />;
+  if (view === 'rondoDaily') return <RondoGame key="rondo-daily" daily onExit={() => setView('home')} />;
   return <HomePage />;
 }
 

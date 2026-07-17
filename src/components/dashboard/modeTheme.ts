@@ -69,6 +69,15 @@ export const MODE_THEMES: Partial<Record<View, ModeTheme>> = {
     title: 'Daily Scout',
     tagline: "One secret recruitment rule. Crack it in the fewest reports.",
   },
+  rondo: {
+    accent: '#2ED573',
+    accent2: '#3B82F6',
+    emblem: Waypoints,
+    motif: 'pitch',
+    eyebrow: 'Keep-ball duel',
+    title: 'Rondo',
+    tagline: 'One rule, two players, no repeats. Keep the ball moving — lose it and concede.',
+  },
   connections: {
     accent: '#8B5CF6',
     accent2: '#3B82F6',

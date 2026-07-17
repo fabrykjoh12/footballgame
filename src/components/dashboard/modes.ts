@@ -14,6 +14,7 @@ import {
   Zap,
   Shield,
   Trophy,
+  Waypoints,
   type LucideIcon,
 } from 'lucide-react';
 import type { View } from '../../lib/viewRoute';
@@ -29,6 +30,7 @@ export interface ModeMeta {
 }
 
 export const VERSUS_MODES: ModeMeta[] = [
+  { view: 'rondo', label: 'Rondo', sub: 'Take turns naming players who fit', kind: 'Versus', icon: Waypoints },
   { view: 'scout', label: 'The Scout', sub: 'Deduce the secret scouting rule', kind: 'Versus', icon: Search },
   { view: 'mystery', label: 'Mystery Duel', sub: 'Football Guess Who, 1v1', kind: 'Versus', icon: UserSearch },
 ];
@@ -36,6 +38,7 @@ export const VERSUS_MODES: ModeMeta[] = [
 export const DAILY_MODES: ModeMeta[] = [
   { view: 'connectionsDaily', label: 'Daily Connections', sub: 'One club-pair puzzle a day', kind: 'Daily', icon: CalendarDays },
   { view: 'scoutDaily', label: 'Daily Scout', sub: "Crack today's rule in fewest probes", kind: 'Daily', icon: ScanSearch },
+  { view: 'rondoDaily', label: 'Daily Rondo', sub: 'Endurance: name as many as you can', kind: 'Daily', icon: Waypoints },
 ];
 
 export const SOLO_MODES: ModeMeta[] = [
