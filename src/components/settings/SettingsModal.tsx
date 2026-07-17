@@ -15,6 +15,7 @@ import {
   clearAllLocalData,
 } from '../../lib/backup';
 import { resetOnboarding } from '../../lib/onboarding';
+import { CloudHealthPanel } from './CloudHealthPanel';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { IconClose, IconCheck, IconShare, IconCopy } from '../ui/icons';
@@ -206,6 +207,9 @@ export function SettingsModal({ onClose }: { onClose: () => void }) {
             onChange={onFile}
           />
         </Card>
+
+        {/* Cloud health self-test (renders only when signed in) */}
+        <CloudHealthPanel />
 
         <button
           type="button"

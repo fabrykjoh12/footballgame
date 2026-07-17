@@ -44,6 +44,7 @@ import {
 } from 'firebase/firestore';
 import { firebaseConfig } from '../lib/firebaseConfig';
 import type { ProgressSnapshot } from '../lib/progress';
+import { usernamePrefixRange } from '../lib/usernamePrefix';
 
 const EMAIL_STORAGE_KEY = 'bk_emailForSignIn';
 const COLLECTION = 'progress';
@@ -298,11 +299,11 @@ export async function claimUsername(uid: string, username: string): Promise<void
 export async function searchUsersByUsername(searchTerm: string): Promise<PublicProfile[]> {
   const ctx = ensure();
   if (!ctx) return [];
-  const lower = searchTerm.toLowerCase();
+  const { start, end } = usernamePrefixRange(searchTerm);
   const q = query(
     collection(ctx.db, 'users'),
-    where('username', '>=', lower),
-    where('username', '<=', lower + ''),
+    where('username', '>=', start),
+    where('username', '<=', end),
     fbLimit(8),
   );
   const snap = await getDocs(q);
@@ -488,7 +489,10 @@ export async function listLeagues(uid: string): Promise<LeagueDoc[]> {
   if (!ctx) return [];
   const q = query(collection(ctx.db, 'leagues'), where('memberUids', 'array-contains', uid));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => d.data() as LeagueDoc);
+  return snap.docs
+    .map((d) => d.data() as LeagueDoc)
+    // Hide the Cloud Health self-test's throwaway league from the real UI.
+    .filter((l) => !l.id.startsWith('selftest-'));
 }
 
 export async function getLeague(leagueId: string): Promise<LeagueDoc | null> {

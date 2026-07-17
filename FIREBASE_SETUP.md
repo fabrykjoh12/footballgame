@@ -67,83 +67,10 @@ to start with.**
 ## 4. Create Firestore + lock it down
 
 1. **Build → Firestore Database → Create database** (Production mode is fine).
-2. **Rules** tab — replace with the following so each player can only read/write
-   their own progress document:
-
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-
-    // Private progress sync — only the owner.
-    match /progress/{uid} {
-      allow read, write: if signedIn() && request.auth.uid == uid;
-    }
-
-    // Public profile (name + friend code). Any signed-in user can read it so
-    // friends resolve; only the owner can write their own.
-    match /users/{uid} {
-      allow read: if signedIn();
-      allow write: if signedIn() && request.auth.uid == uid;
-
-      // Your friends list + your invite inbox live under your own doc.
-      match /friends/{friendUid} {
-        allow read, write: if signedIn() && request.auth.uid == uid;
-      }
-      match /invites/{inviteId} {
-        // The owner reads/deletes; anyone signed-in may send you an invite.
-        allow read, delete: if signedIn() && request.auth.uid == uid;
-        allow create: if signedIn();
-      }
-    }
-
-    // Friend-code → uid lookup. Readable by signed-in users; you may only
-    // claim a code that points at your own uid.
-    match /friendCodes/{code} {
-      allow read: if signedIn();
-      allow write: if signedIn() && request.resource.data.uid == request.auth.uid;
-    }
-
-    // Username → uid lookup. Anyone signed-in can read (for search); you may
-    // only CREATE a username entry pointing at your own uid. Update + delete are
-    // forbidden so usernames can't be stolen or released.
-    match /usernames/{username} {
-      allow read: if signedIn();
-      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
-      allow update, delete: if false;
-    }
-
-    // Leaderboards — readable by signed-in users; you may only write your row.
-    // NOTE: scoring is client-trusted (the host runs the engine), so treat
-    // these as casual bragging rights, not cheat-proof rankings.
-    match /leaderboards/{board}/entries/{uid} {
-      allow read: if signedIn();
-      allow write: if signedIn() && request.auth.uid == uid;
-    }
-
-    // Private friend leagues. A league doc is readable by its members; the
-    // owner creates it; a signed-in user may update it only if they end up a
-    // member (this is how joining by code works). Each member may write only
-    // their own result rows.
-    match /leagues/{leagueId} {
-      allow read: if signedIn() && request.auth.uid in resource.data.memberUids;
-      allow create: if signedIn() && request.auth.uid == request.resource.data.ownerUid;
-      allow update: if signedIn() && request.auth.uid in request.resource.data.memberUids;
-
-      match /results/{resultId} {
-        allow read: if signedIn();
-        allow write: if signedIn() && request.auth.uid == request.resource.data.uid;
-      }
-    }
-    // League join-code → id lookup.
-    match /leagueCodes/{code} {
-      allow read: if signedIn();
-      allow write: if signedIn();
-    }
-  }
-}
-```
+2. **Rules** tab — replace the contents with the ruleset in
+   [`firestore.rules`](./firestore.rules) at the repo root, then **Publish**.
+   (It's kept as a file so it's version-controlled and copy-paste-exact — open it,
+   copy the whole thing, paste into the Rules editor.)
 
 This covers everything: `progress/{uid}` (private sync), `users/{uid}` (public
 profile + your `friends`/`invites` sub-collections), `friendCodes/{code}` (the
@@ -151,6 +78,15 @@ add-by-code lookup), `leaderboards/{board}/entries/{uid}` (daily + all-time
 boards), and `leagues/{id}` + `leagueCodes/{code}` (private friend leagues — the
 Daily-fed season tables). All these features stay hidden until sign-in is
 enabled, and the app still works fully anonymously without any of this.
+
+## 5. Verify it all works (from one device)
+
+Once the providers, authorized domains and rules are in, sign in and open
+**Settings → Cloud health → Run self-test**. It round-trips every Firestore path
+against your own account (sync, profile, username search, friend code, invites,
+leaderboards, leagues) and shows a green checklist — or, for anything that
+fails, the exact fix (an unpublished rule, a missing index, a disabled provider).
+You do **not** need a second account or device to confirm the plumbing works.
 
 ---
 
