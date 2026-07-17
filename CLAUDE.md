@@ -28,7 +28,7 @@ deterministic per-team kit colours, a premium UI
 pass, and **460 unit tests** gating an auto-deploy pipeline.
 
 > **Central databases (NEW):** `src/data/players.ts` + `src/data/clubs.ts` +
-> `src/data/managers.ts` + `src/lib/playerDb.ts` — **464 curated players** (stable
+> `src/data/managers.ts` + `src/lib/playerDb.ts` — **503 curated players** (stable
 > facts: clubs, nationality, position, era, trophies, **birth year**) and **62
 > managers**, both over a **228-club canonical registry** with alias resolution.
 > Seven modes read from these: Mystery Player Duel (unified onto it, + **manual
@@ -275,7 +275,7 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize, tiebreakers) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
 | Question database (1,177 Qs, 10 types) | `src/data/questions.ts` |
-| **Central player database** (464 players, stable facts incl. birthYear) + canonical club registry (228 clubs, alias resolution) + pure query layer (playedForBoth, byNationality/Position/League, careerChain, cluesFor) | `src/data/players.ts`, `src/data/clubs.ts`, `src/lib/playerDb.ts` |
+| **Central player database** (503 players, stable facts incl. birthYear) + canonical club registry (228 clubs, alias resolution) + pure query layer (playedForBoth, byNationality/Position/League, careerChain, cluesFor) | `src/data/players.ts`, `src/data/clubs.ts`, `src/lib/playerDb.ts` |
 | Daily Connections (one seeded puzzle/day + solved-day streak) | `src/lib/dailyConnections.ts` (+ `dailyConnection()` in `connections.ts`) |
 | Older or Younger? (birth-year Higher/Lower survival mode) | `src/lib/olderYounger.ts`, `src/components/solo/OlderYoungerGame.tsx` |
 | Career Path (guess the player from their club chain; progressive reveal, typed) | `src/lib/careerPath.ts`, `src/components/solo/CareerPathGame.tsx` |
