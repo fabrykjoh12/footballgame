@@ -28,9 +28,9 @@ deterministic per-team kit colours, a premium UI
 pass, and **460 unit tests** gating an auto-deploy pipeline.
 
 > **Central databases (NEW):** `src/data/players.ts` + `src/data/clubs.ts` +
-> `src/data/managers.ts` + `src/lib/playerDb.ts` — **299 curated players** (stable
+> `src/data/managers.ts` + `src/lib/playerDb.ts` — **424 curated players** (stable
 > facts: clubs, nationality, position, era, trophies, **birth year**) and **62
-> managers**, both over a **165-club canonical registry** with alias resolution.
+> managers**, both over a **228-club canonical registry** with alias resolution.
 > Seven modes read from these: Mystery Player Duel (unified onto it, + **manual
 > answers** + **online 1v1**), **Connections** (database-backed, out of beta, 46
 > puzzles), **Daily Connections**, **Older or Younger?** (birth-year Higher/Lower),
@@ -275,13 +275,13 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Question selection (per-type mix, difficulty, topic filter, answer-position randomize, tiebreakers) | `src/lib/questionPicker.ts` |
 | Topic/category filter options | `src/lib/categories.ts` |
 | Question database (1,177 Qs, 10 types) | `src/data/questions.ts` |
-| **Central player database** (299 players, stable facts incl. birthYear) + canonical club registry (165 clubs, alias resolution) + pure query layer (playedForBoth, byNationality/Position/League, careerChain, cluesFor) | `src/data/players.ts`, `src/data/clubs.ts`, `src/lib/playerDb.ts` |
+| **Central player database** (424 players, stable facts incl. birthYear) + canonical club registry (228 clubs, alias resolution) + pure query layer (playedForBoth, byNationality/Position/League, careerChain, cluesFor) | `src/data/players.ts`, `src/data/clubs.ts`, `src/lib/playerDb.ts` |
 | Daily Connections (one seeded puzzle/day + solved-day streak) | `src/lib/dailyConnections.ts` (+ `dailyConnection()` in `connections.ts`) |
 | Older or Younger? (birth-year Higher/Lower survival mode) | `src/lib/olderYounger.ts`, `src/components/solo/OlderYoungerGame.tsx` |
 | Career Path (guess the player from their club chain; progressive reveal, typed) | `src/lib/careerPath.ts`, `src/components/solo/CareerPathGame.tsx` |
 | Manager Merry-go-round (name a manager who managed both clubs; typed) + 62-manager dataset | `src/lib/managers.ts`, `src/data/managers.ts`, `src/components/solo/ManagerMerryGoRound.tsx` |
 | Mystery online 1v1 (host-authoritative via Ably; forces manual answers + redacts secrets — built, not device-tested) | `src/services/ablyMysteryService.ts`, `src/components/mystery/MysteryOnlineGame.tsx` |
-| **The Scout** (NEW — deduction duel: hide a secret "recruitment rule" from a ~63-rule catalog auto-generated over the player DB with pool-depth guards; probe players for fits / doesn't-fit, accuse to win, a wrong accusation costs a turn; pure engine + info-greedy CPU + seeded daily rule with solved-day streak; vs CPU · hot-seat · daily; views `#scout`/`#daily-scout`, storage `bk_scout_v1`. Turn-based + secretless wire shape, so an Ably online layer can follow the Mystery pattern later) | `src/lib/scout/` (`categories`, `engine`, `cpu`, `daily` — all tested), `src/components/scout/ScoutGame.tsx` |
+| **The Scout** (NEW — deduction duel: hide a secret "recruitment rule" from a ~88-rule catalog across 11 deduction axes — club, league, nationality, position, trophy (incl. multi-trophy combos like CL+World Cup), era, continent, **club-count** (one-club vs 5+), **travelled** (3+/4+ leagues, 2+ continents), **debut-decade + 17-year-career** — auto-generated over the player DB with pool-depth guards; probe players for fits / doesn't-fit, accuse to win, a wrong accusation costs a turn; pure engine + info-greedy CPU + seeded daily rule with solved-day streak; vs CPU · hot-seat · daily; views `#scout`/`#daily-scout`, storage `bk_scout_v1`. Turn-based + secretless wire shape, so an Ably online layer can follow the Mystery pattern later) | `src/lib/scout/` (`categories`, `engine`, `cpu`, `daily` — all tested), `src/components/scout/ScoutGame.tsx` |
 | Match modes + per-mode clock (Casual easy+med/18s · Serious med+hard/15s · Nightmare nightmare-only/9s; `MODE_DURATION_MS`, `durationForMode`) | `src/lib/matchModes.ts` |
 | Daily Rival Match + seeded RNG (deterministic per-day fixture vs a named fictional rival; streak, scoreline, best category, "beat my result" challenge links, tomorrow countdown) | `src/lib/dailyChallenge.ts`, `src/lib/dailyRival.ts`, `src/lib/seededRandom.ts`, `src/components/home/DailyRivalCard.tsx` |
 | Career Mode (divisions, season schedule, AI sim, promotion) | `src/lib/career.ts`, `src/components/career/` |

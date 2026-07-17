@@ -13,7 +13,8 @@
  */
 
 import { PLAYERS } from '../../data/players';
-import type { Player, PlayerRole } from '../playerDb';
+import { countryForClub } from '../../data/clubs';
+import { CONTINENT_BY_NATION, type Continent, type Player, type PlayerRole } from '../playerDb';
 
 export type ScoutCategoryKind =
   | 'nationality'
@@ -22,7 +23,30 @@ export type ScoutCategoryKind =
   | 'league'
   | 'position'
   | 'trophy'
-  | 'era';
+  | 'era'
+  | 'club-count'
+  | 'travel'
+  | 'career';
+
+/** Reference "now" for career-length rules on still-active players (keeps the
+ * catalog deterministic — no Date.now() in a seeded/daily code path). */
+export const SCOUT_REFERENCE_YEAR = 2025;
+
+/** Distinct continents a player's clubs are based in (via the club registry). */
+function clubContinentCount(p: Player): number {
+  const set = new Set<Continent>();
+  for (const club of p.clubs) {
+    const country = countryForClub(club);
+    const cont = country ? CONTINENT_BY_NATION[country] : undefined;
+    if (cont) set.add(cont);
+  }
+  return set.size;
+}
+
+/** Career length in years (open-ended careers measured to the reference year). */
+function careerSpan(p: Player): number {
+  return (p.lastYear ?? SCOUT_REFERENCE_YEAR) - p.debutYear;
+}
 
 export interface ScoutCategory {
   id: string;
@@ -98,6 +122,26 @@ export function buildScoutCatalog(players: Player[] = PLAYERS): ScoutCategory[] 
 
   for (const t of TROPHY_DEFS) add(`trophy:${t.token}`, t.label, 'trophy', t.test);
   for (const e of ERA_DEFS) add(`era:${e.slug}`, e.label, 'era', e.test);
+
+  // Club count — one-club loyalists vs well-travelled journeymen.
+  add('clubs:one', 'Played for only one senior club', 'club-count', (p) => p.clubs.length === 1);
+  add('clubs:5plus', 'Played for 5 or more clubs', 'club-count', (p) => p.clubs.length >= 5);
+
+  // Travelled — breadth of leagues and continents across a career.
+  add('travel:leagues3', 'Played in 3 or more different leagues', 'travel', (p) => p.leagues.length >= 3);
+  add('travel:leagues4', 'Played in 4 or more different leagues', 'travel', (p) => p.leagues.length >= 4);
+  add('travel:continents2', 'Played club football on two or more continents', 'travel', (p) => clubContinentCount(p) >= 2);
+
+  // Career era detail — debut decade + longevity.
+  for (const decade of [1980, 1990, 2000, 2010] as const) {
+    add(`career:debut-${decade}s`, `Debuted in the ${decade}s`, 'career', (p) => p.debutYear >= decade && p.debutYear < decade + 10);
+  }
+  add('career:long', 'Had a 17-year (or longer) career', 'career', (p) => careerSpan(p) >= 17);
+
+  // Trophy combos — the hardest rules to satisfy, so a strong deduction signal.
+  add('trophy:cl+wc', 'Won both the Champions League and the World Cup', 'trophy', (p) => p.trophies.championsLeague && p.trophies.worldCup);
+  add('trophy:wc+bd', "Won both the World Cup and the Ballon d'Or", 'trophy', (p) => p.trophies.worldCup && p.trophies.ballonDor);
+  add('trophy:cl+bd', "Won both the Champions League and the Ballon d'Or", 'trophy', (p) => p.trophies.championsLeague && p.trophies.ballonDor);
 
   return out;
 }

@@ -77,6 +77,46 @@ describe('name normalization + resolution', () => {
   });
 });
 
+describe('expanded deduction axes', () => {
+  const catalog = buildScoutCatalog(PLAYERS);
+  const ids = new Set(catalog.map((c) => c.id));
+
+  it('exposes the new rule kinds', () => {
+    const kinds = new Set(catalog.map((c) => c.kind));
+    expect(kinds.has('club-count')).toBe(true);
+    expect(kinds.has('travel')).toBe(true);
+    expect(kinds.has('career')).toBe(true);
+  });
+
+  it('carries the marquee rules from each new axis', () => {
+    // If the roster ever shrinks a pool below the guard these will fail loudly,
+    // signalling the axis needs more players rather than silently disappearing.
+    expect(ids.has('clubs:5plus')).toBe(true);
+    expect(ids.has('travel:continents2')).toBe(true);
+    expect(ids.has('trophy:cl+wc')).toBe(true);
+    expect([...ids].some((id) => id.startsWith('career:debut-'))).toBe(true);
+  });
+
+  it('one-club and journeyman rules are mutually exclusive', () => {
+    const one = scoutCategoryById('clubs:one', catalog);
+    const many = scoutCategoryById('clubs:5plus', catalog);
+    if (one && many) {
+      for (const p of PLAYERS) expect(one.test(p) && many.test(p)).toBe(false);
+    }
+  });
+
+  it('a trophy-combo rule implies both underlying trophies', () => {
+    const combo = scoutCategoryById('trophy:cl+wc', catalog);
+    expect(combo).toBeDefined();
+    for (const p of PLAYERS) {
+      if (combo!.test(p)) {
+        expect(p.trophies.championsLeague).toBe(true);
+        expect(p.trophies.worldCup).toBe(true);
+      }
+    }
+  });
+});
+
 describe('probe suggestions', () => {
   it('suggests full names for a partial query', () => {
     expect(suggestScoutPlayers('sala')).toContain('Mohamed Salah');

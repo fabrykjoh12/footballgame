@@ -32,6 +32,9 @@ const KIND_WEIGHT: Record<ScoutCategory['kind'], number> = {
   nationality: 2,
   era: 2,
   trophy: 2,
+  'club-count': 2,
+  travel: 2,
+  career: 2,
   position: 1,
   continent: 1,
 };

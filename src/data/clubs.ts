@@ -204,6 +204,7 @@ export const CLUBS: ClubInfo[] = [
   { name: 'Orlando City', country: 'United States', league: 'MLS' },
   { name: 'DC United', country: 'United States', league: 'MLS', aliases: ['D.C. United'] },
   { name: 'Montreal Impact', country: 'Canada', league: 'MLS', aliases: ['CF Montréal', 'CF Montreal'] },
+  { name: 'Vancouver Whitecaps', country: 'Canada', league: 'MLS', aliases: ['Whitecaps', 'Vancouver Whitecaps FC'] },
 
   /* ---------------- Middle East / Asia / Oceania ---------------- */
   { name: 'Al Nassr', country: 'Saudi Arabia', league: 'Saudi Pro League', aliases: ['Al-Nassr'] },
