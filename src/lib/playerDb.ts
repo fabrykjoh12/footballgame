@@ -101,6 +101,7 @@ export const CONTINENT_BY_NATION: Record<string, Continent> = {
   Ukraine: 'Europe', Russia: 'Europe', Bulgaria: 'Europe', Romania: 'Europe',
   Greece: 'Europe', Turkey: 'Europe', Hungary: 'Europe', Finland: 'Europe',
   Georgia: 'Europe', Iceland: 'Europe', Bosnia: 'Europe', 'Bosnia and Herzegovina': 'Europe',
+  Montenegro: 'Europe', 'North Macedonia': 'Europe', Albania: 'Europe',
   // South America
   Brazil: 'South America', Argentina: 'South America', Uruguay: 'South America',
   Colombia: 'South America', Chile: 'South America', Peru: 'South America',
