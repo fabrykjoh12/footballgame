@@ -114,6 +114,7 @@ export const CONTINENT_BY_NATION: Record<string, Continent> = {
   // North America
   'United States': 'North America', USA: 'North America', Mexico: 'North America',
   Canada: 'North America', 'Costa Rica': 'North America', Jamaica: 'North America',
+  'Trinidad and Tobago': 'North America', Honduras: 'North America', Panama: 'North America',
   // Asia
   'South Korea': 'Asia', Japan: 'Asia', Iran: 'Asia', 'Saudi Arabia': 'Asia',
   Qatar: 'Asia', Australia: 'Oceania', 'New Zealand': 'Oceania',
