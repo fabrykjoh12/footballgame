@@ -37,6 +37,7 @@ import { Badge } from '../ui/Badge';
 import { IconBack, IconArrowRight, IconCheck, IconShare } from '../ui/icons';
 import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
 import { modeTheme } from '../dashboard/modeTheme';
+import { SuggestInput } from '../ui/SuggestInput';
 import { RondoOnlineGame } from './RondoOnlineGame';
 import { isAblyConfigured } from '../../lib/realtimeConfig';
 
@@ -318,23 +319,22 @@ function RondoDuel({
   }, [cpuTurn, rally.turn, rally.named.length]);
 
   const submit = useCallback(
-    (raw: string) => {
-      if (rally.phase !== 'playing') return;
+    (raw: string): string | null => {
+      if (rally.phase !== 'playing') return null;
       const player = resolveScoutPlayer(raw, PLAYERS);
-      if (!player) {
-        setMsg('No player found — check the spelling.');
-        return;
-      }
+      // An unresolved typo stays in the field with a hint; a resolved-but-wrong
+      // or repeated name is a real move (it ends the rally — the turnover card
+      // explains it), so it clears.
+      if (!player) return 'No player found — check the spelling.';
       const { rally: r, result } = nameInRondo(rally, rally.turn, player, category);
       if (result === 'ok') {
-        setMsg(null);
         play('correct');
         onMatch({ ...match, rally: r });
       } else {
-        setMsg(result === 'repeat' ? `${player.name} was already named!` : `${player.name} doesn't fit.`);
         play('wrong');
         onMatch(concludeRally(match, r));
       }
+      return null;
     },
     [rally, category, match, onMatch],
   );
@@ -508,24 +508,22 @@ function RondoDaily({ onExit }: { onExit: () => void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, phase]);
 
-  const submit = (raw: string) => {
+  const submit = (raw: string): string | null => {
     const player = resolveScoutPlayer(raw, PLAYERS);
-    if (!player) {
-      setMsg('No player found — check the spelling.');
-      return;
-    }
+    if (!player) return 'No player found — check the spelling.';
     if (usedIds.includes(player.id)) {
       end(`${player.name} was already named`);
-      return;
+      return null;
     }
     if (!category.test(player)) {
       end(`${player.name} doesn't fit`);
-      return;
+      return null;
     }
     setMsg(null);
     play('correct');
     setUsedIds((u) => [...u, player.id]);
     setNames((n) => [...n, player.name]);
+    return null;
   };
 
   return (
@@ -583,6 +581,8 @@ function RondoDaily({ onExit }: { onExit: () => void }) {
 /* Shared typed name input with autocomplete                           */
 /* ------------------------------------------------------------------ */
 
+const rondoSuggest = (q: string) => suggestScoutPlayers(q, 5);
+
 function NameInput({
   disabled,
   timeLeft,
@@ -594,19 +594,10 @@ function NameInput({
   timeLeft: number;
   totalTime: number;
   prompt: string;
-  onSubmit: (raw: string) => void;
+  onSubmit: (raw: string) => string | null;
 }) {
-  const [value, setValue] = useState('');
-  const suggestions = useMemo(() => (value.trim().length >= 2 ? suggestScoutPlayers(value, 5) : []), [value]);
   const pct = Math.max(0, Math.min(100, (timeLeft / totalTime) * 100));
   const low = timeLeft <= 5;
-
-  const commit = (raw: string) => {
-    const v = raw.trim();
-    if (!v) return;
-    setValue('');
-    onSubmit(v);
-  };
 
   return (
     <div>
@@ -616,40 +607,15 @@ function NameInput({
           style={{ width: `${pct}%` }}
         />
       </div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          commit(value);
-        }}
-        className="flex gap-2"
-      >
-        <input
-          autoFocus
-          value={value}
-          disabled={disabled}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder={prompt}
-          className="input-field flex-1"
-          aria-label={prompt}
-        />
-        <Button type="submit" disabled={disabled || !value.trim()}>
-          <IconCheck className="h-4 w-4" />
-        </Button>
-      </form>
-      {suggestions.length > 0 && (
-        <div className="mt-1.5 flex flex-wrap gap-1.5">
-          {suggestions.map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => commit(s)}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-white/75 hover:border-pitch/40 hover:text-white"
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
+      <SuggestInput
+        suggest={rondoSuggest}
+        onCommit={onSubmit}
+        placeholder={prompt}
+        disabled={disabled}
+        submitIcon={<IconCheck className="h-4 w-4" />}
+        submitLabel="Submit name"
+        listId="rondo-name"
+      />
       <div className={`mt-1 text-right text-[11px] font-semibold ${low ? 'text-danger' : 'text-white/40'}`}>
         {timeLeft}s
       </div>

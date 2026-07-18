@@ -33,6 +33,7 @@ import { play } from '../../lib/sound';
 import { refreshAchievements } from '../../lib/achievements';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { SuggestInput } from '../ui/SuggestInput';
 import { Badge } from '../ui/Badge';
 import { IconBack, IconArrowRight, IconBolt, IconCheck, IconClose } from '../ui/icons';
 import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
@@ -217,6 +218,8 @@ export function EvidenceRow({ probe }: { probe: ScoutProbe }) {
 }
 
 /** Typed probe input with roster suggestions. */
+const probeSuggest = (q: string) => suggestScoutPlayers(q);
+
 export function ProbeInput({
   disabled,
   probedIds,
@@ -226,70 +229,22 @@ export function ProbeInput({
   probedIds: ReadonlySet<string>;
   onProbe: (playerId: string) => void;
 }) {
-  const [input, setInput] = useState('');
-  const [miss, setMiss] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const suggestions = useMemo(() => suggestScoutPlayers(input), [input]);
-
-  const submit = (raw: string) => {
-    const player = resolveScoutPlayer(raw);
-    if (!player) {
-      setMiss(`“${raw.trim()}” isn't in the scouting book — try a suggestion.`);
-      return;
-    }
-    if (probedIds.has(player.id)) {
-      setMiss(`${player.name} has already been probed.`);
-      return;
-    }
-    setMiss(null);
-    setInput('');
-    onProbe(player.id);
-  };
-
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (input.trim()) submit(input);
+    <SuggestInput
+      suggest={probeSuggest}
+      onCommit={(raw) => {
+        const player = resolveScoutPlayer(raw);
+        if (!player) return `“${raw}” isn't in the scouting book — try a suggestion.`;
+        if (probedIds.has(player.id)) return `${player.name} has already been probed.`;
+        onProbe(player.id);
+        return null;
       }}
-      className="flex flex-col gap-2"
-    >
-      <div className="flex gap-2">
-        <input
-          ref={inputRef}
-          type="text"
-          className="input-field flex-1"
-          placeholder="Probe a player…"
-          aria-label="Probe: name any footballer to test against the secret rule"
-          autoComplete="off"
-          spellCheck={false}
-          disabled={disabled}
-          value={input}
-          onChange={(e) => {
-            setInput(e.target.value);
-            setMiss(null);
-          }}
-        />
-        <Button type="submit" disabled={disabled || !input.trim()}>
-          Probe
-        </Button>
-      </div>
-      {miss && <p className="text-xs text-gold/90" role="status">{miss}</p>}
-      {suggestions.length > 0 && !disabled && (
-        <div className="flex flex-wrap gap-1.5" aria-label="Player suggestions">
-          {suggestions.map((name) => (
-            <button
-              key={name}
-              type="button"
-              className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-white/70 transition hover:border-pitch/40 hover:text-white answer-press"
-              onClick={() => submit(name)}
-            >
-              {name}
-            </button>
-          ))}
-        </div>
-      )}
-    </form>
+      placeholder="Probe a player…"
+      ariaLabel="Probe: name any footballer to test against the secret rule"
+      disabled={disabled}
+      submitIcon="Probe"
+      listId="scout-probe"
+    />
   );
 }
 

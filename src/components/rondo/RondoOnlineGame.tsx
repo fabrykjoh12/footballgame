@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { AblyRondoService } from '../../services/ablyRondoService';
 import type { ConnectionState } from '../../types/game';
 import type { RondoSyncState } from '../../lib/rondo/online';
@@ -12,6 +12,7 @@ import { play } from '../../lib/sound';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { SuggestInput } from '../ui/SuggestInput';
 import { IconBack, IconBolt, IconArrowRight, IconCheck } from '../ui/icons';
 
 type Phase = 'menu' | 'connecting' | 'playing' | 'error';
@@ -277,17 +278,26 @@ function RondoRule({
       </Card>
 
       {myTurn ? (
-        <OnlineNameInput
-          key={`${match.rallyNumber}-${match.rally.named.length}`}
-          timeLeft={remaining}
-          onSubmit={(raw) => {
-            const player = resolveScoutPlayer(raw, PLAYERS);
-            if (!player) return 'No player found — check the spelling.';
-            play('click');
-            svc.name(player.id);
-            return null;
-          }}
-        />
+        <div>
+          <SuggestInput
+            key={`${match.rallyNumber}-${match.rally.named.length}`}
+            suggest={rondoSuggest}
+            onCommit={(raw) => {
+              const player = resolveScoutPlayer(raw, PLAYERS);
+              if (!player) return 'No player found — check the spelling.';
+              play('click');
+              svc.name(player.id);
+              return null;
+            }}
+            placeholder="Name a player"
+            submitIcon={<IconCheck className="h-4 w-4" />}
+            submitLabel="Submit name"
+            listId="rondo-online-name"
+          />
+          <div className={`mt-1 text-right text-[11px] font-semibold ${remaining <= 5 ? 'text-danger' : 'text-white/40'}`}>
+            {remaining}s
+          </div>
+        </div>
       ) : (
         <div role="status" className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-6 text-center text-sm text-white/55">
           {nameOf(match.rally.turn)} is naming… {remaining}s
@@ -313,65 +323,4 @@ function RondoRule({
   );
 }
 
-function OnlineNameInput({
-  timeLeft,
-  onSubmit,
-}: {
-  timeLeft: number;
-  onSubmit: (raw: string) => string | null;
-}) {
-  const [value, setValue] = useState('');
-  const [msg, setMsg] = useState<string | null>(null);
-  const suggestions = useMemo(() => (value.trim().length >= 2 ? suggestScoutPlayers(value, 5) : []), [value]);
-  const low = timeLeft <= 5;
-
-  const commit = (raw: string) => {
-    const v = raw.trim();
-    if (!v) return;
-    const problem = onSubmit(v);
-    setMsg(problem);
-    if (!problem) setValue('');
-  };
-
-  return (
-    <div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          commit(value);
-        }}
-        className="flex gap-2"
-      >
-        <input
-          autoFocus
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="Name a player"
-          className="input-field flex-1"
-          aria-label="Name a player"
-        />
-        <Button type="submit" disabled={!value.trim()}>
-          <IconCheck className="h-4 w-4" />
-        </Button>
-      </form>
-      {suggestions.length > 0 && (
-        <div className="mt-1.5 flex flex-wrap gap-1.5">
-          {suggestions.map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => commit(s)}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-white/75 hover:border-pitch/40 hover:text-white"
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      )}
-      <div className="mt-1 flex items-center justify-between">
-        {msg ? <span className="text-[11px] font-medium text-gold">{msg}</span> : <span />}
-        <span className={`text-[11px] font-semibold ${low ? 'text-danger' : 'text-white/40'}`}>{timeLeft}s</span>
-      </div>
-    </div>
-  );
-}
+const rondoSuggest = (q: string) => suggestScoutPlayers(q, 5);
