@@ -294,7 +294,8 @@ streaks/stats; the streak bonus only applies then. The match engine derives
 | Optional sign-in + cross-device progress sync (Firebase) | `src/context/AuthProvider.tsx`, `src/lib/progress.ts`, `src/lib/firebaseConfig.ts`, `src/services/firebaseBackend.ts`, `src/components/auth/` |
 | Local profile / lifetime stats | `src/lib/profileStats.ts` |
 | Per-device question-history (recent-repeat avoidance, local) | `src/lib/questionHistory.ts` |
-| Achievements / badges (derived from stats + match feats, pure unlock rules) | `src/lib/achievements.ts`, `src/components/home/TrophyCabinet.tsx` |
+| Achievements / badges (derived from stats + match feats + **every solo/duel mode's stored bests** via `readModeProgress` — incl. Rondo `tiki_taka`/`keep_ball`; pure unlock rules) | `src/lib/achievements.ts`, `src/components/home/TrophyCabinet.tsx` |
+| **Unified "Your modes" stats** (pure builder over `ModeProgress` → one headline best per mode; home dashboard card with played/unplayed states) | `src/lib/modeStats.ts`(+test), `src/components/home/ModeStatsCard.tsx` |
 | Match feats (one-off accomplishments: perfect match, comeback, clean sheet, five-star, hat-trick, win-on-points, nightmare win, stoppage winner; feed achievements) | `src/lib/feats.ts` |
 | Head-to-head record vs each opponent (local) | `src/lib/headToHead.ts` |
 | Recent opponents (real non-bot foes you've faced; one-tap add in Friends) | `src/lib/recentOpponents.ts` |

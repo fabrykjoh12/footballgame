@@ -16,9 +16,11 @@ const ASSETS_DIR = 'dist/assets';
 // The guard exists to catch a mode/data bank (~80–480 kB each, all normally
 // code-split) being statically pulled into the home path — NOT to police a few
 // kB of organic growth. The entry sat ~284 kB when added, then grew to ~300 kB
-// as the home + connection UX got richer; 312 kB restores real headroom while a
-// stray data/SDK import (which lands hundreds of kB) still trips it decisively.
-const BUDGET_BYTES = 312 * 1024;
+// as the home + connection UX got richer, and ~312 kB once the home dashboard
+// gained the unified "Your modes" stats card; 320 kB restores real headroom
+// while a stray data/SDK import (which lands hundreds of kB) still trips it
+// decisively.
+const BUDGET_BYTES = 320 * 1024;
 
 let files;
 try {

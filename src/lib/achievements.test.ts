@@ -69,6 +69,9 @@ describe('mode achievements', () => {
     expect(evaluateAchievements(m({ olderYoungerBest: 12 })).has('time_traveller')).toBe(true);
     expect(evaluateAchievements(m({ careerPathBest: 8 })).has('well_travelled')).toBe(true);
     expect(evaluateAchievements(m({ managersBest: 8 })).has('merry_go_round')).toBe(true);
+    expect(evaluateAchievements(m({ rondoDuelsWon: 1 })).has('tiki_taka')).toBe(true);
+    expect(evaluateAchievements(m({ rondoBestRun: 14 })).has('keep_ball')).toBe(false);
+    expect(evaluateAchievements(m({ rondoBestRun: 15 })).has('keep_ball')).toBe(true);
   });
 
   it('stay locked with no mode progress', () => {

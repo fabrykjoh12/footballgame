@@ -32,6 +32,8 @@ export interface ModeProgress {
   olderYoungerBest: number;
   careerPathBest: number;
   managersBest: number;
+  rondoDuelsWon: number;
+  rondoBestRun: number;
 }
 
 export const EMPTY_MODE_PROGRESS: ModeProgress = {
@@ -44,6 +46,8 @@ export const EMPTY_MODE_PROGRESS: ModeProgress = {
   olderYoungerBest: 0,
   careerPathBest: 0,
   managersBest: 0,
+  rondoDuelsWon: 0,
+  rondoBestRun: 0,
 };
 
 function readJson(key: string): Record<string, unknown> {
@@ -68,6 +72,8 @@ export function readModeProgress(): ModeProgress {
   const oy = readJson('bk_older_younger_v1');
   const careerPath = readJson('bk_career_path_v1');
   const managers = readJson('bk_managers_v1');
+  const rondo = readJson('bk_rondo_v1');
+  const rondoDaily = (rondo.daily && typeof rondo.daily === 'object' ? rondo.daily : {}) as Record<string, unknown>;
   return {
     survivalBest: num(solo.survivalBest),
     timeAttackBest: num(solo.timeAttackBest),
@@ -78,6 +84,8 @@ export function readModeProgress(): ModeProgress {
     olderYoungerBest: num(oy.bestStreak),
     careerPathBest: num(careerPath.bestStreak),
     managersBest: num(managers.bestStreak),
+    rondoDuelsWon: num(rondo.duelsWon),
+    rondoBestRun: num(rondoDaily.bestRun),
   };
 }
 
@@ -304,6 +312,20 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     description: 'Reach an 8 streak in Manager Merry-go-round.',
     icon: '📋',
     earned: (c) => c.modes.managersBest >= 8,
+  },
+  {
+    id: 'tiki_taka',
+    title: 'Tiki-Taka',
+    description: 'Win your first Rondo duel.',
+    icon: '🌀',
+    earned: (c) => c.modes.rondoDuelsWon >= 1,
+  },
+  {
+    id: 'keep_ball',
+    title: 'Keep-Ball',
+    description: 'Name 15 in a row in a Rondo run.',
+    icon: '🔁',
+    earned: (c) => c.modes.rondoBestRun >= 15,
   },
 ];
 

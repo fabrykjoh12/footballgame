@@ -17,6 +17,7 @@ import { DailyRivalCard } from './DailyRivalCard';
 import { QuestsCard } from './QuestsCard';
 import { StreakRewardCard } from './StreakRewardCard';
 import { TrophyCabinet } from './TrophyCabinet';
+import { ModeStatsCard } from './ModeStatsCard';
 import { LeaguesCard } from '../leagues/LeaguesCard';
 import { ClubIdentityModal } from '../club/ClubIdentityModal';
 import { SettingsModal } from '../settings/SettingsModal';
@@ -276,6 +277,9 @@ export function HomePage() {
             <div className="grid gap-4 lg:grid-cols-2">
               <TrophyCabinet />
               <LeaguesCard />
+            </div>
+            <div className="mt-4">
+              <ModeStatsCard />
             </div>
           </section>
         </>
