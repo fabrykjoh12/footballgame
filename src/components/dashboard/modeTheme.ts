@@ -27,7 +27,8 @@ export type MotifKey =
   | 'chalkboard'
   | 'bracket'
   | 'pitch'
-  | 'pulse';
+  | 'pulse'
+  | 'rondo';
 
 export interface ModeTheme {
   accent: string; // primary identity colour (hex)
@@ -73,7 +74,7 @@ export const MODE_THEMES: Partial<Record<View, ModeTheme>> = {
     accent: '#2ED573',
     accent2: '#3B82F6',
     emblem: Waypoints,
-    motif: 'pitch',
+    motif: 'rondo',
     eyebrow: 'Keep-ball duel',
     title: 'Rondo',
     tagline: 'One rule, two players, no repeats. Keep the ball moving — lose it and concede.',

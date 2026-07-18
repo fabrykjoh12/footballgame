@@ -46,6 +46,7 @@ export function ModeArt({ motif, color, color2 }: { motif: MotifKey; color: stri
       {motif === 'bracket' && <Bracket id={id} color={color} color2={color2} />}
       {motif === 'pitch' && <Pitch id={id} color={color} color2={color2} />}
       {motif === 'pulse' && <Pulse id={id} color={color} color2={color2} />}
+      {motif === 'rondo' && <Rondo id={id} color={color} color2={color2} />}
     </svg>
   );
 }
@@ -338,6 +339,82 @@ function Pitch({ id, color, color2 }: Parts) {
         <path d="M1140 90 L1140 140 L980 140 L980 90" />
       </g>
       <circle cx="840" cy="235" r="4" fill={color} opacity="0.6" />
+    </g>
+  );
+}
+
+/* ---- Rondo: a keep-ball passing ring, ball mid-pass, defender in the middle ---- */
+function Rondo({ id, color, color2 }: Parts) {
+  const cx = 850;
+  const cy = 200;
+  const R = 140;
+  const N = 7;
+  const ring = Array.from({ length: N }, (_, i) => {
+    const a = (-90 + (i * 360) / N) * (Math.PI / 180);
+    return [cx + R * Math.cos(a), cy + R * Math.sin(a)] as [number, number];
+  });
+  // The ball sits partway along the pass from player 0 to player 1.
+  const bx = ring[0][0] + (ring[1][0] - ring[0][0]) * 0.55;
+  const by = ring[0][1] + (ring[1][1] - ring[0][1]) * 0.55;
+  return (
+    <g>
+      <circle cx={cx} cy={cy} r="250" fill={`url(#${id('halo')})`} opacity="0.55" />
+      <defs>
+        <marker id={id('pass')} markerWidth="9" markerHeight="9" refX="6" refY="4.5" orient="auto">
+          <path d="M0 0 L7 4.5 L0 9" fill="none" stroke={color} strokeWidth="1.6" />
+        </marker>
+      </defs>
+      {/* faint full ring the ball travels along */}
+      <circle cx={cx} cy={cy} r={R} fill="none" stroke={color} strokeWidth="1.5" strokeDasharray="2 10" opacity="0.25" />
+      {/* passing lanes between adjacent attackers */}
+      <g fill="none" opacity="0.5">
+        {ring.map(([x, y], i) => {
+          const [nx, ny] = ring[(i + 1) % N];
+          // trim the lane so the arrow doesn't overlap the dots
+          const tx = x + (nx - x) * 0.16;
+          const ty = y + (ny - y) * 0.16;
+          const ex = x + (nx - x) * 0.82;
+          const ey = y + (ny - y) * 0.82;
+          return (
+            <line
+              key={i}
+              x1={tx}
+              y1={ty}
+              x2={ex}
+              y2={ey}
+              stroke={color}
+              strokeWidth="2"
+              opacity={i === 0 ? 0.9 : 0.4}
+              markerEnd={`url(#${id('pass')})`}
+              filter={i === 0 ? `url(#${id('glow')})` : undefined}
+            />
+          );
+        })}
+      </g>
+      {/* the two defenders caught in the middle */}
+      {[[cx - 26, cy + 6], [cx + 30, cy - 10]].map(([x, y], i) => (
+        <g key={i}>
+          <circle cx={x} cy={y} r="9" fill={color2} fillOpacity="0.16" stroke={color2} strokeWidth="2" strokeOpacity="0.75" />
+        </g>
+      ))}
+      {/* attackers around the ring */}
+      {ring.map(([x, y], i) => (
+        <circle
+          key={i}
+          cx={x}
+          cy={y}
+          r="11"
+          fill={color}
+          fillOpacity="0.16"
+          stroke={color}
+          strokeWidth="2.5"
+          strokeOpacity="0.85"
+          filter={`url(#${id('glow')})`}
+        />
+      ))}
+      {/* the ball, mid-pass, with a short motion trail */}
+      <line x1={ring[0][0]} y1={ring[0][1]} x2={bx} y2={by} stroke={color} strokeWidth="4" strokeLinecap="round" opacity="0.3" />
+      <circle cx={bx} cy={by} r="7" fill="#f8fafc" filter={`url(#${id('glow')})`} />
     </g>
   );
 }
