@@ -37,6 +37,8 @@ import { Badge } from '../ui/Badge';
 import { IconBack, IconArrowRight, IconCheck, IconShare } from '../ui/icons';
 import { ModeHeroBanner } from '../dashboard/ModeHeroBanner';
 import { modeTheme } from '../dashboard/modeTheme';
+import { RondoOnlineGame } from './RondoOnlineGame';
+import { isAblyConfigured } from '../../lib/realtimeConfig';
 
 const TARGET_GOALS = 3;
 const TURN_SECONDS = 15;
@@ -48,7 +50,19 @@ type DuelKind = 'cpu' | 'hotseat';
 type Stage =
   | { name: 'lobby' }
   | { name: 'duel'; kind: DuelKind; difficulty: RondoDifficulty; match: RondoMatch }
-  | { name: 'daily' };
+  | { name: 'daily' }
+  | { name: 'online' };
+
+/** The player's saved display name (or a friendly default) for online play. */
+function rondoPlayerName(): string {
+  try {
+    const n = localStorage.getItem('bk_name');
+    if (n && n.trim()) return n.trim();
+  } catch {
+    /* ignore */
+  }
+  return 'Player';
+}
 
 /** A stable per-mount RNG for category picks + CPU choices (browser-seeded). */
 function makeRng(): Rng {
@@ -77,6 +91,15 @@ export function RondoGame({ daily = false, onExit }: { daily?: boolean; onExit: 
   const rngRef = useRef<Rng>(makeRng());
   const [stage, setStage] = useState<Stage>(daily ? { name: 'daily' } : { name: 'lobby' });
 
+  // Online play renders its own back button + menu (no hero framing).
+  if (stage.name === 'online') {
+    return (
+      <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-4">
+        <RondoOnlineGame name={rondoPlayerName()} onExit={() => setStage({ name: 'lobby' })} />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto w-full max-w-2xl px-4 pb-16 pt-4">
       <button
@@ -103,6 +126,7 @@ export function RondoGame({ daily = false, onExit }: { daily?: boolean; onExit: 
             });
           }}
           onDaily={() => setStage({ name: 'daily' })}
+          onOnline={() => setStage({ name: 'online' })}
         />
       )}
 
@@ -129,9 +153,11 @@ export function RondoGame({ daily = false, onExit }: { daily?: boolean; onExit: 
 function RondoLobby({
   onStart,
   onDaily,
+  onOnline,
 }: {
   onStart: (kind: DuelKind, difficulty: RondoDifficulty) => void;
   onDaily: () => void;
+  onOnline: () => void;
 }) {
   const [difficulty, setDifficulty] = useState<RondoDifficulty>('pro');
   const progress = useMemo(() => getRondoProgress(), []);
@@ -173,6 +199,21 @@ function RondoLobby({
           </Button>
         </div>
       </Card>
+
+      {isAblyConfigured && (
+        <button
+          onClick={onOnline}
+          className="flex w-full items-center justify-between rounded-xl border border-pitch/25 bg-pitch/[0.06] px-4 py-3 text-left transition hover:border-pitch/50"
+        >
+          <span className="min-w-0">
+            <span className="flex items-center gap-2 text-sm font-semibold">
+              Play a friend online <Badge tone="pitch">1v1</Badge>
+            </span>
+            <span className="text-[11px] text-white/55">Same rules, across devices — share a code</span>
+          </span>
+          <IconArrowRight className="h-4 w-4 shrink-0 text-pitch" />
+        </button>
+      )}
 
       <button
         onClick={onDaily}
